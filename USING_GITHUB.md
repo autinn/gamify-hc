@@ -95,6 +95,7 @@ Note how it is expected that the code has been tested before being put into a PR
 ## 6. Merging and Closing a PR
 
 A PR needs to be reviewed at least once by someone other than the person who made the code. I would recommend assigning reviews to members of the same department (i.e. backend code is reviewed by backend engineers). If any changes need to be made, which they often do, comments should be added to the PR, all of which should be addressed before merging. It is important that the reviewer run the test suite designed for the new branch, and ideally the full test suite, before merging.
+Note that the reviewer should be the one to merge a PR in almost all cases, as doing otherwise will create delays in the development process.
 
 ------------
 
