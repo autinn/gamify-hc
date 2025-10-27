@@ -5,9 +5,9 @@
 -- A course is a collection of units.
 CREATE TABLE courses (
     course_id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    title            TEXT NOT NULL CHECK(length(title)),
-    description      TEXT CHECK(length(description) > 0),
-    );
+    title            TEXT NOT NULL CHECK(length(title) > 0),
+    description      TEXT CHECK(length(description) > 0)
+);
 
 -- A unit is a collection of concepts.
 CREATE TABLE units (
@@ -54,7 +54,7 @@ CREATE TABLE quiz_answers (
 -- 3. USER TABLES
 -- ===============================
 
---Uuser implementation, has major security flaws, but is a good starting point for the MVP.
+-- User implementation, has major security flaws, but is a good starting point for the MVP.
 CREATE TABLE users (
     user_id          INTEGER PRIMARY KEY AUTOINCREMENT,
     username         TEXT UNIQUE NOT NULL CHECK(length(username) >= 3 AND length(username) <= 50),
