@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../UI/Button';
+import { useNavigate } from 'react-router-dom';
 import PerformanceChart from '../Charts/PerformanceChart';
 import './PageLayout.css';
 
@@ -23,8 +24,13 @@ const PageLayout = ({
   showButton = true,
   chartData,
   chartLabel,
-  rightContent
+  rightContent,
+  // optional path to navigate to when Start Quiz is clicked
+  startQuizPath,
+  // optional custom left-side content to render instead of the PerformanceChart
+  leftContent,
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="page-layout">
       {/* Left Column: Greeting, Title, Button, Chart */}
@@ -38,13 +44,17 @@ const PageLayout = ({
         {/* Start Quiz Button */}
         {showButton && (
           <div className="page-layout__button-container">
-            <Button label="Start Quiz" variant="primary" />
+            <Button
+              label="Start Quiz"
+              variant="primary"
+              onClick={() => navigate(startQuizPath || '/quiz')}
+            />
           </div>
         )}
 
-        {/* Performance Chart Placeholder */}
+        {/* Performance Chart Placeholder or custom leftContent (used by QuizPage) */}
         <div className="page-layout__chart-container">
-          <PerformanceChart data={chartData} label={chartLabel} />
+          {leftContent ? leftContent : <PerformanceChart data={chartData} label={chartLabel} />}
         </div>
       </div>
 

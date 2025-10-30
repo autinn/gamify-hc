@@ -1,0 +1,74 @@
+
+/* Modelled after UnitList.css: use a responsive grid so answer cards
+   align consistently with other list components in the app. */
+.quiz-answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding: 24px;
+}
+
+.quiz-answers__option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-card, #fff);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  text-align: left;
+}
+
+.quiz-answers__option:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
+}
+
+.quiz-answers__label {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--color-accent, #5b8def);
+  color: #fff;
+  font-weight: 700;
+}
+
+.quiz-answers__text {
+  flex: 1 1 auto;
+  color: var(--color-text, #12263f);
+  font-size: 16px;
+}
+
+/* Small screens: make options larger/tappable */
+/* Responsive adjustments matching UnitList breakpoints */
+@media (max-width: 1024px) {
+  .quiz-answers {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .quiz-answers {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quiz-answers {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  .quiz-answers__option { padding: 14px; }
+  .quiz-answers__text { font-size: 15px; }
+}

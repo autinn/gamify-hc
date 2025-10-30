@@ -105,6 +105,7 @@ const UnitPage = () => {
       greeting={greeting}
       title={unit ? unit.title : 'Unit'}
       showButton={true}
+      startQuizPath={`/course/${courseId}/unit/${unitId}/quiz`}
       chartData={chartData}
       chartLabel="Problem Solving HCs"
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
