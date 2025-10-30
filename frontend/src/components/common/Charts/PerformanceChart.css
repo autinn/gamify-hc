@@ -1,0 +1,122 @@
+/* PerformanceChart - Placeholder bar chart */
+
+.performance-chart {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.performance-chart__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+.performance-chart__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  height: 180px;
+  padding-bottom: 50px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.performance-chart__bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  flex: 1;
+  max-width: 60px;
+  height: 100%;
+  position: relative;
+}
+
+.performance-chart__bar {
+  width: 40px;
+  background-color: #333;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s ease;
+  min-height: 4px;
+  max-height: 145px;
+  flex-shrink: 0;
+}
+
+.performance-chart__bar:hover {
+  background-color: #666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.performance-chart__label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding: 0 2px;
+  text-align: center;
+  line-height: 1.2;
+  position: absolute;
+  bottom: -50px;
+  transform: rotate(-90deg);
+  transform-origin: center center;
+  white-space: nowrap;
+  width: auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 50%;
+  margin-left: -30px;
+}
+
+.performance-chart__description {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.performance-chart__placeholder {
+  font-size: 16px;
+  color: #999;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .performance-chart__bars {
+    gap: 10px;
+    height: 150px;
+    padding-bottom: 45px;
+  }
+
+  .performance-chart__bar {
+    width: 30px;
+    max-height: 120px;
+  }
+
+  .performance-chart__label {
+    font-size: 9px;
+    bottom: -45px;
+    height: 50px;
+    margin-left: -25px;
+  }
+
+  .performance-chart__bar-wrapper {
+    max-width: 45px;
+  }
+}
