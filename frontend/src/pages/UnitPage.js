@@ -84,7 +84,7 @@ const UnitPage = () => {
       showButton={true}
       chartData={chartData}
       chartLabel="Problem Solving HCs"
-      rightContent={<ConceptList concepts={concepts} />}
+      rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
     />
   );
 };
