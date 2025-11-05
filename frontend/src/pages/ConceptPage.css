@@ -52,6 +52,15 @@
   min-width: 0;
 }
 
+.concept-page__definition {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  margin: 8px 0 0 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
 .concept-page__button-container {
   display: flex;
   width: auto;
@@ -93,6 +102,10 @@
   }
 
   .concept-page__greeting {
+    font-size: 14px;
+  }
+
+  .concept-page__definition {
     font-size: 14px;
   }
 

@@ -172,6 +172,9 @@ const ConceptPage = () => {
             <Button label="Start Quiz" variant="primary" onClick={handleStartQuiz} />
           </div>
         </div>
+        {concept.definition && (
+          <p className="concept-page__definition">{concept.definition}</p>
+        )}
       </div>
 
       {/* Content Section */}
