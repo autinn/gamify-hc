@@ -1,0 +1,46 @@
+/* CourseCard - Individual course card */
+
+.course-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: 20px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.course-card:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.course-card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.course-card__name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .course-card {
+    min-height: 150px;
+  }
+
+  .course-card__name {
+    font-size: 20px;
+  }
+}
+

@@ -1,0 +1,20 @@
+/* ConceptList - Wrapping concept buttons flex layout */
+
+.concept-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .concept-list {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .concept-list {
+    gap: 10px;
+  }
+}
