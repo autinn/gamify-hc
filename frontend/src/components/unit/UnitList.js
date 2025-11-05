@@ -20,11 +20,10 @@ const UnitList = ({ courseId, units }) => {
     <div className="unit-list">
       {units.map((unit) => (
         <UnitCard
-          key={unit.id}
+          key={unit.unit_id}
           courseId={courseId}
-          unitNumber={unit.id}
-          unitName={unit.name}
-          questionCount={unit.questionCount}
+          unitId={unit.unit_id}
+          unitTitle={unit.title}
         />
       ))}
     </div>

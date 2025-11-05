@@ -16,7 +16,7 @@ const ConceptList = ({ concepts, courseId, unitId }) => {
     <div className="concept-list">
       {concepts.map((concept) => (
         <ConceptCard 
-            key={concept.id} 
+            key={concept.concept_id} 
             concept={concept}
             courseId={courseId}
             unitId={unitId}

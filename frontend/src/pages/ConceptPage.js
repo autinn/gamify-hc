@@ -14,12 +14,15 @@ import './ConceptPage.css';
 const ConceptPage = () => {
   const { courseId, unitId, conceptId } = useParams();
   const navigate = useNavigate();
+  const courseIdInt = parseInt(courseId, 10);
+  const unitIdInt = parseInt(unitId, 10);
+  const conceptIdInt = parseInt(conceptId, 10);
 
   // Dummy data: Concepts with quiz cards and answers (aligned with DB schema)
-  // Keyed by courseId-unitId-conceptId combination
+  // Keyed by concept_id (int)
   // Replace this with actual API call when backend is ready
   const conceptData = {
-    'EA50-1-6': {
+    6: { // concept_id: 6
       concept_id: 6,
       unit_id: 1,
       title: '#heuristics',
@@ -83,7 +86,7 @@ const ConceptPage = () => {
         }
       ]
     },
-    'EA50-1-1': {
+    1: { // concept_id: 1
       concept_id: 1,
       unit_id: 1,
       title: '#rightproblem',
@@ -108,20 +111,39 @@ const ConceptPage = () => {
     // Add more concepts as needed
   };
 
-  // Get unit names for display in greeting
-  const unitNames = {
-    'EA50-1': 'Problem - Solving',
-    'EA50-2': 'Problem Solving',
-    'FA50-1': 'Analysis Techniques',
-    'FA50-2': 'Pattern Recognition',
-    'MC50-1': 'Metacognition Basics',
-    'MC50-2': 'Self-Assessment',
-    'CX50-1': 'User Experience',
-    'CX50-2': 'Design Thinking',
+  // Dummy data: Courses (aligned with DB schema)
+  // Schema: course_id (int, PK), title (varchar), description (varchar)
+  const courses = {
+    1: { course_id: 1, title: 'EA50', description: 'Problem Solving and Analysis' },
+    2: { course_id: 2, title: 'FA50', description: 'Fundamental Analysis' },
+    3: { course_id: 3, title: 'MC50', description: 'Metacognition and Critical Thinking' },
+    4: { course_id: 4, title: 'CX50', description: 'Complex Systems and Design' },
   };
 
-  const concept = conceptData[`${courseId}-${unitId}-${conceptId}`] || null;
-  const unitName = unitNames[`${courseId}-${unitId}`] || 'Unit';
+  // Get unit names for display in greeting (aligned with DB schema)
+  const units = {
+    1: { unit_id: 1, course_id: 1, title: 'Scientific Method', description: 'Introduction to scientific methodology', order_index: 1 },
+    2: { unit_id: 2, course_id: 1, title: 'Problem Solving', description: 'Problem-solving techniques and heuristics', order_index: 2 },
+    3: { unit_id: 3, course_id: 2, title: 'Analysis Techniques', description: 'Methods for data analysis', order_index: 1 },
+    4: { unit_id: 4, course_id: 2, title: 'Pattern Recognition', description: 'Identifying patterns in data', order_index: 2 },
+    5: { unit_id: 5, course_id: 3, title: 'Metacognition Basics', description: 'Understanding thinking about thinking', order_index: 1 },
+    6: { unit_id: 6, course_id: 3, title: 'Self-Assessment', description: 'Evaluating your own understanding', order_index: 2 },
+    7: { unit_id: 7, course_id: 4, title: 'User Experience', description: 'Designing for user needs', order_index: 1 },
+    8: { unit_id: 8, course_id: 4, title: 'Design Thinking', description: 'Creative problem-solving approach', order_index: 2 },
+  };
+
+  const concept = conceptData[conceptIdInt] || null;
+  const course = courses[courseIdInt] || null;
+  const unit = units[unitIdInt] || null;
+
+  // Build greeting with course and unit names
+  const greeting = course && unit 
+    ? `${course.title} - ${unit.title}`
+    : course 
+    ? `${course.title} - Unit ${unitId}`
+    : unit 
+    ? `${courseId} - ${unit.title}`
+    : `${courseId} - Unit ${unitId}`;
 
   // Handle quiz button click
   const handleStartQuiz = () => {
@@ -132,7 +154,7 @@ const ConceptPage = () => {
     return (
       <div className="concept-page">
         <div className="concept-page__header">
-          <p className="concept-page__greeting">{`${courseId} - ${unitName}`}</p>
+          <p className="concept-page__greeting">{greeting}</p>
           <h1 className="concept-page__title">Concept Not Found</h1>
         </div>
       </div>
@@ -143,7 +165,7 @@ const ConceptPage = () => {
     <div className="concept-page">
       {/* Header Section */}
       <div className="concept-page__header">
-        <p className="concept-page__greeting">{`${courseId} - ${unitName}`}</p>
+        <p className="concept-page__greeting">{greeting}</p>
         <div className="concept-page__header-row">
           <h1 className="concept-page__title">{concept.title}</h1>
           <div className="concept-page__button-container">
