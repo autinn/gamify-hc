@@ -12,6 +12,24 @@
   --title-font-size: 48px;
 }
 
+/* Header wrapper placed above the page layout so it can be pinned to the top */
+.page-layout__header-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50; /* ensure header sits above page content */
+  width: 100%;
+  background: #ffffff; /* match header background to avoid content showing beneath */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Small adjustment for mobile where sticky headers can consume space */
+@media (max-width: 768px) {
+  .page-layout__header-wrapper {
+    position: relative;
+    box-shadow: none;
+  }
+}
+
 .page-layout {
   display: flex;
   gap: var(--column-gap);
