@@ -1,19 +1,24 @@
 import React from 'react';
-import './QuizAnswers.css';
+import './QuizAnswers.css'; // you might later rename this to Quiz.css for both question & answers
 
 /**
- * QuizQuestion - simple question display used on the left column of the quiz page.
- * Shows the question text, optional metadata (progress / points), and a small hint area.
+ * QuizQuestion - displays current quiz question and progress.
  * Props:
  *  - question: { id, text }
  *  - progress: { current, total }
  */
-const QuizQuestion = ({ question = { id: 1, text: 'What is 2 + 2?' }, progress = { current: 1, total: 10 } }) => {
+const QuizQuestion = ({ question, progress }) => {
+  if (!question) return null;
+
   return (
     <div className="quiz-question">
-      <div className="quiz-question__meta">Question {progress.current} / {progress.total}</div>
+      <div className="quiz-question__meta">
+        Question {progress.current} / {progress.total}
+      </div>
       <h2 className="quiz-question__text">{question.text}</h2>
-      <div className="quiz-question__hint">Select the best answer from the right.</div>
+      <div className="quiz-question__hint">
+        Select the best answer from the right.
+      </div>
     </div>
   );
 };

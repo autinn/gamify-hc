@@ -1,37 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './QuizAnswers.css';
 
 /**
- * QuizAnswers - displays four answer options stacked vertically.
- * Each option is styled as a selectable card. Currently there is no
- * state/selection persistence; this component focuses on layout and styling
- * to match the `rightContent` area of `PageLayout`.
- *
- * Props (future):
- *  - options: array of { id, text }
- *  - onSelect: function(id)
+ * QuizAnswers - displays multiple-choice options for a given question.
+ * Props:
+ *  - options: [{ id, text, is_correct, explanation }]
+ *  - questionId: string or number (used to reset between questions)
+ *  - onCorrect: callback when user selects the correct answer
  */
-const defaultOptions = [
-  { id: 'A', text: 'Answer option A' },
-  { id: 'B', text: 'Answer option B' },
-  { id: 'C', text: 'Answer option C' },
-  { id: 'D', text: 'Answer option D' },
-];
+const QuizAnswers = ({ options, questionId, onCorrect }) => {
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
 
-const QuizAnswers = ({ options = defaultOptions, onSelect }) => {
+  // ✅ Reset state when question changes
+  useEffect(() => {
+    setSelectedOption(null);
+    setIsLocked(false);
+  }, [questionId]);
+
+  const handleSelect = (option) => {
+    if (isLocked) return; // stop after correct answer
+    setSelectedOption(option.id);
+
+    if (option.is_correct) {
+      setIsLocked(true);
+      onCorrect?.();
+    }
+  };
+
   return (
     <div className="quiz-answers">
-      {options.map((opt) => (
-        <button
-          key={opt.id}
-          className="quiz-answers__option"
-          onClick={() => onSelect && onSelect(opt.id)}
-          type="button"
-        >
-          <div className="quiz-answers__label">{opt.id}</div>
-          <div className="quiz-answers__text">{opt.text}</div>
-        </button>
-      ))}
+      {options.map((option) => {
+        const isSelected = selectedOption === option.id;
+        const isCorrect = option.is_correct && isSelected;
+        const isIncorrect = !option.is_correct && isSelected;
+
+        return (
+          <div key={option.id} className="quiz-answers__block">
+            <div
+              className={`quiz-answers__option ${
+                isCorrect
+                  ? 'quiz-answers__option--correct'
+                  : isIncorrect
+                  ? 'quiz-answers__option--incorrect'
+                  : ''
+              }`}
+              onClick={() => handleSelect(option)}
+            >
+              <div className="quiz-answers__label">
+                {String.fromCharCode(65 + options.indexOf(option))}
+              </div>
+              <div className="quiz-answers__text">{option.text}</div>
+            </div>
+
+            {isSelected && option.explanation && (
+              <div className="quiz-answers__explanation">
+                {option.explanation}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
