@@ -12,79 +12,102 @@ import ConceptList from '../components/concept/ConceptList';
  */
 const UnitPage = () => {
   const { courseId, unitId } = useParams();
+  const courseIdInt = parseInt(courseId, 10);
+  const unitIdInt = parseInt(unitId, 10);
 
-  // Dummy data: Concepts for each unit (keyed by courseId-unitId combination)
+  // Dummy data: Courses (aligned with DB schema)
+  // Schema: course_id (int, PK), title (varchar), description (varchar)
+  const courses = {
+    1: { course_id: 1, title: 'EA50', description: 'Problem Solving and Analysis' },
+    2: { course_id: 2, title: 'FA50', description: 'Fundamental Analysis' },
+    3: { course_id: 3, title: 'MC50', description: 'Metacognition and Critical Thinking' },
+    4: { course_id: 4, title: 'CX50', description: 'Complex Systems and Design' },
+  };
+
+  // Dummy data: Units (aligned with DB schema)
+  // Schema: unit_id (int, PK), course_id (int, FK), title (varchar), description (varchar), order_index (int)
+  const units = {
+    1: { unit_id: 1, course_id: 1, title: 'Scientific Method', description: 'Introduction to scientific methodology', order_index: 1 },
+    2: { unit_id: 2, course_id: 1, title: 'Problem Solving', description: 'Problem-solving techniques and heuristics', order_index: 2 },
+    3: { unit_id: 3, course_id: 2, title: 'Analysis Techniques', description: 'Methods for data analysis', order_index: 1 },
+    4: { unit_id: 4, course_id: 2, title: 'Pattern Recognition', description: 'Identifying patterns in data', order_index: 2 },
+    5: { unit_id: 5, course_id: 3, title: 'Metacognition Basics', description: 'Understanding thinking about thinking', order_index: 1 },
+    6: { unit_id: 6, course_id: 3, title: 'Self-Assessment', description: 'Evaluating your own understanding', order_index: 2 },
+    7: { unit_id: 7, course_id: 4, title: 'User Experience', description: 'Designing for user needs', order_index: 1 },
+    8: { unit_id: 8, course_id: 4, title: 'Design Thinking', description: 'Creative problem-solving approach', order_index: 2 },
+  };
+
+  // Dummy data: Concepts for each unit (aligned with DB schema)
+  // Schema: concept_id (int, PK), unit_id (int, FK), title (varchar), definition (varchar)
   // Replace this with actual API call when backend is ready
   const unitConcepts = {
-    'EA50-1': [
-      { id: 1, name: '#rightproblem' },
-      { id: 2, name: '#gapanalysis' },
-      { id: 3, name: '#scienceoflearning' },
-      { id: 4, name: '#constraints' },
-      { id: 5, name: '#breakitdown' },
-      { id: 6, name: '#heuristics' },
-      { id: 7, name: '#evidencebased' },
+    1: [ // Scientific Method (unit_id: 1)
+      { concept_id: 1, unit_id: 1, title: '#rightproblem', definition: 'Identifying the correct problem to solve' },
+      { concept_id: 2, unit_id: 1, title: '#gapanalysis', definition: 'Analyzing gaps in knowledge or understanding' },
+      { concept_id: 3, unit_id: 1, title: '#scienceoflearning', definition: 'Understanding how learning works' },
+      { concept_id: 4, unit_id: 1, title: '#constraints', definition: 'Identifying and working within limitations' },
+      { concept_id: 5, unit_id: 1, title: '#breakitdown', definition: 'Decomposing complex problems into smaller parts' },
+      { concept_id: 6, unit_id: 1, title: '#heuristics', definition: 'Mental shortcuts for problem-solving' },
+      { concept_id: 7, unit_id: 1, title: '#evidencebased', definition: 'Making decisions based on evidence' },
     ],
-    'EA50-2': [
-      { id: 8, name: '#problem-analysis' },
-      { id: 9, name: '#solution-design' },
-      { id: 10, name: '#implementation' },
+    2: [ // Problem Solving (unit_id: 2)
+      { concept_id: 8, unit_id: 2, title: '#problem-analysis', definition: 'Analyzing problems systematically' },
+      { concept_id: 9, unit_id: 2, title: '#solution-design', definition: 'Designing effective solutions' },
+      { concept_id: 10, unit_id: 2, title: '#implementation', definition: 'Putting solutions into practice' },
     ],
-    'FA50-1': [
-      { id: 11, name: '#regression' },
-      { id: 12, name: '#clustering' },
+    3: [ // Analysis Techniques (unit_id: 3)
+      { concept_id: 11, unit_id: 3, title: '#regression', definition: 'Statistical regression analysis' },
+      { concept_id: 12, unit_id: 3, title: '#clustering', definition: 'Grouping similar data points' },
     ],
-    'FA50-2': [
-      { id: 13, name: '#pattern-recognition' },
-      { id: 14, name: '#analysis' },
+    4: [ // Pattern Recognition (unit_id: 4)
+      { concept_id: 13, unit_id: 4, title: '#pattern-recognition', definition: 'Identifying patterns in data' },
+      { concept_id: 14, unit_id: 4, title: '#analysis', definition: 'Systematic examination of data' },
     ],
-    'MC50-1': [
-      { id: 15, name: '#designthinking' },
-      { id: 16, name: '#interpretivelens' },
+    5: [ // Metacognition Basics (unit_id: 5)
+      { concept_id: 15, unit_id: 5, title: '#designthinking', definition: 'Human-centered design approach' },
+      { concept_id: 16, unit_id: 5, title: '#interpretivelens', definition: 'Frameworks for interpretation' },
     ],
-    'MC50-2': [
-      { id: 17, name: '#metacognition' },
-      { id: 18, name: '#self-assessment' },
+    6: [ // Self-Assessment (unit_id: 6)
+      { concept_id: 17, unit_id: 6, title: '#metacognition', definition: 'Thinking about thinking' },
+      { concept_id: 18, unit_id: 6, title: '#self-assessment', definition: 'Evaluating your own understanding' },
     ],
-    'CX50-1': [
-      { id: 19, name: '#systemmapping' },
-      { id: 20, name: '#levelsofanalysis' },
+    7: [ // User Experience (unit_id: 7)
+      { concept_id: 19, unit_id: 7, title: '#systemmapping', definition: 'Mapping system structures' },
+      { concept_id: 20, unit_id: 7, title: '#levelsofanalysis', definition: 'Different levels of system analysis' },
     ],
-    'CX50-2': [
-      { id: 21, name: '#userexperience' },
-      { id: 22, name: '#design' },
+    8: [ // Design Thinking (unit_id: 8)
+      { concept_id: 21, unit_id: 8, title: '#userexperience', definition: 'User-centered design approach' },
+      { concept_id: 22, unit_id: 8, title: '#design', definition: 'Principles of effective design' },
     ],
   };
 
-  // Unit names for display
-  const unitNames = {
-    'EA50-1': 'Scientific Method',
-    'EA50-2': 'Problem Solving',
-    'FA50-1': 'Analysis Techniques',
-    'FA50-2': 'Pattern Recognition',
-    'MC50-1': 'Metacognition Basics',
-    'MC50-2': 'Self-Assessment',
-    'CX50-1': 'User Experience',
-    'CX50-2': 'Design Thinking',
-  };
-
-  const concepts = unitConcepts[`${courseId}-${unitId}`] || [];
-  const unitName = unitNames[`${courseId}-${unitId}`] || 'Unit';
+  const course = courses[courseIdInt] || null;
+  const unit = units[unitIdInt] || null;
+  const concepts = unitConcepts[unitIdInt] || [];
 
   // Dummy chart data - concept performance within this unit
   const chartData = {
-    labels: concepts.map(c => c.name.replace('#', '')),
+    labels: concepts.map(c => c.title.replace('#', '')),
     values: concepts.map(() => Math.floor(Math.random() * 100)), // Random values for now
   };
 
+  // Build greeting with course and unit names
+  const greeting = course && unit 
+    ? `${course.title} - ${unit.title}`
+    : course 
+    ? `${course.title} - Unit ${unitId}`
+    : unit 
+    ? `${courseId} - ${unit.title}`
+    : `${courseId} - Unit ${unitId}`;
+
   return (
     <PageLayout
-      greeting={`${courseId} - Unit ${unitId}`}
-      title={unitName}
+      greeting={greeting}
+      title={unit ? unit.title : 'Unit'}
       showButton={true}
       chartData={chartData}
       chartLabel="Problem Solving HCs"
-      rightContent={<ConceptList concepts={concepts} />}
+      rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
     />
   );
 };

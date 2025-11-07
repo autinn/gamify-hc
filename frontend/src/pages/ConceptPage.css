@@ -1,0 +1,116 @@
+/* ConceptPage - Custom layout for concept page */
+
+:root {
+  /* Spacing Variables - matching PageLayout */
+  --page-padding: 70px;
+  --section-spacing: 30px;
+
+  /* Typography - matching PageLayout */
+  --greeting-font-size: 16px;
+  --title-font-size: 48px;
+}
+
+.concept-page {
+  padding: var(--page-padding);
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.concept-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--section-spacing);
+}
+
+.concept-page__greeting {
+  font-size: var(--greeting-font-size);
+  font-weight: 400;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.concept-page__header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.concept-page__title {
+  font-size: var(--title-font-size);
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+}
+
+.concept-page__definition {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  margin: 8px 0 0 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.concept-page__button-container {
+  display: flex;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.concept-page__button-container button {
+  width: auto;
+}
+
+.concept-page__content {
+  width: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .concept-page {
+    padding: 20px;
+  }
+
+  .concept-page__title {
+    font-size: 36px;
+  }
+
+  .concept-page__header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .concept-page {
+    padding: 15px;
+  }
+
+  .concept-page__title {
+    font-size: 28px;
+  }
+
+  .concept-page__greeting {
+    font-size: 14px;
+  }
+
+  .concept-page__definition {
+    font-size: 14px;
+  }
+
+  .concept-page__header-row {
+    gap: 12px;
+  }
+}
+

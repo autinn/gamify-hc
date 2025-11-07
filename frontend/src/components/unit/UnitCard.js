@@ -8,22 +8,20 @@ import './UnitCard.css';
  * Displays a single unit as a clickable card.
  * Navigates to the UnitPage when clicked.
  *
- * @param {string} courseId - Parent course ID (e.g., "EA50")
- * @param {number} unitNumber - Unit number (1, 2, 3...)
- * @param {string} unitName - Unit name (e.g., "Problem-Solving")
- * @param {number} questionCount - Number of questions in this unit
+ * @param {string} courseId - Parent course ID (course_id from URL)
+ * @param {number} unitId - Unit ID (unit_id from DB schema)
+ * @param {string} unitTitle - Unit title (e.g., "Problem-Solving")
  */
-const UnitCard = ({ courseId, unitNumber, unitName, questionCount }) => {
+const UnitCard = ({ courseId, unitId, unitTitle }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/course/${courseId}/unit/${unitNumber}`);
+    navigate(`/course/${courseId}/unit/${unitId}`);
   };
 
   return (
     <div className="unit-card" onClick={handleClick} role="button" tabIndex={0}>
-      <p className="unit-card__number">Unit {unitNumber}:</p>
-      <p className="unit-card__name">{unitName}</p>
+      <p className="unit-card__name">{unitTitle}</p>
     </div>
   );
 };

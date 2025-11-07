@@ -8,8 +8,8 @@ import './CourseCard.css';
  * Displays a single course (e.g., EA50, FA50) as a clickable card.
  * Navigates to the CoursePage when clicked.
  *
- * @param {string} id - Course ID (e.g., "EA50", "FA50")
- * @param {string} name - Course name/display text (e.g., "EA50")
+ * @param {number} id - Course ID (course_id from DB schema)
+ * @param {string} name - Course title/display text (e.g., "EA50")
  */
 const CourseCard = ({ id, name }) => {
   const navigate = useNavigate();

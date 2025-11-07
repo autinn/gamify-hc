@@ -9,17 +9,18 @@ import CourseList from '../components/course/CourseList';
  * Uses PageLayout for consistent two-column structure.
  */
 const MainPage = () => {
-  // Dummy data: 4 courses
+  // Dummy data: 4 courses (aligned with DB schema)
+  // Schema: course_id (int, PK), title (varchar), description (varchar)
   const courses = [
-    { id: 'EA50', name: 'EA50' },
-    { id: 'FA50', name: 'FA50' },
-    { id: 'MC50', name: 'MC50' },
-    { id: 'CX50', name: 'CX50' },
+    { course_id: 1, title: 'EA50', description: 'Problem Solving and Analysis' },
+    { course_id: 2, title: 'FA50', description: 'Fundamental Analysis' },
+    { course_id: 3, title: 'MC50', description: 'Metacognition and Critical Thinking' },
+    { course_id: 4, title: 'CX50', description: 'Complex Systems and Design' },
   ];
 
   // Dummy chart data - shows performance across courses
   const chartData = {
-    labels: ['EA', 'FA', 'MC', 'CX'],
+    labels: courses.map(c => c.title),
     values: [65, 45, 55, 35],
   };
 
