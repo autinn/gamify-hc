@@ -1,0 +1,47 @@
+/* ConceptCard - Hashtag-style concept button */
+
+.concept-card {
+  padding: 12px 16px;
+  border: 2px solid #333;
+  border-radius: 24px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: fit-content;
+}
+
+.concept-card:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.concept-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.concept-card__name {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .concept-card {
+    padding: 10px 14px;
+  }
+
+  .concept-card__name {
+    font-size: 12px;
+  }
+}
