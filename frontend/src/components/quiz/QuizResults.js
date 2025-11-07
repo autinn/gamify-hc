@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './QuizAnswers.css'; // reuse same base styling for consistency
+import './Quiz.css'; // reuse same base styling for consistency
 
 /**
  * QuizResults - shows quiz summary and return button.

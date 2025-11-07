@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './QuizAnswers.css';
+import './Quiz.css';
 
 /**
  * QuizAnswers - displays multiple-choice options for a given question.

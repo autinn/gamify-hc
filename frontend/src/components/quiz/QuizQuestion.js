@@ -1,5 +1,5 @@
 import React from 'react';
-import './QuizAnswers.css'; // you might later rename this to Quiz.css for both question & answers
+import './Quiz.css'; // you might later rename this to Quiz.css for both question & answers
 
 /**
  * QuizQuestion - displays current quiz question and progress.
