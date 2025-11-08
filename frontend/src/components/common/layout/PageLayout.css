@@ -36,8 +36,7 @@
 .page-layout {
   display: flex;
   gap: var(--column-gap);
-  /* add top padding equal to header height so sticky header doesn't overlap content */
-  padding: calc(var(--page-padding) + var(--header-height)) var(--page-padding);
+  padding: calc(var(--header-height) + 5px) var(--page-padding) var(--page-padding) var(--page-padding);
   min-height: 100vh;
   background-color: #ffffff;
   max-width: 1400px;
