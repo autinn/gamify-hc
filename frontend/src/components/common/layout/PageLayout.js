@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from './Header.js';
 import Button from '../UI/Button';
 import { useNavigate } from 'react-router-dom';
 import PerformanceChart from '../Charts/PerformanceChart';
@@ -32,7 +33,11 @@ const PageLayout = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="page-layout">
+    <>
+      <div className="page-layout__header-wrapper">
+        <Header />
+      </div>
+      <div className="page-layout">
       {/* Left Column: Greeting, Title, Button, Chart */}
       <div className="page-layout__left-column">
         {/* Greeting and Title Section */}
@@ -62,7 +67,8 @@ const PageLayout = ({
       <div className="page-layout__right-column">
         {rightContent}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
