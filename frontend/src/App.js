@@ -10,8 +10,7 @@ import './App.css';
 function App() {
   return (
     <Router>
-       <MainLayout>
-       <Routes>
+      <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/course/:courseId" element={<CoursePage />} />
         <Route path="/course/:courseId/unit/:unitId" element={<UnitPage />} />
@@ -20,7 +19,6 @@ function App() {
         <Route path="/course/:courseId/quiz" element={<QuizPage />} />
         <Route path="/course/:courseId/unit/:unitId/quiz" element={<QuizPage />} />
       </Routes>
-      </MainLayout>
     </Router>
   );
 }
