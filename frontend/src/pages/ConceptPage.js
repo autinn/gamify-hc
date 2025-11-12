@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../components/common/UI/Button';
 import QuestionAnswerBlocks from '../components/concept/QuestionAnswerBlocks';
+import Header from '../components/common/layout/Header';
 import './ConceptPage.css';
 
 /**
@@ -162,7 +163,10 @@ const ConceptPage = () => {
   }
 
   return (
-    <div className="concept-page">
+    <>
+      <Header />
+
+      <div className="concept-page">
       {/* Header Section */}
       <div className="concept-page__header">
         <p className="concept-page__greeting">{greeting}</p>
@@ -181,7 +185,8 @@ const ConceptPage = () => {
       <div className="concept-page__content">
         <QuestionAnswerBlocks quizCards={concept.quiz_cards} />
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
