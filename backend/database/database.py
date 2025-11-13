@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional, Union
 from sqlalchemy import (
     Boolean, CheckConstraint, Column, DateTime, Float, ForeignKey,
-    Integer, Text, Index, create_engine
+    Integer, Text, create_engine
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -116,8 +116,6 @@ class Unit(Base):
         CheckConstraint(
             'order_index >= 0', name='check_order_index_non_negative'
         ),
-        # Fast lookup of units by course
-        Index('idx_units_course_id', 'course_id'),
     )
 
     def __repr__(self):
@@ -152,8 +150,6 @@ class Concept(Base):
         CheckConstraint(
             'length(definition) > 0', name='check_definition_length'
         ),
-        # Fast lookup of concepts by unit
-        Index('idx_concepts_unit_id', 'unit_id'),
     )
 
     def __repr__(self):
@@ -195,8 +191,6 @@ class QuizCard(Base):
         CheckConstraint(
             'length(question) > 0', name='check_question_length'
         ),
-        # Fast lookup of quiz cards by concept
-        Index('idx_quiz_cards_concept_id', 'concept_id'),
     )
 
     def __repr__(self):
@@ -235,10 +229,6 @@ class QuizAnswer(Base):
         CheckConstraint(
             'length(explanation) > 0', name='check_explanation_length'
         ),
-        # Fast lookup of answers by quiz card
-        Index('idx_quiz_answers_quiz_card_id', 'quiz_card_id'),
-        # Fast filtering of correct/incorrect answers
-        Index('idx_quiz_answers_is_correct', 'is_correct'),
     )
 
     def __repr__(self):
@@ -343,14 +333,6 @@ class UserCard(Base):
             'failure_count >= 0',
             name='check_failure_count_non_negative'
         ),
-        # Fast lookup of user's cards
-        Index('idx_user_card_user_id', 'user_id'),
-        # Fast lookup of card's users
-        Index('idx_user_card_quiz_card_id', 'quiz_card_id'),
-        # Spaced repetition: find cards due for review
-        Index('idx_user_card_due_date', 'due_date'),
-        # Analytics: find recently reviewed cards
-        Index('idx_user_card_last_reviewed', 'last_reviewed'),
     )
 
     @property
