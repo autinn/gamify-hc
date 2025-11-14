@@ -11,8 +11,7 @@ from sqlalchemy import (
     Boolean, CheckConstraint, Column, DateTime, Float, ForeignKey,
     Integer, Text, create_engine
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 Base = declarative_base()
 
@@ -216,7 +215,8 @@ class QuizAnswer(Base):
     )
     answer_text = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=False)
-    explanation = Column(Text, nullable=False)
+    # Nullable - not all questions have explanations
+    explanation = Column(Text)
 
     # Relationships
     quiz_card = relationship('QuizCard', back_populates='answers')
@@ -225,9 +225,6 @@ class QuizAnswer(Base):
     __table_args__ = (
         CheckConstraint(
             'length(answer_text) > 0', name='check_answer_text_length'
-        ),
-        CheckConstraint(
-            'length(explanation) > 0', name='check_explanation_length'
         ),
     )
 
@@ -356,6 +353,7 @@ class UserCard(Base):
 def create_database(
     database_url: Optional[str] = None,
     echo: Union[bool, str, None] = None,
+    auto_seed: bool = True,
 ):
     """
     Create the database engine and all tables.
@@ -366,6 +364,8 @@ def create_database(
             back to a bundled SQLite file.
         echo: Whether to log SQL statements. Accepts bools or truthy strings.
             When omitted, the ``SQLALCHEMY_ECHO`` environment variable is used.
+        auto_seed: If True, automatically seed database with initial data if
+            it's empty. Default: True.
 
     Returns:
         tuple: (engine, Session class)
@@ -375,6 +375,30 @@ def create_database(
     engine = create_engine(database_url, echo=echo_flag)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
+
+    # Auto-seed if database is empty
+    if auto_seed:
+        session = Session()
+        try:
+            # Check if database is empty (no courses)
+            course_count = session.query(Course).count()
+            if course_count == 0:
+                print("Database is empty. Seeding initial data...")
+                # Import seed function - works as module or direct execution
+                try:
+                    # Relative import (works when imported as module)
+                    from .seed_data.seed import populate_database
+                except ImportError:
+                    # Absolute import (works when run directly)
+                    from seed_data.seed import populate_database
+                populate_database(session)
+                print("✓ Seeding complete!")
+        except Exception as e:
+            print(f"Warning: Failed to seed database: {e}")
+            session.rollback()
+        finally:
+            session.close()
+
     return engine, Session
 
 
@@ -400,18 +424,69 @@ if __name__ == '__main__':
     # Create the database and tables
     print("Creating database...")
     engine, Session = create_database()
-    print("Database created successfully!")
+    print("Database created successfully!\n")
 
-    # Example usage
+    # Display database content
     session = Session()
+    try:
+        # Summary statistics
+        print("=" * 80)
+        print("DATABASE SUMMARY")
+        print("=" * 80)
+        print(f"Total Courses: {session.query(Course).count()}")
+        print(f"Total Units: {session.query(Unit).count()}")
+        print(f"Total Concepts: {session.query(Concept).count()}")
+        print(f"Total Quiz Cards: {session.query(QuizCard).count()}")
+        print(f"Total Answers: {session.query(QuizAnswer).count()}")
+        print("=" * 80)
+        print()
 
-    # Create a sample course
-    course = Course(
-        title="Introduction to Habits of Mind",
-        description="Learn the fundamental habits of mind"
-    )
-    session.add(course)
-    session.commit()
+        # Display all courses with their content
+        courses = session.query(Course).order_by(Course.course_id).all()
+        for course in courses:
+            print(f"\n{'=' * 80}")
+            print(f"COURSE: {course.title}")
+            print(f"Description: {course.description}")
+            print(f"Units: {len(course.units)}")
+            print(f"{'=' * 80}")
 
-    print(f"Created sample course: {course}")
-    session.close()
+            # Display units
+            for unit in sorted(course.units, key=lambda u: u.order_index or 0):
+                print(f"\n  UNIT {unit.order_index}: {unit.title}")
+                print(f"  Description: {unit.description}")
+                print(f"  Concepts: {len(unit.concepts)}")
+
+                # Display concepts
+                for concept in unit.concepts:
+                    print(f"\n    CONCEPT: {concept.title}")
+                    print(f"    Definition: {concept.definition}")
+                    print(f"    Questions: {len(concept.quiz_cards)}")
+
+                    # Display quiz cards/questions
+                    for quiz_card in concept.quiz_cards:
+                        print("\n      QUESTION:")
+                        print(f"      {quiz_card.question}")
+                        print(f"      Answers: {len(quiz_card.answers)}")
+
+                        # Display answers
+                        for answer in quiz_card.answers:
+                            correct_marker = "✓" if answer.is_correct else " "
+                            print(
+                                f"        [{correct_marker}] "
+                                f"{answer.answer_text}"
+                            )
+                        if quiz_card.answers:
+                            explanation = quiz_card.answers[0].explanation
+                            if explanation:
+                                print(f"      Explanation: {explanation}")
+                            else:
+                                print("      Explanation: (none provided)")
+                        else:
+                            print("      Explanation: N/A")
+
+        print(f"\n{'=' * 80}")
+        print("END OF DATABASE CONTENT")
+        print(f"{'=' * 80}\n")
+
+    finally:
+        session.close()
