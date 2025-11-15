@@ -1,0 +1,189 @@
+/* Existing layout and styling */
+.quiz-answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding: 24px;
+}
+
+.quiz-answers__option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-card, #fff);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+  text-align: left;
+}
+
+.quiz-answers__option:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
+}
+
+.quiz-answers__label {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--color-accent, #5b8def);
+  color: #fff;
+  font-weight: 700;
+}
+
+.quiz-answers__text {
+  flex: 1 1 auto;
+  color: var(--color-text, #12263f);
+  font-size: 16px;
+}
+
+/* ✅ Feedback states */
+.quiz-answers__option--correct {
+  background: #e6f4ea; /* light green */
+  border-color: #34a853;
+}
+
+.quiz-answers__option--incorrect {
+  background: #fce8e6; /* light red */
+  border-color: #d93025;
+}
+
+/* ✅ Explanation below selected answer */
+.quiz-answers__block {
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-answers__explanation {
+  margin-top: 8px;
+  margin-left: 60px;
+  font-size: 15px;
+  color: var(--color-text-muted, #444);
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .quiz-answers {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .quiz-answers {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quiz-answers {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  .quiz-answers__option { padding: 14px; }
+  .quiz-answers__text { font-size: 15px; }
+  .quiz-answers__explanation { margin-left: 48px; }
+}
+
+.quiz-next-button {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: var(--color-accent, #5b8def);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.quiz-next-button:hover {
+  background: #4a7cdb;
+  transform: translateY(-2px);
+}
+
+/* ---------------- Results styling ---------------- */
+
+.quiz-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  width: 100%;
+}
+
+.quiz-results__title {
+  font-size: 28px;
+  color: var(--color-text, #12263f);
+  margin-bottom: 12px;
+}
+
+.quiz-results__score {
+  font-size: 18px;
+  color: var(--color-text-muted, #444);
+  margin-bottom: 24px;
+}
+
+/* Make the "Return Home" button visually match the answers but larger */
+.quiz-results__button {
+  width: 60%;
+  max-width: 400px;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  background: var(--color-accent, #5b8def);
+  color: #fff;
+  border: none;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.quiz-results__button:hover {
+  background: #4a7bdf;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(18, 38, 63, 0.15);
+}
+
+/* ---------------- Next Question button ---------------- */
+
+.quiz-next-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.quiz-next-button {
+  width: 60%;
+  max-width: 400px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  background: var(--color-accent, #5b8def);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.quiz-next-button:hover {
+  background: #4a7bdf;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(18, 38, 63, 0.15);
+}
