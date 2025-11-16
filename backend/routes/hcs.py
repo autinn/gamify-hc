@@ -4,7 +4,7 @@ Handles all HC-related API endpoints
 """
 
 from flask import Blueprint, jsonify
-from backend.database.database import Concept, QuizCard, QuizAnswer
+from backend.database.models import Concept, QuizCard, QuizAnswer
 
 # Create blueprint
 hcs_bp = Blueprint('hcs', __name__, url_prefix='/api')

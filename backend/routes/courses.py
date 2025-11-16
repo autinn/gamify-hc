@@ -4,7 +4,7 @@ Handles all course-related API endpoints
 """
 
 from flask import Blueprint, jsonify
-from backend.database.database import Course, Unit
+from backend.database.models import Course, Unit
 
 # Create blueprint
 courses_bp = Blueprint('courses', __name__, url_prefix='/api')

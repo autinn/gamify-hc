@@ -5,7 +5,7 @@ Modular REST API using Flask blueprints
 
 from flask import Flask, jsonify
 from flask_cors import CORS
-from backend.utils.db import DatabaseManager
+from backend.utils.database_manager import DatabaseManager
 from backend.routes.courses import courses_bp
 from backend.routes.units import units_bp
 from backend.routes.hcs import hcs_bp

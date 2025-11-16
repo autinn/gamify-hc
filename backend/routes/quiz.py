@@ -4,7 +4,7 @@ Handles all quiz-related API endpoints
 """
 
 from flask import Blueprint, jsonify, request
-from backend.database.database import QuizCard, QuizAnswer, UserCard
+from backend.database.models import QuizCard, QuizAnswer, UserCard
 from datetime import datetime
 
 # Create blueprint

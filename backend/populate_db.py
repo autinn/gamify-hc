@@ -3,9 +3,8 @@
 Populate the database with test data for API testing
 """
 
-from backend.database.database import (
-    create_database, Course, Unit, Concept, QuizCard, QuizAnswer, User
-)
+from backend.database.setup import create_database
+from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer, User
 
 
 def populate_test_data():

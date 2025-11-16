@@ -4,7 +4,7 @@ Handles all unit-related API endpoints
 """
 
 from flask import Blueprint, jsonify
-from backend.database.database import Unit, Concept
+from backend.database.models import Unit, Concept
 
 # Create blueprint
 units_bp = Blueprint('units', __name__, url_prefix='/api')

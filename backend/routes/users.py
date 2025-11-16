@@ -4,7 +4,7 @@ Handles all user-related API endpoints
 """
 
 from flask import Blueprint, jsonify
-from backend.database.database import User, UserCard
+from backend.database.models import User, UserCard
 
 # Create blueprint
 users_bp = Blueprint('users', __name__, url_prefix='/api')
