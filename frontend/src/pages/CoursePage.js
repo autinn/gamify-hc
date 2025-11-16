@@ -59,6 +59,7 @@ const CoursePage = () => {
       greeting="Welcome to"
       title={course ? course.title : courseId}
       showButton={true}
+      startQuizPath={`/course/${courseId}/quiz`}
       chartData={chartData}
       chartLabel="Questions you answered correctly (% correct answered)"
       rightContent={<UnitList courseId={courseId} units={units} />}
