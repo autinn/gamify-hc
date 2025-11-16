@@ -80,30 +80,34 @@ def submit_quiz_answer():
         
         if user_card:
             # Update existing record
-            user_card.times_seen = (user_card.times_seen or 0) + 1
+            user_card.repetitions = (user_card.repetitions or 0) + 1
             if is_correct:
-                user_card.times_correct = (
-                    user_card.times_correct or 0
-                ) + 1
-            user_card.last_seen = datetime.utcnow()
+                user_card.success_count = (user_card.success_count or 0) + 1
+            else:
+                user_card.failure_count = (user_card.failure_count or 0) + 1
+            user_card.last_reviewed = datetime.utcnow()
         else:
             # Create new record
             user_card = UserCard(
                 user_id=user_id,
                 quiz_card_id=quiz_card_id,
-                times_seen=1,
-                times_correct=1 if is_correct else 0,
-                last_seen=datetime.utcnow()
+                repetitions=1,
+                success_count=1 if is_correct else 0,
+                failure_count=0 if is_correct else 1,
+                last_reviewed=datetime.utcnow()
             )
             db.add(user_card)
         
         db.commit()
         
+        # Calculate total reviews for response
+        total_reviews = user_card.success_count + user_card.failure_count
+        
         return jsonify({
             'is_correct': is_correct,
             'explanation': answer.explanation,
-            'times_seen': user_card.times_seen,
-            'times_correct': user_card.times_correct
+            'times_seen': total_reviews,
+            'times_correct': user_card.success_count
         })
     except Exception as e:
         db.rollback()

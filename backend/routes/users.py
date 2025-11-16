@@ -48,9 +48,9 @@ def get_user_progress(user_id):
         
         return jsonify([{
             'quiz_card_id': uc.quiz_card_id,
-            'times_seen': uc.times_seen,
-            'times_correct': uc.times_correct,
-            'last_seen': uc.last_seen.isoformat() if uc.last_seen else None
+            'times_seen': uc.success_count + uc.failure_count,
+            'times_correct': uc.success_count,
+            'last_seen': uc.last_reviewed.isoformat() if uc.last_reviewed else None
         } for uc in user_cards])
     finally:
         db.close()
