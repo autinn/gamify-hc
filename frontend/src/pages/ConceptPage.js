@@ -72,11 +72,11 @@ const ConceptPage = () => {
 
         // Map quiz cards - backend returns array of quiz cards with answers
         // Previously: Used hardcoded quiz_cards from conceptData object
-        // Backend returns: {id, hc_id, question, answers: [{id, answer_text, ...}]}
+        // Backend returns: {id, concept_id, question, answers: [{id, answer_text, ...}]}
         // Component expects: {quiz_card_id, concept_id, question, quiz_answers: [{answer_id, ...}]}
         const mappedQuizCards = quizCardsData.map(qc => ({
           quiz_card_id: qc.id,
-          concept_id: qc.hc_id,
+          concept_id: qc.concept_id,
           question: qc.question,
           quiz_answers: qc.answers.map(a => ({
             answer_id: a.id,

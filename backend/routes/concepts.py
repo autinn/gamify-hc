@@ -1,13 +1,13 @@
 """
-HCs (Habits & Concepts) routes blueprint
-Handles all HC-related API endpoints
+Concepts routes blueprint
+Handles all concept-related API endpoints
 """
 
 from flask import Blueprint, jsonify
 from backend.database.models import Concept, QuizCard, QuizAnswer
 
 # Create blueprint
-hcs_bp = Blueprint('hcs', __name__, url_prefix='/api')
+concepts_bp = Blueprint('concepts', __name__, url_prefix='/api')
 
 
 def get_db():
@@ -16,28 +16,29 @@ def get_db():
     return current_app.db_session()
 
 
-@hcs_bp.route('/hcs/<int:hc_id>', methods=['GET'])
-def get_hc(hc_id):
-    """Get a specific HC with its quizzes"""
+@concepts_bp.route('/concepts/<int:concept_id>', methods=['GET'])
+def get_concept(concept_id):
+    """Get a specific concept with its quizzes"""
     db = get_db()
     try:
-        hc = db.query(Concept).filter(
-            Concept.concept_id == hc_id
+        concept = db.query(Concept).filter(
+            Concept.concept_id == concept_id
         ).first()
-        if not hc:
-            return jsonify({'error': 'HC not found'}), 404
+        if not concept:
+            return jsonify({'error': 'Concept not found'}), 404
         
-        # Get quiz cards for this HC
+        # Get quiz cards for this concept
         quiz_cards = db.query(QuizCard).filter(
-            QuizCard.concept_id == hc_id
+            QuizCard.concept_id == concept_id
         ).all()
         
         return jsonify({
-            'id': hc.concept_id,
-            'unit_id': hc.unit_id,
-            'name': hc.title,
-            'tag': hc.title,  # Can be updated when tag field is added to DB
-            'definition': hc.definition,
+            'id': concept.concept_id,
+            'unit_id': concept.unit_id,
+            'name': concept.title,
+            # Can be updated when tag field is added to DB
+            'tag': concept.title,
+            'definition': concept.definition,
             'quizzes': [{
                 'id': q.quiz_card_id,
                 'question': q.question
@@ -47,13 +48,13 @@ def get_hc(hc_id):
         db.close()
 
 
-@hcs_bp.route('/hcs/<int:hc_id>/quizzes', methods=['GET'])
-def get_hc_quizzes(hc_id):
-    """Get all quizzes for an HC"""
+@concepts_bp.route('/concepts/<int:concept_id>/quiz-cards', methods=['GET'])
+def get_concept_quiz_cards(concept_id):
+    """Get all quiz cards for a concept"""
     db = get_db()
     try:
         quiz_cards = db.query(QuizCard).filter(
-            QuizCard.concept_id == hc_id
+            QuizCard.concept_id == concept_id
         ).all()
         
         result = []
@@ -64,7 +65,7 @@ def get_hc_quizzes(hc_id):
             
             result.append({
                 'id': q.quiz_card_id,
-                'hc_id': q.concept_id,
+                'concept_id': q.concept_id,
                 'question': q.question,
                 'answers': [{
                     'id': a.answer_id,
@@ -78,14 +79,3 @@ def get_hc_quizzes(hc_id):
     finally:
         db.close()
 
-
-@hcs_bp.route('/concepts/<int:concept_id>', methods=['GET'])
-def get_concept(concept_id):
-    """Get a specific concept (alias for /hcs endpoint)"""
-    return get_hc(concept_id)
-
-
-@hcs_bp.route('/concepts/<int:concept_id>/quiz-cards', methods=['GET'])
-def get_concept_quiz_cards(concept_id):
-    """Get all quiz cards for a concept (alias for /hcs/{id}/quizzes endpoint)"""
-    return get_hc_quizzes(concept_id)

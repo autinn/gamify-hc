@@ -79,40 +79,40 @@ class TestUnitEndpoints:
         assert 'name' in data
         assert 'description' in data
     
-    def test_get_unit_hcs(self, test_client, populated_test_data):
-        """Test getting HCs (concepts) for a unit"""
+    def test_get_unit_concepts(self, test_client, populated_test_data):
+        """Test getting concepts for a unit"""
         unit_id = populated_test_data['units'][0].unit_id
-        response = test_client.get(f'/api/units/{unit_id}/hcs')
+        response = test_client.get(f'/api/units/{unit_id}/concepts')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
         
         if len(data) > 0:
-            hc = data[0]
-            assert 'id' in hc
-            assert 'unit_id' in hc
-            assert 'name' in hc
-            assert 'definition' in hc
+            concept = data[0]
+            assert 'id' in concept
+            assert 'unit_id' in concept
+            assert 'name' in concept
+            assert 'definition' in concept
 
 
-class TestHCEndpoints:
-    """Tests for HC (concept) endpoints"""
+class TestConceptEndpoints:
+    """Tests for concept endpoints"""
     
-    def test_get_hc_by_id(self, test_client, populated_test_data):
-        """Test getting a specific HC"""
-        hc_id = populated_test_data['concepts'][0].concept_id
-        response = test_client.get(f'/api/hcs/{hc_id}')
+    def test_get_concept_by_id(self, test_client, populated_test_data):
+        """Test getting a specific concept"""
+        concept_id = populated_test_data['concepts'][0].concept_id
+        response = test_client.get(f'/api/concepts/{concept_id}')
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['id'] == hc_id
+        assert data['id'] == concept_id
         assert 'unit_id' in data
         assert 'name' in data
         assert 'definition' in data
     
-    def test_get_hc_quizzes(self, test_client, populated_test_data):
-        """Test getting quizzes for an HC"""
-        hc_id = populated_test_data['concepts'][0].concept_id
-        response = test_client.get(f'/api/hcs/{hc_id}/quizzes')
+    def test_get_concept_quiz_cards(self, test_client, populated_test_data):
+        """Test getting quiz cards for a concept"""
+        concept_id = populated_test_data['concepts'][0].concept_id
+        response = test_client.get(f'/api/concepts/{concept_id}/quiz-cards')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
@@ -120,7 +120,7 @@ class TestHCEndpoints:
         if len(data) > 0:
             quiz = data[0]
             assert 'id' in quiz
-            assert 'hc_id' in quiz
+            assert 'concept_id' in quiz
             assert 'question' in quiz
             assert 'answers' in quiz
 
@@ -135,7 +135,7 @@ class TestQuizEndpoints:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data['id'] == quiz_card_id
-        assert 'hc_id' in data
+        assert 'concept_id' in data
         assert 'question' in data
         assert 'answers' in data
         assert isinstance(data['answers'], list)

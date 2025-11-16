@@ -37,7 +37,7 @@ def get_quiz_card(quiz_card_id):
         
         return jsonify({
             'id': quiz_card.quiz_card_id,
-            'hc_id': quiz_card.concept_id,
+            'concept_id': quiz_card.concept_id,
             'question': quiz_card.question,
             'answers': [{
                 'id': a.answer_id,

@@ -36,27 +36,21 @@ def get_unit(unit_id):
         db.close()
 
 
-@units_bp.route('/units/<int:unit_id>/hcs', methods=['GET'])
-def get_unit_hcs(unit_id):
-    """Get all HCs for a unit"""
+@units_bp.route('/units/<int:unit_id>/concepts', methods=['GET'])
+def get_unit_concepts(unit_id):
+    """Get all concepts for a unit"""
     db = get_db()
     try:
-        hcs = db.query(Concept).filter(
+        concepts = db.query(Concept).filter(
             Concept.unit_id == unit_id
         ).all()
         
         return jsonify([{
-            'id': hc.concept_id,
-            'unit_id': hc.unit_id,
-            'name': hc.title,
-            'tag': hc.title,  # Can be updated when tag field is added
-            'definition': hc.definition
-        } for hc in hcs])
+            'id': concept.concept_id,
+            'unit_id': concept.unit_id,
+            'name': concept.title,
+            'tag': concept.title,  # Can be updated when tag field is added
+            'definition': concept.definition
+        } for concept in concepts])
     finally:
         db.close()
-
-
-@units_bp.route('/units/<int:unit_id>/concepts', methods=['GET'])
-def get_unit_concepts(unit_id):
-    """Get all concepts for a unit (alias for /hcs endpoint)"""
-    return get_unit_hcs(unit_id)
