@@ -4,7 +4,9 @@ Handles all quiz-related API endpoints
 """
 
 from flask import Blueprint, jsonify, request
-from backend.database.models import QuizCard, QuizAnswer, UserCard
+from backend.database.models import (
+    QuizCard, QuizAnswer, UserCard, Concept, Unit
+)
 from datetime import datetime
 
 # Create blueprint
@@ -44,6 +46,95 @@ def get_quiz_card(quiz_card_id):
                 'explanation': a.explanation
             } for a in answers]
         })
+    finally:
+        db.close()
+
+
+@quiz_bp.route('/courses/<int:course_id>/quiz-cards', methods=['GET'])
+def get_course_quiz_cards(course_id):
+    """Get all quiz cards for a course"""
+    db = get_db()
+    try:
+        # Get all units for this course
+        units = db.query(Unit).filter(Unit.course_id == course_id).all()
+        unit_ids = [u.unit_id for u in units]
+        
+        if not unit_ids:
+            return jsonify([])
+        
+        # Get all concepts for these units
+        concepts = db.query(Concept).filter(
+            Concept.unit_id.in_(unit_ids)
+        ).all()
+        concept_ids = [c.concept_id for c in concepts]
+        
+        if not concept_ids:
+            return jsonify([])
+        
+        # Get all quiz cards for these concepts
+        quiz_cards = db.query(QuizCard).filter(
+            QuizCard.concept_id.in_(concept_ids)
+        ).all()
+        
+        result = []
+        for qc in quiz_cards:
+            answers = db.query(QuizAnswer).filter(
+                QuizAnswer.quiz_card_id == qc.quiz_card_id
+            ).all()
+            
+            result.append({
+                'id': qc.quiz_card_id,
+                'concept_id': qc.concept_id,
+                'question': qc.question,
+                'answers': [{
+                    'id': a.answer_id,
+                    'answer_text': a.answer_text,
+                    'is_correct': a.is_correct,
+                    'explanation': a.explanation
+                } for a in answers]
+            })
+        
+        return jsonify(result)
+    finally:
+        db.close()
+
+
+@quiz_bp.route('/units/<int:unit_id>/quiz-cards', methods=['GET'])
+def get_unit_quiz_cards(unit_id):
+    """Get all quiz cards for a unit"""
+    db = get_db()
+    try:
+        # Get all concepts for this unit
+        concepts = db.query(Concept).filter(Concept.unit_id == unit_id).all()
+        concept_ids = [c.concept_id for c in concepts]
+        
+        if not concept_ids:
+            return jsonify([])
+        
+        # Get all quiz cards for these concepts
+        quiz_cards = db.query(QuizCard).filter(
+            QuizCard.concept_id.in_(concept_ids)
+        ).all()
+        
+        result = []
+        for qc in quiz_cards:
+            answers = db.query(QuizAnswer).filter(
+                QuizAnswer.quiz_card_id == qc.quiz_card_id
+            ).all()
+            
+            result.append({
+                'id': qc.quiz_card_id,
+                'concept_id': qc.concept_id,
+                'question': qc.question,
+                'answers': [{
+                    'id': a.answer_id,
+                    'answer_text': a.answer_text,
+                    'is_correct': a.is_correct,
+                    'explanation': a.explanation
+                } for a in answers]
+            })
+        
+        return jsonify(result)
     finally:
         db.close()
 

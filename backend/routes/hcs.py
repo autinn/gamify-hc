@@ -77,3 +77,15 @@ def get_hc_quizzes(hc_id):
         return jsonify(result)
     finally:
         db.close()
+
+
+@hcs_bp.route('/concepts/<int:concept_id>', methods=['GET'])
+def get_concept(concept_id):
+    """Get a specific concept (alias for /hcs endpoint)"""
+    return get_hc(concept_id)
+
+
+@hcs_bp.route('/concepts/<int:concept_id>/quiz-cards', methods=['GET'])
+def get_concept_quiz_cards(concept_id):
+    """Get all quiz cards for a concept (alias for /hcs/{id}/quizzes endpoint)"""
+    return get_hc_quizzes(concept_id)

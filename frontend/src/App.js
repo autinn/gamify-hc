@@ -18,6 +18,8 @@ function App() {
         <Route path="/quiz" element={<QuizPage />} />
         <Route path="/course/:courseId/quiz" element={<QuizPage />} />
         <Route path="/course/:courseId/unit/:unitId/quiz" element={<QuizPage />} />
+        {/* CHANGED: Added route for concept-level quiz to support quiz functionality at concept level */}
+        <Route path="/course/:courseId/unit/:unitId/concept/:conceptId/quiz" element={<QuizPage />} />
       </Routes>
     </Router>
   );

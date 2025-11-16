@@ -54,3 +54,9 @@ def get_unit_hcs(unit_id):
         } for hc in hcs])
     finally:
         db.close()
+
+
+@units_bp.route('/units/<int:unit_id>/concepts', methods=['GET'])
+def get_unit_concepts(unit_id):
+    """Get all concepts for a unit (alias for /hcs endpoint)"""
+    return get_unit_hcs(unit_id)

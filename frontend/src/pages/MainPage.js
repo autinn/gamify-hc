@@ -22,11 +22,19 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // CHANGED: Added field mapping to convert API response format to component expectations
+    // Backend returns: {id, name/code, description} -> Component expects: {course_id, title, description}
     // Try to fetch real courses from API
     api.getCourses()
       .then(data => {
         if (data && data.length > 0) {
-          setCourses(data);
+          // Map API response to component expectations
+          const mappedCourses = data.map(c => ({
+            course_id: c.id,
+            title: c.name || c.code,
+            description: c.description
+          }));
+          setCourses(mappedCourses);
         }
         setLoading(false);
       })

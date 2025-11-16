@@ -75,6 +75,16 @@ export async function getQuizCard(quizCardId) {
   return apiRequest(`/quiz-cards/${quizCardId}`);
 }
 
+// CHANGED: Added new API functions to fetch quiz cards filtered by course or unit
+// These endpoints were added to the backend to support quiz functionality at different levels
+export async function getCourseQuizCards(courseId) {
+  return apiRequest(`/courses/${courseId}/quiz-cards`);
+}
+
+export async function getUnitQuizCards(unitId) {
+  return apiRequest(`/units/${unitId}/quiz-cards`);
+}
+
 export async function submitQuizAnswer(data) {
   return apiRequest('/quiz-submit', {
     method: 'POST',
