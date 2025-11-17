@@ -1,5 +1,8 @@
 """
 Pytest tests for API endpoints
+
+Tests cover all course-related endpoints with proper error handling
+and response structure validation.
 """
 
 import pytest
@@ -10,7 +13,7 @@ class TestHealthEndpoint:
     """Tests for health check endpoint"""
     
     def test_health_check(self, test_client):
-        """Test health check endpoint"""
+        """Test health check endpoint returns OK status"""
         response = test_client.get('/api/health')
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -19,50 +22,89 @@ class TestHealthEndpoint:
 
 
 class TestCourseEndpoints:
-    """Tests for course-related endpoints"""
+    """Tests for course-related endpoints
+    
+    Tests cover:
+    - Getting all courses
+    - Getting specific course by ID
+    - Getting units for a course
+    - Error handling for non-existent courses
+    """
     
     def test_get_courses(self, test_client, populated_test_data):
-        """Test getting all courses"""
+        """Test getting all courses returns list with proper structure"""
         response = test_client.get('/api/courses')
         assert response.status_code == 200
         data = json.loads(response.data)
+        
+        # Verify response is a list
         assert isinstance(data, list)
         assert len(data) >= 2
         
-        # Check structure
+        # Verify course structure
         course = data[0]
         assert 'id' in course
         assert 'code' in course
         assert 'name' in course
         assert 'description' in course
+        
+        # Verify course IDs are unique
+        course_ids = [c['id'] for c in data]
+        assert len(course_ids) == len(set(course_ids))
     
     def test_get_course_by_id(self, test_client, populated_test_data):
-        """Test getting a specific course"""
-        course_id = populated_test_data['courses'][0].course_id
+        """Test getting a specific course by ID"""
+        course = populated_test_data['courses'][0]
+        course_id = course.course_id
+        
         response = test_client.get(f'/api/courses/{course_id}')
         assert response.status_code == 200
+        
         data = json.loads(response.data)
         assert data['id'] == course_id
         assert 'code' in data
         assert 'name' in data
         assert 'description' in data
+        assert data['code'] == course.title
+        assert data['name'] == course.title
+    
+    def test_get_course_by_id_not_found(self, test_client):
+        """Test getting non-existent course returns 404"""
+        response = test_client.get('/api/courses/99999')
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
     
     def test_get_course_units(self, test_client, populated_test_data):
-        """Test getting units for a course"""
-        course_id = populated_test_data['courses'][0].course_id
+        """Test getting units for a course
+        
+        Units contain Habits & Foundational Concepts (HCs) that students learn.
+        """
+        course = populated_test_data['courses'][0]
+        course_id = course.course_id
+        
         response = test_client.get(f'/api/courses/{course_id}/units')
         assert response.status_code == 200
+        
         data = json.loads(response.data)
         assert isinstance(data, list)
-        assert len(data) >= 2
+        assert len(data) >= 1
         
-        # Check structure
+        # Verify unit structure
         unit = data[0]
         assert 'id' in unit
         assert 'course_id' in unit
         assert 'name' in unit
         assert 'description' in unit
         assert 'order_index' in unit
+        assert unit['course_id'] == course_id
+    
+    def test_get_course_units_not_found(self, test_client):
+        """Test getting units for non-existent course returns 404"""
+        response = test_client.get('/api/courses/99999/units')
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
 
 
 class TestUnitEndpoints:

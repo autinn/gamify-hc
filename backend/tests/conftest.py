@@ -1,11 +1,14 @@
 """
 Pytest configuration and fixtures for backend tests
+
+Test infrastructure setup for Flask API endpoints.
+Uses in-memory SQLite database for fast, isolated tests.
 """
 
 import pytest
-import os
 import sys
 import tempfile
+import os
 from pathlib import Path
 
 # Add project root to Python path
@@ -16,64 +19,109 @@ if str(project_root) not in sys.path:
 from backend.app import create_app
 from backend.database.setup import create_database
 from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer, User
-from sqlalchemy.orm import Session
 
 
-@pytest.fixture(scope='session')
+# ===============================
+# DATABASE FIXTURES
+# ===============================
+
+@pytest.fixture(scope='function')
 def test_database_url():
-    """Create a temporary test database URL"""
-    # Use in-memory SQLite for faster tests
-    return "sqlite:///:memory:"
+    """Create a temporary test database URL.
+    
+    Uses a temporary file-based SQLite database so Flask app and fixtures
+    can share the same database instance. File is automatically cleaned up.
+    """
+    # Create temporary file for test database
+    temp_db = tempfile.NamedTemporaryFile(delete=False, suffix='.db')
+    temp_db.close()
+    db_url = f"sqlite:///{temp_db.name}"
+    
+    yield db_url
+    
+    # Cleanup: remove temporary database file
+    try:
+        os.unlink(temp_db.name)
+    except OSError:
+        pass  # File may already be deleted
 
 
-@pytest.fixture(scope='session')
-def db_session(test_database_url):
-    """Create a test database session"""
+@pytest.fixture(scope='function')
+def clean_db(test_database_url):
+    """Create a clean database session for each test.
+    
+    Creates a fresh database and session, cleans up after test completes.
+    Uses the same database URL as test_client so they share data.
+    """
     engine, Session = create_database(
         database_url=test_database_url,
         echo=False,
         auto_seed=False  # We'll seed manually in fixtures
     )
     session = Session()
-    yield session
-    session.close()
+    
+    # Clean database before test
+    _clean_database(session)
+    
+    try:
+        yield session
+    finally:
+        # Clean database after test, even if test failed
+        try:
+            _clean_database(session)
+        except Exception:
+            pass  # Ignore cleanup errors
+        finally:
+            session.close()
 
 
-@pytest.fixture(scope='function')
-def clean_db(db_session):
-    """Clean database before each test"""
-    # Delete in reverse order of dependencies
-    db_session.query(QuizAnswer).delete()
-    db_session.query(QuizCard).delete()
-    db_session.query(Concept).delete()
-    db_session.query(Unit).delete()
-    db_session.query(Course).delete()
-    db_session.query(User).delete()
-    db_session.commit()
-    yield db_session
-    # Cleanup after test
-    db_session.query(QuizAnswer).delete()
-    db_session.query(QuizCard).delete()
-    db_session.query(Concept).delete()
-    db_session.query(Unit).delete()
-    db_session.query(Course).delete()
-    db_session.query(User).delete()
-    db_session.commit()
+def _clean_database(session):
+    """Helper to clean all tables in reverse dependency order."""
+    try:
+        # Rollback any pending transactions first
+        session.rollback()
+        
+        session.query(QuizAnswer).delete()
+        session.query(QuizCard).delete()
+        session.query(Concept).delete()
+        session.query(Unit).delete()
+        session.query(Course).delete()
+        session.query(User).delete()
+        session.commit()
+    except Exception:
+        # If cleanup fails, rollback and continue
+        session.rollback()
 
+
+# ===============================
+# FLASK APP FIXTURES
+# ===============================
 
 @pytest.fixture
 def test_client(test_database_url):
-    """Create a test Flask client"""
+    """Create a test Flask client with isolated database.
+    
+    Each test gets a fresh Flask app instance.
+    Uses the same database URL as clean_db so they share the same database.
+    """
     app = create_app(database_url=test_database_url)
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
+    
     with app.test_client() as client:
         yield client
 
 
+# ===============================
+# SAMPLE DATA FIXTURES
+# ===============================
+
 @pytest.fixture
 def sample_course(clean_db):
-    """Create a sample course for testing"""
+    """Create a sample course for testing.
+    
+    Represents EA50 - Empirical Analyses course containing units with HCs.
+    """
     course = Course(
         title="EA50 - Empirical Analyses",
         description="Empirical analysis and data-driven reasoning"
@@ -86,7 +134,10 @@ def sample_course(clean_db):
 
 @pytest.fixture
 def sample_unit(clean_db, sample_course):
-    """Create a sample unit for testing"""
+    """Create a sample unit for testing.
+    
+    Units contain Habits & Foundational Concepts (HCs) that students learn.
+    """
     unit = Unit(
         course_id=sample_course.course_id,
         title="Data Visualization",
@@ -101,7 +152,10 @@ def sample_unit(clean_db, sample_course):
 
 @pytest.fixture
 def sample_concept(clean_db, sample_unit):
-    """Create a sample concept for testing"""
+    """Create a sample concept (HC) for testing.
+    
+    Concepts represent Habits & Foundational Concepts like #dataviz, #heuristics, etc.
+    """
     concept = Concept(
         unit_id=sample_unit.unit_id,
         title="#dataviz",
@@ -115,7 +169,7 @@ def sample_concept(clean_db, sample_unit):
 
 @pytest.fixture
 def sample_quiz_card(clean_db, sample_concept):
-    """Create a sample quiz card for testing"""
+    """Create a sample quiz card for testing."""
     quiz_card = QuizCard(
         concept_id=sample_concept.concept_id,
         question="Which visualization is best for showing proportions of a whole?"
@@ -128,7 +182,7 @@ def sample_quiz_card(clean_db, sample_concept):
 
 @pytest.fixture
 def sample_quiz_answers(clean_db, sample_quiz_card):
-    """Create sample quiz answers for testing"""
+    """Create sample quiz answers for testing."""
     answers = [
         QuizAnswer(
             quiz_card_id=sample_quiz_card.quiz_card_id,
@@ -150,11 +204,18 @@ def sample_quiz_answers(clean_db, sample_quiz_card):
 
 @pytest.fixture
 def sample_user(clean_db):
-    """Create a sample user for testing"""
+    """Create a sample user for testing.
+    
+    Uses a valid password hash (bcrypt format requires >= 60 chars).
+    """
+    # Use a valid bcrypt hash format (60+ characters)
+    # This is a dummy hash that meets the constraint requirement
+    valid_hash = "$2b$12$" + "x" * 54  # 60 characters total
+    
     user = User(
         username="test_user",
         email="test@example.com",
-        password_hash="dummy_hash_for_testing"
+        password_hash=valid_hash
     )
     clean_db.add(user)
     clean_db.commit()
@@ -164,7 +225,18 @@ def sample_user(clean_db):
 
 @pytest.fixture
 def populated_test_data(clean_db):
-    """Populate database with comprehensive test data"""
+    """Populate database with comprehensive test data.
+    
+    Creates a full test dataset with:
+    - 2 courses (EA50, FA50)
+    - 3 units across courses
+    - 4 concepts (HCs) with tags like #dataviz, #heuristics
+    - 3 quiz cards with questions
+    - Multiple quiz answers
+    - 1 test user
+    
+    Returns dict with all created objects for easy test access.
+    """
     # Create courses
     course1 = Course(
         title="EA50 - Empirical Analyses",
@@ -282,10 +354,13 @@ def populated_test_data(clean_db):
     clean_db.commit()
     
     # Create test user
+    # Use a valid password hash (bcrypt format requires >= 60 chars)
+    valid_hash = "$2b$12$" + "x" * 54  # 60 characters total
+    
     user = User(
         username="test_user",
         email="test@example.com",
-        password_hash="dummy_hash_for_testing"
+        password_hash=valid_hash
     )
     clean_db.add(user)
     clean_db.commit()
