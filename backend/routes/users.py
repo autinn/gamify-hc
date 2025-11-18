@@ -5,15 +5,10 @@ Handles all user-related API endpoints
 
 from flask import Blueprint, jsonify
 from backend.database.models import User, UserCard
+from backend.utils.database_manager import get_db
 
 # Create blueprint
 users_bp = Blueprint('users', __name__, url_prefix='/api')
-
-
-def get_db():
-    """Get database session - will be injected by app.py"""
-    from flask import current_app
-    return current_app.db_session()
 
 
 @users_bp.route('/users/<int:user_id>', methods=['GET'])

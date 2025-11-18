@@ -5,15 +5,10 @@ Handles all unit-related API endpoints
 
 from flask import Blueprint, jsonify
 from backend.database.models import Unit, Concept
+from backend.utils.database_manager import get_db
 
 # Create blueprint
 units_bp = Blueprint('units', __name__, url_prefix='/api')
-
-
-def get_db():
-    """Get database session - will be injected by app.py"""
-    from flask import current_app
-    return current_app.db_session()
 
 
 @units_bp.route('/units/<int:unit_id>', methods=['GET'])

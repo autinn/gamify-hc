@@ -13,29 +13,11 @@ Endpoints:
 
 from flask import Blueprint, jsonify
 from backend.database.models import Concept, QuizCard, QuizAnswer
+from backend.utils.database_manager import get_db
 
 # Create blueprint for concept-related routes
 # All routes in this blueprint will be prefixed with '/api'
 concepts_bp = Blueprint('concepts', __name__, url_prefix='/api')
-
-
-def get_db():
-    """
-    Get database session from Flask application context.
-
-    This function retrieves the database session that is injected by
-    app.py. The session is used to perform database queries within
-    route handlers.
-
-    Returns:
-        Session: SQLAlchemy database session object
-
-    Note:
-        The database session must be closed after use to prevent
-        connection leaks. This is typically done in a finally block.
-    """
-    from flask import current_app
-    return current_app.db_session()
 
 
 @concepts_bp.route('/concepts/<int:concept_id>', methods=['GET'])

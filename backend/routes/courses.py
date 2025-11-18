@@ -5,15 +5,10 @@ Handles all course-related API endpoints
 
 from flask import Blueprint, jsonify
 from backend.database.models import Course, Unit
+from backend.utils.database_manager import get_db
 
 # Create blueprint
 courses_bp = Blueprint('courses', __name__, url_prefix='/api')
-
-
-def get_db():
-    """Get database session - will be injected by app.py"""
-    from flask import current_app
-    return current_app.db_session()
 
 
 @courses_bp.route('/courses', methods=['GET'])

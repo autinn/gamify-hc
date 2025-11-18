@@ -22,3 +22,22 @@ class DatabaseManager:
     def get_session(self) -> Session:
         """Create and return a new database session"""
         return self.SessionLocal()
+
+
+def get_db():
+    """
+    Get database session from Flask application context.
+
+    This function retrieves the database session that is injected by
+    app.py. The session is used to perform database queries within
+    route handlers.
+
+    Returns:
+        Session: SQLAlchemy database session object
+
+    Note:
+        The database session must be closed after use to prevent
+        connection leaks. This is typically done in a finally block.
+    """
+    from flask import current_app
+    return current_app.db_session()

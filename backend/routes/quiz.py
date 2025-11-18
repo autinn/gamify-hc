@@ -7,16 +7,11 @@ from flask import Blueprint, jsonify, request
 from backend.database.models import (
     QuizCard, QuizAnswer, UserCard, Concept, Unit
 )
+from backend.utils.database_manager import get_db
 from datetime import datetime
 
 # Create blueprint
 quiz_bp = Blueprint('quiz', __name__, url_prefix='/api')
-
-
-def get_db():
-    """Get database session - will be injected by app.py"""
-    from flask import current_app
-    return current_app.db_session()
 
 
 @quiz_bp.route('/quiz-cards/<int:quiz_card_id>', methods=['GET'])
