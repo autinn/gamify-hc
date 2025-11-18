@@ -6,6 +6,7 @@ Modular REST API using Flask blueprints
 from flask import Flask, jsonify
 from flask_cors import CORS
 from backend.utils.database_manager import DatabaseManager
+from backend.routes.auth import auth_bp
 from backend.routes.courses import courses_bp
 from backend.routes.units import units_bp
 from backend.routes.concepts import concepts_bp
@@ -25,6 +26,7 @@ def create_app(database_url=None):
     app.db_session = db_manager.get_session
     
     # Register blueprints
+    app.register_blueprint(auth_bp)
     app.register_blueprint(courses_bp)
     app.register_blueprint(units_bp)
     app.register_blueprint(concepts_bp)
