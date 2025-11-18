@@ -32,7 +32,7 @@ def _serialize_course(course):
     """
     return {
         'id': course.course_id,
-        'code': course.title,  # TODO: Map to course code like "EA50"
+        'code': course.title,
         'name': course.title,
         'description': course.description
     }

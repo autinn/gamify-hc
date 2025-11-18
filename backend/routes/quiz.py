@@ -26,25 +26,6 @@ from datetime import datetime
 quiz_bp = Blueprint('quiz', __name__, url_prefix='/api')
 
 
-def _serialize_answer(answer):
-    """
-    Serialize a QuizAnswer model instance to a dictionary.
-
-    Args:
-        answer (QuizAnswer): The answer model instance to serialize
-
-    Returns:
-        dict: Serialized answer data with id, answer_text, is_correct,
-            and explanation
-    """
-    return {
-        'id': answer.answer_id,
-        'answer_text': answer.answer_text,
-        'is_correct': answer.is_correct,
-        'explanation': answer.explanation
-    }
-
-
 def _serialize_quiz_card_with_answers(quiz_card, answers):
     """
     Serialize a QuizCard model instance with its answers to a dictionary.
@@ -61,7 +42,12 @@ def _serialize_quiz_card_with_answers(quiz_card, answers):
         'id': quiz_card.quiz_card_id,
         'concept_id': quiz_card.concept_id,
         'question': quiz_card.question,
-        'answers': [_serialize_answer(a) for a in answers]
+        'answers': [{
+            'id': a.answer_id,
+            'answer_text': a.answer_text,
+            'is_correct': a.is_correct,
+            'explanation': a.explanation
+        } for a in answers]
     }
 
 
