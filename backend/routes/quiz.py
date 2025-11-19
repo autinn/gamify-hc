@@ -15,10 +15,12 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify, request
+from sqlalchemy.exc import IntegrityError
 from backend.database.models import (
     QuizCard, QuizAnswer, UserCard, Concept, Unit
 )
 from backend.utils.database_manager import get_db
+from backend.routes.auth import jwt_required
 from datetime import datetime
 
 # Create blueprint for quiz-related routes
@@ -268,20 +270,24 @@ def get_unit_quiz_cards(unit_id):
 
 
 @quiz_bp.route('/quiz-submit', methods=['POST'])
+@jwt_required
 def submit_quiz_answer():
     """
     Submit a quiz answer and update user progress.
 
     This endpoint processes a quiz answer submission, validates the answer,
     and updates the user's progress tracking (UserCard). It handles both
-    new submissions and updates to existing progress records.
+    new submissions and updates to existing progress records. Requires
+    authentication and uses the authenticated user's ID from the JWT token.
 
     Request Body (JSON):
         {
-            'user_id': int,        # User ID submitting the answer
             'quiz_card_id': int,   # ID of the quiz card being answered
             'answer_id': int       # ID of the selected answer
         }
+
+    Headers:
+        Authorization: Bearer <jwt_token>
 
     Returns:
         JSON response with the following structure:
@@ -299,11 +305,13 @@ def submit_quiz_answer():
     HTTP Status Codes:
         200: Success - Answer processed and progress updated
         400: Bad Request - Missing required fields or invalid answer_id
+        401: Unauthorized - Invalid or missing token
         500: Internal Server Error - Database error occurred
 
     Example:
         POST /api/quiz-submit
-        Body: {"user_id": 1, "quiz_card_id": 1, "answer_id": 2}
+        Headers: Authorization: Bearer <jwt_token>
+        Body: {"quiz_card_id": 1, "answer_id": 2}
         Returns: {"is_correct": true, "explanation": "...",
             "times_seen": 3, "times_correct": 2}
     """
@@ -311,13 +319,15 @@ def submit_quiz_answer():
     try:
         data = request.get_json()
 
-        # Extract and validate required fields
-        user_id = data.get('user_id')
-        quiz_card_id = data.get('quiz_card_id')
-        answer_id = data.get('answer_id')
+        # Use authenticated user_id from JWT token instead of request body
+        user_id = request.user_id
+        quiz_card_id = data.get('quiz_card_id') if data else None
+        answer_id = data.get('answer_id') if data else None
 
-        if not all([user_id, quiz_card_id, answer_id]):
-            return jsonify({'error': 'Missing required fields'}), 400
+        if not all([quiz_card_id, answer_id]):
+            return jsonify({
+                'error': 'Missing required fields: quiz_card_id and answer_id'
+            }), 400
 
         # Validate that the answer exists
         answer = db.query(QuizAnswer).filter(
@@ -360,6 +370,7 @@ def submit_quiz_answer():
             db.add(user_card)
 
         db.commit()
+        db.refresh(user_card)
 
         # Calculate total reviews for response
         total_reviews = (
@@ -372,6 +383,36 @@ def submit_quiz_answer():
             'times_seen': total_reviews,
             'times_correct': user_card.success_count
         })
+    except IntegrityError:
+        db.rollback()
+        # UserCard already exists, try to update it instead
+        user_card = db.query(UserCard).filter(
+            UserCard.user_id == user_id,
+            UserCard.quiz_card_id == quiz_card_id
+        ).first()
+        if user_card:
+            # Update existing progress record
+            user_card.repetitions = (user_card.repetitions or 0) + 1
+            if is_correct:
+                user_card.success_count = (
+                    user_card.success_count or 0
+                ) + 1
+            else:
+                user_card.failure_count = (
+                    user_card.failure_count or 0
+                ) + 1
+            user_card.last_reviewed = datetime.utcnow()
+            db.commit()
+            db.refresh(user_card)
+            total_reviews = user_card.success_count + user_card.failure_count
+            return jsonify({
+                'is_correct': is_correct,
+                'explanation': answer.explanation,
+                'times_seen': total_reviews,
+                'times_correct': user_card.success_count
+            })
+        else:
+            return jsonify({'error': 'Failed to update progress'}), 500
     except Exception as e:
         db.rollback()
         return jsonify({'error': str(e)}), 500

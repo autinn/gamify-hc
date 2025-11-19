@@ -18,6 +18,7 @@ from functools import wraps
 
 import jwt
 from flask import Blueprint, jsonify, request
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from backend.database.models import User
@@ -113,7 +114,7 @@ def jwt_required(f):
 
 def validate_email(email):
     """
-    Validate email format and check if it ends with .minerva.edu.
+    Validate email format and check if it ends with minerva.edu.
 
     Args:
         email (str): Email address to validate
@@ -128,9 +129,9 @@ def validate_email(email):
     if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
         return False, 'Invalid email format'
 
-    # Check if email ends with .minerva.edu
-    if not email.endswith('.minerva.edu'):
-        return False, 'Email must end with .minerva.edu'
+    # Check if email ends with minerva.edu
+    if not email.endswith('minerva.edu'):
+        return False, 'Email must end with minerva.edu'
 
     return True, None
 
@@ -180,12 +181,12 @@ def register():
 
     This endpoint creates a new user account with username, email, and
     password. The password is hashed before storage. Email must end with
-    .minerva.edu.
+    minerva.edu.
 
     Request Body:
         {
             'username': str,    # 3-50 characters
-            'email': str,       # Must end with .minerva.edu
+            'email': str,       # Must end with minerva.edu
             'password': str     # Minimum 8 characters
         }
 
@@ -266,6 +267,20 @@ def register():
             )
         }), 201
 
+    except IntegrityError as e:
+        db.rollback()
+        # Check if it's a duplicate username or email
+        error_msg = str(e.orig) if hasattr(e, 'orig') else str(e)
+        username_constraint = 'UNIQUE constraint failed: users.username'
+        email_constraint = 'UNIQUE constraint failed: users.email'
+        if ('username' in error_msg.lower() or
+                username_constraint in error_msg):
+            return jsonify({'error': 'Username already exists'}), 409
+        elif ('email' in error_msg.lower() or
+              email_constraint in error_msg):
+            return jsonify({'error': 'Email already exists'}), 409
+        else:
+            return jsonify({'error': 'Registration failed'}), 500
     except Exception:
         db.rollback()
         return jsonify({'error': 'Registration failed'}), 500
