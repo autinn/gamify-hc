@@ -3,9 +3,7 @@ Pytest configuration and fixtures for backend tests
 """
 
 import pytest
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 # Add project root to Python path
@@ -16,25 +14,39 @@ if str(project_root) not in sys.path:
 from backend.app import create_app
 from backend.database.setup import create_database
 from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer, User
-from sqlalchemy.orm import Session
 
 
 @pytest.fixture(scope='session')
 def test_database_url():
     """Create a temporary test database URL"""
     # Use in-memory SQLite for faster tests
-    return "sqlite:///:memory:"
+    # Note: Using check_same_thread=False allows sharing across threads
+    return "sqlite:///:memory:?check_same_thread=False"
 
 
 @pytest.fixture(scope='session')
-def db_session(test_database_url):
-    """Create a test database session"""
-    engine, Session = create_database(
+def test_engine(test_database_url):
+    """Create a shared test database engine"""
+    engine, _ = create_database(
         database_url=test_database_url,
         echo=False,
         auto_seed=False  # We'll seed manually in fixtures
     )
-    session = Session()
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture(scope='session')
+def test_session_factory(test_engine):
+    """Create a session factory from the shared test engine"""
+    from sqlalchemy.orm import sessionmaker
+    return sessionmaker(bind=test_engine)
+
+
+@pytest.fixture(scope='function')
+def db_session(test_session_factory):
+    """Create a test database session"""
+    session = test_session_factory()
     yield session
     session.close()
 
@@ -42,8 +54,12 @@ def db_session(test_database_url):
 @pytest.fixture(scope='function')
 def clean_db(db_session):
     """Clean database before each test"""
+    from backend.database.models import UserCard
+    # Rollback any pending transactions
+    db_session.rollback()
     # Delete in reverse order of dependencies
     db_session.query(QuizAnswer).delete()
+    db_session.query(UserCard).delete()
     db_session.query(QuizCard).delete()
     db_session.query(Concept).delete()
     db_session.query(Unit).delete()
@@ -52,7 +68,9 @@ def clean_db(db_session):
     db_session.commit()
     yield db_session
     # Cleanup after test
+    db_session.rollback()
     db_session.query(QuizAnswer).delete()
+    db_session.query(UserCard).delete()
     db_session.query(QuizCard).delete()
     db_session.query(Concept).delete()
     db_session.query(Unit).delete()
@@ -62,11 +80,28 @@ def clean_db(db_session):
 
 
 @pytest.fixture
-def test_client(test_database_url):
-    """Create a test Flask client"""
+def test_client(test_engine, test_session_factory, test_database_url):
+    """Create a test Flask client with shared database engine"""
+    from backend.utils.database_manager import DatabaseManager
+    
+    # Create DatabaseManager with shared engine
+    db_manager = DatabaseManager(
+        engine=test_engine,
+        SessionLocal=test_session_factory
+    )
+    
+    # Create app with test database URL, but override db_session
     app = create_app(database_url=test_database_url)
+    # Replace the app's db_session with our shared one to ensure
+    # all sessions use the same engine
+    app.db_session = db_manager.get_session
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
+    
+    # Ensure database tables exist
+    from backend.database.models import Base
+    Base.metadata.create_all(bind=test_engine)
+    
     with app.test_client() as client:
         yield client
 
@@ -151,10 +186,11 @@ def sample_quiz_answers(clean_db, sample_quiz_card):
 @pytest.fixture
 def sample_user(clean_db):
     """Create a sample user for testing"""
+    from werkzeug.security import generate_password_hash
     user = User(
         username="test_user",
-        email="test@example.com",
-        password_hash="dummy_hash_for_testing"
+        email="test@minerva.edu",
+        password_hash=generate_password_hash("test_password")
     )
     clean_db.add(user)
     clean_db.commit()
@@ -282,10 +318,11 @@ def populated_test_data(clean_db):
     clean_db.commit()
     
     # Create test user
+    from werkzeug.security import generate_password_hash
     user = User(
-        username="test_user",
-        email="test@example.com",
-        password_hash="dummy_hash_for_testing"
+        username="populated_user",
+        email="populated@minerva.edu",
+        password_hash=generate_password_hash("test_password")
     )
     clean_db.add(user)
     clean_db.commit()
@@ -299,4 +336,39 @@ def populated_test_data(clean_db):
         'answers': answers,
         'user': user
     }
+
+
+@pytest.fixture
+def auth_token(sample_user):
+    """Create a JWT token for the sample user"""
+    import jwt
+    from datetime import datetime, timedelta
+    
+    payload = {
+        'user_id': sample_user.user_id,
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'iat': datetime.utcnow()
+    }
+    return jwt.encode(
+        payload,
+        'dev-secret-key-change-in-production',
+        algorithm='HS256'
+    )
+
+
+def create_auth_token(user_id):
+    """Helper function to create a JWT token for a user"""
+    import jwt
+    from datetime import datetime, timedelta
+    
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'iat': datetime.utcnow()
+    }
+    return jwt.encode(
+        payload,
+        'dev-secret-key-change-in-production',
+        algorithm='HS256'
+    )
 

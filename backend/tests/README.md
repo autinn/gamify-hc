@@ -16,19 +16,26 @@ pytest backend/tests/ -v
 
 Run a specific test file:
 ```bash
-pytest backend/tests/test_api.py
+pytest backend/tests/test_health.py
+pytest backend/tests/test_auth.py
+pytest backend/tests/test_courses.py
 ```
 
 Run a specific test:
 ```bash
-pytest backend/tests/test_api.py::TestHealthEndpoint::test_health_check
+pytest backend/tests/test_health.py::TestHealthEndpoint::test_health_check
 ```
 
 ## Test Structure
 
 - `conftest.py` - Pytest configuration and fixtures
-- `test_api.py` - API endpoint tests
-- `fixtures.py` - Test data population functions
+- `test_health.py` - Health check endpoint tests
+- `test_auth.py` - Authentication endpoint tests
+- `test_users.py` - User endpoint tests
+- `test_courses.py` - Course endpoint tests
+- `test_units.py` - Unit endpoint tests
+- `test_concepts.py` - Concept endpoint tests
+- `test_quiz.py` - Quiz endpoint tests
 
 ## Test Fixtures
 
@@ -43,7 +50,7 @@ The test suite uses pytest fixtures defined in `conftest.py`:
 
 ## Test Data
 
-Test data is populated using functions from `fixtures.py`. The `populate_test_data()` function creates:
+Test data is populated using the `populated_test_data` fixture in `conftest.py`. This fixture creates:
 - 2 courses (EA50, FA50)
 - 3 units
 - 4 concepts
