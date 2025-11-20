@@ -112,8 +112,17 @@ const ConceptPage = () => {
       <Header />
 
       <div className="concept-page">
-      {/* Header Section */}
-      <div className="concept-page__header">
+        {/* Back Button Bar */}
+        <div className="concept-page__back-button-bar">
+          <Button 
+            label="← Back" 
+            variant="secondary" 
+            onClick={() => navigate(`/course/${courseId}/unit/${unitId}`)} 
+          />
+        </div>
+
+        {/* Header Section */}
+        <div className="concept-page__header">
         <p className="concept-page__greeting">{greeting}</p>
         <div className="concept-page__header-row">
           <h1 className="concept-page__title">{concept ? concept.title : ''}</h1>

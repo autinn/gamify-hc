@@ -5,12 +5,16 @@ import CoursePage from './pages/CoursePage';
 import UnitPage from './pages/UnitPage';
 import ConceptPage from './pages/ConceptPage';
 import QuizPage from './pages/QuizPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import './App.css';
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<MainPage />} />
         <Route path="/course/:courseId" element={<CoursePage />} />
         <Route path="/course/:courseId/unit/:unitId" element={<UnitPage />} />

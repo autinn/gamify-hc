@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import QuizAnswers from '../components/quiz/QuizAnswers';
 import QuizQuestion from '../components/quiz/QuizQuestion';
@@ -16,6 +16,7 @@ import '../components/quiz/Quiz.css';
  */
 const QuizPage = () => {
   const { courseId, unitId, conceptId } = useParams();
+  const navigate = useNavigate();
   // State for quiz questions fetched from API
   // Previously: Used hardcoded dummyQuestions array
   const [questions, setQuestions] = useState([]);
@@ -64,6 +65,18 @@ const QuizPage = () => {
   const greeting = courseId ? `Quiz for ${courseId}` : 'Quiz';
   const title = unitId ? `Unit ${unitId}` : courseId ? courseId : 'Practice';
 
+  // Determine back button navigation
+  const getBackPath = () => {
+    if (conceptId) {
+      return `/course/${courseId}/unit/${unitId}/concept/${conceptId}`;
+    } else if (unitId) {
+      return `/course/${courseId}/unit/${unitId}`;
+    } else if (courseId) {
+      return `/course/${courseId}`;
+    }
+    return '/';
+  };
+
   const handleCorrect = () => {
     // ✅ Mark as correct but wait for the user to click “Next Question”
     setIsAnsweredCorrectly(true);
@@ -80,6 +93,8 @@ const QuizPage = () => {
       greeting={greeting}
       title={title}
       showButton={false}
+      showBackButton={true}
+      onBackClick={() => navigate(getBackPath())}
       leftContent={
         isQuizDone ? (
           <QuizResults correctCount={correctCount} totalCount={totalCount} />
