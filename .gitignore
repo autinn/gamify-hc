@@ -3,3 +3,21 @@ claude.md
 prompt.md
 PR_DESCRIPTION.md
 
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.Python
+venv/
+env/
+*.db
+
+# Node
+node_modules/
+npm-debug.log
+.env
+.DS_Store

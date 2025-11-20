@@ -12,20 +12,23 @@ is structured hierarchically:
                         └── QuizAnswer (Answer options)
 
 It is intended that populate_database() is called automatically by
-create_database() in database.py when the database is empty, ensuring new
+create_database() in setup.py when the database is empty, ensuring new
 databases are automatically populated with quiz content.
 """
 # Handle imports for both module import and direct execution
 try:
     # Try relative imports first (when imported as module)
-    from ..database import Course, Unit, Concept, QuizCard, QuizAnswer
+    from ..models import Course, Unit, Concept, QuizCard, QuizAnswer
     from .cx50 import CX50_DATA
     from .ea50 import EA50_DATA
     from .fa50 import FA50_DATA
     from .mc50 import MC50_DATA
 except ImportError:
     # Fall back to absolute imports (when run from database directory)
-    from database import Course, Unit, Concept, QuizCard, QuizAnswer
+    try:
+        from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer
+    except ImportError:
+        from database.models import Course, Unit, Concept, QuizCard, QuizAnswer
     from seed_data.cx50 import CX50_DATA
     from seed_data.ea50 import EA50_DATA
     from seed_data.fa50 import FA50_DATA

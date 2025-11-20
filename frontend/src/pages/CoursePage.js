@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import UnitList from '../components/unit/UnitList';
+import * as api from '../services/api';
 
 /**
  * CoursePage - Course details page with units
@@ -9,49 +10,58 @@ import UnitList from '../components/unit/UnitList';
  * Displays course name, performance chart, and list of units for the course.
  * Uses URL parameter :courseId to determine which course to display.
  * Uses PageLayout for consistent two-column structure.
+ * 
+ * CHANGES: Replaced dummy data (hardcoded courses and units objects) with API calls
+ * to fetch real data from the backend. Added useState/useEffect hooks to manage
+ * API data fetching and state.
  */
 const CoursePage = () => {
   const { courseId } = useParams();
   const courseIdInt = parseInt(courseId, 10);
 
-  // Dummy data: Courses (aligned with DB schema)
-  // Schema: course_id (int, PK), title (varchar), description (varchar)
-  const courses = {
-    1: { course_id: 1, title: 'EA50', description: 'Problem Solving and Analysis' },
-    2: { course_id: 2, title: 'FA50', description: 'Fundamental Analysis' },
-    3: { course_id: 3, title: 'MC50', description: 'Metacognition and Critical Thinking' },
-    4: { course_id: 4, title: 'CX50', description: 'Complex Systems and Design' },
-  };
+  // State for course and units data fetched from API
+  // Previously: Used hardcoded dummy data objects (courses, courseUnits)
+  const [course, setCourse] = useState(null);
+  const [units, setUnits] = useState([]);
 
-  // Dummy data: Units for a course (aligned with DB schema)
-  // Schema: unit_id (int, PK), course_id (int, FK), title (varchar), description (varchar), order_index (int)
-  // Replace this with actual API call when backend is ready
-  const courseUnits = {
-    1: [ // EA50
-      { unit_id: 1, course_id: 1, title: 'Scientific Method', description: 'Introduction to scientific methodology', order_index: 1 },
-      { unit_id: 2, course_id: 1, title: 'Problem Solving', description: 'Problem-solving techniques and heuristics', order_index: 2 },
-    ],
-    2: [ // FA50
-      { unit_id: 3, course_id: 2, title: 'Analysis Techniques', description: 'Methods for data analysis', order_index: 1 },
-      { unit_id: 4, course_id: 2, title: 'Pattern Recognition', description: 'Identifying patterns in data', order_index: 2 },
-    ],
-    3: [ // MC50
-      { unit_id: 5, course_id: 3, title: 'Metacognition Basics', description: 'Understanding thinking about thinking', order_index: 1 },
-      { unit_id: 6, course_id: 3, title: 'Self-Assessment', description: 'Evaluating your own understanding', order_index: 2 },
-    ],
-    4: [ // CX50
-      { unit_id: 7, course_id: 4, title: 'User Experience', description: 'Designing for user needs', order_index: 1 },
-      { unit_id: 8, course_id: 4, title: 'Design Thinking', description: 'Creative problem-solving approach', order_index: 2 },
-    ],
-  };
+  useEffect(() => {
+    // CHANGED: Replaced dummy data lookup with API calls to fetch real course and units
+    // Previously: const course = courses[courseIdInt] || null;
+    // Previously: const units = courseUnits[courseIdInt] || [];
+    // Fetch course and units in parallel
+    Promise.all([
+      api.getCourse(courseIdInt),
+      api.getCourseUnits(courseIdInt)
+    ])
+      .then(([courseData, unitsData]) => {
+        // Map API response fields to component expectations
+        // Backend returns: {id, name/code, description} -> Component expects: {course_id, title, description}
+        setCourse({
+          course_id: courseData.id,
+          title: courseData.name || courseData.code,
+          description: courseData.description
+        });
 
-  const course = courses[courseIdInt] || null;
-  const units = courseUnits[courseIdInt] || [];
+        // Map API response fields to component expectations
+        // Backend returns: {id, name, ...} -> Component expects: {unit_id, title, ...}
+        const mappedUnits = unitsData.map(u => ({
+          unit_id: u.id,
+          course_id: u.course_id,
+          title: u.name,
+          description: u.description,
+          order_index: u.order_index
+        }));
+        setUnits(mappedUnits);
+      })
+      .catch(err => {
+        console.error('Error fetching course data:', err);
+      });
+  }, [courseIdInt]);
 
-  // Dummy chart data - performance within this course
+  // Chart data - performance within this course
   const chartData = {
     labels: units.map(u => u.title),
-    values: units.map(() => Math.floor(Math.random() * 100)), // Placeholder values
+    values: units.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
   };
 
   return (
