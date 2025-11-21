@@ -56,7 +56,7 @@ const LoginPage = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-title">Gamify-HC</h1>
-        <h2 className="auth-subtitle">Sign In</h2>
+        <h2 className="auth-subtitle">Log In</h2>
 
         {error && <div className="auth-error">{error}</div>}
 
@@ -92,7 +92,7 @@ const LoginPage = () => {
             className="auth-button"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
 
