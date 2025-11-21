@@ -3,6 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import * as api from '../../../services/api';
 import './Header.css';
 
+const isAuthenticated = () => {
+  return localStorage.getItem('token') !== null;
+};
+
 const Header = () => {
   const location = useLocation();
   const pathParts = location.pathname.split('/');
@@ -96,6 +100,11 @@ const Header = () => {
           </div>
         ))}
       </nav>
+      {isAuthenticated() && (
+        <button className="header__logout-button">
+          <span className="material-symbols-outlined">logout</span>
+        </button>
+      )}
     </header>
   );
 };
