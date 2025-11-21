@@ -33,6 +33,23 @@
   }
 }
 
+/* Back button bar - positioned between header and main content */
+.page-layout__back-button-bar {
+  background-color: #ffffff;
+  padding: 20px var(--page-padding);
+  margin-top: 12px;
+  border-bottom: 1px solid #ddd;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+}
+
+.page-layout__back-button-bar button {
+  padding: 8px 16px;
+  width: auto;
+}
+
 .page-layout {
   display: flex;
   gap: var(--column-gap);

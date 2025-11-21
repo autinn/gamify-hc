@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import * as api from '../../../services/api';
 import './Header.css';
 
 const Header = () => {
@@ -8,32 +9,49 @@ const Header = () => {
   const courseId = pathParts[2];
   
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [courseUnits, setCourseUnits] = useState({});
 
-  const courseUnits = {
-    EA50: [
-      { id: 1, name: 'Scientific Method' },
-      { id: 2, name: 'Problem Solving' },
-    ],
-    FA50: [
-      { id: 1, name: 'Logical Thinking' },
-      { id: 2, name: 'Pattern Recognition' },
-    ],
-    MC50: [
-      { id: 1, name: 'Close Reading: How does language shape and represent reality?' },
-      { id: 2, name: 'Self-Assessment' },
-    ],
-    CX50: [
-      { id: 1, name: 'Characteristics of Complex Systems' },
-      { id: 2, name: 'Design Thinking' },
-    ],
-  };
-
-  const courses = [
-    { id: 'EA50', label: 'EA50' },
-    { id: 'FA50', label: 'FA50' },
-    { id: 'MC50', label: 'MC50' },
-    { id: 'CX50', label: 'CX50' },
-  ];
+  useEffect(() => {
+    // Fetch all courses from API
+    api.getCourses()
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          // Map API response to component expectations
+          const mappedCourses = data.map(c => ({
+            id: c.id || c.course_id,
+            label: c.name || c.code || c.title
+          }));
+          setCourses(mappedCourses);
+          
+          // Fetch units for each course
+          const unitsMap = {};
+          Promise.all(
+            mappedCourses.map(course =>
+              api.getCourseUnits(course.id)
+                .then(units => {
+                  if (Array.isArray(units)) {
+                    unitsMap[course.id] = units.map(u => ({
+                      id: u.id || u.unit_id,
+                      name: u.name || u.title
+                    }));
+                  }
+                })
+                .catch(err => {
+                  console.error(`Error fetching units for course ${course.id}:`, err);
+                  unitsMap[course.id] = [];
+                })
+            )
+          ).then(() => {
+            setCourseUnits(unitsMap);
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching courses:', err);
+        setCourses([]);
+      });
+  }, []);
 
   const handleMouseEnter = (courseId) => {
     setOpenDropdown(courseId);

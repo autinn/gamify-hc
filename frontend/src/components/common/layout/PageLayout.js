@@ -30,6 +30,9 @@ const PageLayout = ({
   startQuizPath,
   // optional custom left-side content to render instead of the PerformanceChart
   leftContent,
+  // optional back button configuration
+  showBackButton = false,
+  onBackClick,
 }) => {
   const navigate = useNavigate();
   return (
@@ -37,6 +40,16 @@ const PageLayout = ({
       <div className="page-layout__header-wrapper">
         <Header />
       </div>
+      {/* Back Button - Separate container between header and page */}
+      {showBackButton && (
+        <div className="page-layout__back-button-bar">
+          <Button
+            label="← Back"
+            variant="secondary"
+            onClick={onBackClick || (() => navigate(-1))}
+          />
+        </div>
+      )}
       <div className="page-layout">
       {/* Left Column: Greeting, Title, Button, Chart */}
       <div className="page-layout__left-column">

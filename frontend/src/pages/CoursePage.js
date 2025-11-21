@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import UnitList from '../components/unit/UnitList';
 import * as api from '../services/api';
@@ -17,6 +17,7 @@ import * as api from '../services/api';
  */
 const CoursePage = () => {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const courseIdInt = parseInt(courseId, 10);
 
   // State for course and units data fetched from API
@@ -73,6 +74,8 @@ const CoursePage = () => {
       chartData={chartData}
       chartLabel="Questions you answered correctly (% correct answered)"
       rightContent={<UnitList courseId={courseId} units={units} />}
+      showBackButton={true}
+      onBackClick={() => navigate('/')}
     />
   );
 };

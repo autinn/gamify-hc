@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import ConceptList from '../components/concept/ConceptList';
 import * as api from '../services/api';
@@ -17,6 +17,7 @@ import * as api from '../services/api';
  */
 const UnitPage = () => {
   const { courseId, unitId } = useParams();
+  const navigate = useNavigate();
   const courseIdInt = parseInt(courseId, 10);
   const unitIdInt = parseInt(unitId, 10);
 
@@ -95,6 +96,8 @@ const UnitPage = () => {
       chartData={chartData}
       chartLabel="Problem Solving HCs"
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
+      showBackButton={true}
+      onBackClick={() => navigate(`/course/${courseId}`)}
     />
   );
 };
