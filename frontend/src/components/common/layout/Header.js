@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as api from '../../../services/api';
 import './Header.css';
 
@@ -9,6 +9,7 @@ const isAuthenticated = () => {
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathParts = location.pathname.split('/');
   const courseId = pathParts[2];
   
@@ -65,6 +66,11 @@ const Header = () => {
     setOpenDropdown(null);
   };
 
+  const handleLogout = () => {
+    api.logout();
+    navigate('/login');
+  };
+
   return (
     <header className="header">
       <Link to="/" className="header__home-button">
@@ -101,7 +107,7 @@ const Header = () => {
         ))}
       </nav>
       {isAuthenticated() && (
-        <button className="header__logout-button">
+        <button className="header__logout-button" onClick={handleLogout}>
           <span className="material-symbols-outlined">logout</span>
         </button>
       )}
