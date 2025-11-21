@@ -68,7 +68,7 @@ const LoginPage = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder="email@uni.minerva.edu"
               className="form-input"
               disabled={loading}
             />

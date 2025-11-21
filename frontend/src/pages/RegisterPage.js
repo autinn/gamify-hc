@@ -126,7 +126,7 @@ const RegisterPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="your@email.com"
+              placeholder="email@uni.minerva.edu"
               className="form-input"
               disabled={loading}
             />
