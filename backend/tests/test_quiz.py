@@ -633,3 +633,128 @@ class TestSubmitQuizAnswer:
         data = json.loads(response.data)
         assert data['explanation'] is None
 
+    def test_submit_quiz_answer_missing_token(
+        self, test_client, sample_quiz_card, sample_quiz_answers
+    ):
+        """
+        Test submitting quiz answer without authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates missing token
+        """
+        correct_answer = next(
+            a for a in sample_quiz_answers if a.is_correct
+        )
+
+        response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': correct_answer.answer_id
+            }
+            # No Authorization header
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+        assert 'token' in data['error'].lower() or 'authorization' in data['error'].lower()
+
+    def test_submit_quiz_answer_invalid_token(
+        self, test_client, sample_quiz_card, sample_quiz_answers
+    ):
+        """
+        Test submitting quiz answer with invalid authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid token
+        """
+        correct_answer = next(
+            a for a in sample_quiz_answers if a.is_correct
+        )
+
+        response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': correct_answer.answer_id
+            },
+            headers={'Authorization': 'Bearer invalid_token_12345'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+        assert 'invalid' in data['error'].lower() or 'expired' in data['error'].lower()
+
+    def test_submit_quiz_answer_expired_token(
+        self, test_client, sample_quiz_card, sample_quiz_answers
+    ):
+        """
+        Test submitting quiz answer with expired authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates expired token
+        """
+        import jwt
+        from datetime import datetime, timedelta
+
+        # Create expired token
+        expired_payload = {
+            'user_id': 1,
+            'exp': datetime.utcnow() - timedelta(hours=1),
+            'iat': datetime.utcnow() - timedelta(hours=2)
+        }
+        expired_token = jwt.encode(
+            expired_payload,
+            'dev-secret-key-change-in-production',
+            algorithm='HS256'
+        )
+
+        correct_answer = next(
+            a for a in sample_quiz_answers if a.is_correct
+        )
+
+        response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': correct_answer.answer_id
+            },
+            headers={'Authorization': f'Bearer {expired_token}'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+
+    def test_submit_quiz_answer_invalid_header_format(
+        self, test_client, sample_quiz_card, sample_quiz_answers
+    ):
+        """
+        Test submitting quiz answer with invalid Authorization header format.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid header format
+        """
+        correct_answer = next(
+            a for a in sample_quiz_answers if a.is_correct
+        )
+
+        response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': correct_answer.answer_id
+            },
+            headers={'Authorization': 'InvalidFormat token'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+
