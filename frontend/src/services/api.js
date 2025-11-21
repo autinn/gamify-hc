@@ -143,6 +143,30 @@ export async function getCurrentUser() {
   return apiRequest('/auth/me');
 }
 
+/**
+ * Logout function - client-side only
+ * 
+ * Note: This function does NOT call a backend route because JWT tokens are stateless.
+ * Unlike session-based authentication, there is no server-side session to invalidate.
+ * 
+ * How it works:
+ * - Removes the JWT token from localStorage, preventing authenticated API requests
+ * - Clears all user data from localStorage
+ * - The token itself remains valid until expiration (24 hours), but without it in
+ *   localStorage, the user cannot make authenticated requests
+ * 
+ * If immediate token invalidation is needed (e.g., security requirements), a backend
+ * logout endpoint with token blacklisting would be required, but this adds complexity
+ * and is typically unnecessary for most applications.
+ */
+export function logout() {
+  // Clear all authentication-related data from localStorage
+  localStorage.removeItem('token');
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('user_email');
+  localStorage.removeItem('user_username');
+}
+
 // ========================================
 // HEALTH CHECK
 // ========================================
