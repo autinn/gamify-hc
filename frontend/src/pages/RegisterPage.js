@@ -30,7 +30,9 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    const normalizedEmail = formData.email.trim().toLowerCase();
+
+    if (!formData.username || !normalizedEmail || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return false;
     }
@@ -40,8 +42,8 @@ const RegisterPage = () => {
       return false;
     }
 
-    if (!formData.email.includes('@')) {
-      setError('Please enter a valid email address');
+    if (!normalizedEmail.endsWith('@minerva.edu')) {
+      setError('Please use your @minerva.edu email');
       return false;
     }
 
@@ -70,14 +72,16 @@ const RegisterPage = () => {
 
     try {
       // Register new user
+      const normalizedEmail = formData.email.trim().toLowerCase();
+
       await api.register(
         formData.username,
-        formData.email,
+        normalizedEmail,
         formData.password
       );
 
       // Automatically log in after successful registration
-      const loginData = await api.login(formData.email, formData.password);
+      const loginData = await api.login(normalizedEmail, formData.password);
       
       // Store token and user data
       localStorage.setItem('token', loginData.access_token);

@@ -86,7 +86,7 @@ const Header = () => {
           >
             <Link
               to={`/course/${course.id}`}
-              className={`header__course-link ${courseId === course.id ? 'header__course-link--active' : ''}`}
+              className={`header__course-link ${String(course.id) === courseId ? 'header__course-link--active' : ''}`}
             >
               {course.label}
             </Link>

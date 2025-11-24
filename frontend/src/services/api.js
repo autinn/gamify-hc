@@ -3,7 +3,7 @@
  * Use these functions in your React components to fetch data from the backend
  */
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';
 
 // Helper function to get auth token from localStorage
 export function getAuthToken() {
