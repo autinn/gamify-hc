@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import * as api from '../services/api';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import './AuthPage.css';
 
 /**
@@ -11,49 +11,14 @@ import './AuthPage.css';
  * Includes link to register page for new users.
  */
 const LoginPage = () => {
-  const navigate = useNavigate();
+  const { login, error, loading, setError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
-    try {
-      const normalizedEmail = email.trim().toLowerCase();
-
-      if (!normalizedEmail || !password) {
-        setError('Please fill in all fields');
-        setLoading(false);
-        return;
-      }
-
-      if (!normalizedEmail.includes('minerva.edu')) {
-        setError('Please use an email that contains "minerva.edu"');
-        setLoading(false);
-        return;
-      }
-
-      // Call login API - backend accepts email in username field
-      const data = await api.login(normalizedEmail, password);
-      
-      // Store token and user data
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user_id', data.user_id);
-      localStorage.setItem('user_email', data.email);
-      localStorage.setItem('user_username', data.username);
-      
-      navigate('/');
-    } catch (err) {
-      // Display error message from backend if available
-      const errorMessage = err.data?.error || err.message || 'Login failed. Please try again.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    await login(email, password);
   };
 
   return (
