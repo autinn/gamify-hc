@@ -78,8 +78,10 @@ const UnitPage = () => {
     values: concepts.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
   };
 
-  // Build greeting with course and unit names
-  const greeting = course && unit 
+  // Build greeting with course and unit number (using order_index + 1)
+  const greeting = course && unit && unit.order_index !== undefined && unit.order_index !== null
+    ? `${course.title} - Unit ${unit.order_index + 1}`
+    : course && unit
     ? `${course.title} - ${unit.title}`
     : course 
     ? `${course.title} - Unit ${unitId}`
