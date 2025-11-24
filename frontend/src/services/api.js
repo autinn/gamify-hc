@@ -102,6 +102,15 @@ export async function getUnitQuizCards(unitId) {
   return apiRequest(`/units/${unitId}/quiz-cards`);
 }
 
+/**
+ * Fetch random quiz cards from all courses
+ * Used for global practice quiz without a specific course context
+ * @returns {Promise<Array>} Array of random quiz cards from all courses
+ */
+export async function getGlobalQuizCards() {
+  return apiRequest('/quiz-cards/random');
+}
+
 export async function submitQuizAnswer(data) {
   return apiRequest('/quiz-submit', {
     method: 'POST',
