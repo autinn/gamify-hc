@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import * as api from '../services/api';
 import './AuthPage.css';
 
 /**
@@ -22,32 +23,35 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // TODO: Replace with actual API call once backend authentication is ready
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password }),
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message);
-      // localStorage.setItem('token', data.token);
+      const normalizedEmail = email.trim().toLowerCase();
 
-      // Temporary: For testing, accept any non-empty credentials
-      if (!email || !password) {
+      if (!normalizedEmail || !password) {
         setError('Please fill in all fields');
         setLoading(false);
         return;
       }
 
-      // Simulate API delay
-      setTimeout(() => {
-        localStorage.setItem('user_email', email);
-        localStorage.setItem('token', 'dummy_token_' + Date.now());
-        navigate('/');
+      if (!normalizedEmail.endsWith('@minerva.edu')) {
+        setError('Please use your @minerva.edu email');
         setLoading(false);
-      }, 500);
+        return;
+      }
+
+      // Call login API - backend accepts email in username field
+      const data = await api.login(normalizedEmail, password);
+      
+      // Store token and user data
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user_id', data.user_id);
+      localStorage.setItem('user_email', data.email);
+      localStorage.setItem('user_username', data.username);
+      
+      navigate('/');
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      // Display error message from backend if available
+      const errorMessage = err.data?.error || err.message || 'Login failed. Please try again.';
+      setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };
