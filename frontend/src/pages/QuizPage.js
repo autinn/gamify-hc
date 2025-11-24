@@ -45,7 +45,8 @@ const QuizPage = () => {
         // Backend returns: {id, question, answers: [{id, answer_text, ...}]}
         // Component expects: {id, text, options: [{id, text, ...}]}
         const shuffled = [...quizCards].sort(() => Math.random() - 0.5);
-        setQuestions(shuffled.map(qc => ({
+        const selected = shuffled.slice(0, 5);   // ← pick first 5 after shuffle
+        setQuestions(selected.map(qc => ({
           id: qc.id,
           text: qc.question,
           options: qc.answers.map(a => ({
