@@ -23,14 +23,22 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      if (!email || !password) {
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (!normalizedEmail || !password) {
         setError('Please fill in all fields');
         setLoading(false);
         return;
       }
 
+      if (!normalizedEmail.endsWith('@minerva.edu')) {
+        setError('Please use your @minerva.edu email');
+        setLoading(false);
+        return;
+      }
+
       // Call login API - backend accepts email in username field
-      const data = await api.login(email, password);
+      const data = await api.login(normalizedEmail, password);
       
       // Store token and user data
       localStorage.setItem('token', data.access_token);
