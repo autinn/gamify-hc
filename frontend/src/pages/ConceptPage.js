@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../components/common/UI/Button';
-import QuestionAnswerBlocks from '../components/concept/QuestionAnswerBlocks';
+import ConceptDetail from '../components/concept/ConceptDetail';
 import Header from '../components/common/layout/Header';
 import * as api from '../services/api';
 import './ConceptPage.css';
@@ -137,7 +137,7 @@ const ConceptPage = () => {
 
       {/* Content Section */}
       <div className="concept-page__content">
-        <QuestionAnswerBlocks quizCards={quizCards} />
+        <ConceptDetail quizCards={quizCards} />
       </div>
       </div>
     </>
