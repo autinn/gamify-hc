@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { fetchQuizByLevel, shuffleArray } from '../services/quizService';
+import { fetchQuizByLevel, getShuffledQuizQuestions } from '../services/quizService';
 
 export function useQuiz(courseId, unitId, conceptId) {
   const [questions, setQuestions] = useState([]);
@@ -18,9 +18,7 @@ export function useQuiz(courseId, unitId, conceptId) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Determine which level of quiz to fetch
-    if (!courseId && !unitId && !conceptId) return;
-
+    // Fetch quiz - works for both specific level (course/unit/concept) and global quiz
     setLoading(true);
     setError(null);
     setCurrentIndex(0);
@@ -30,8 +28,9 @@ export function useQuiz(courseId, unitId, conceptId) {
     fetchQuizByLevel(courseId, unitId, conceptId)
       .then(quizCards => {
         if (quizCards && quizCards.length > 0) {
-          const shuffled = shuffleArray(quizCards);
-          setQuestions(shuffled);
+          // Shuffle and limit to 5 questions
+          const selected = getShuffledQuizQuestions(quizCards);
+          setQuestions(selected);
         }
       })
       .catch(err => {

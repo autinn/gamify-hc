@@ -9,12 +9,12 @@ import * as api from './api';
 import { mapQuizCardsArray } from './dataMappers';
 
 /**
- * Fetch quiz cards based on level (course, unit, or concept)
+ * Fetch quiz cards based on level (course, unit, concept, or global)
  * @param {number} courseId - Course ID (optional)
  * @param {number} unitId - Unit ID (optional)
  * @param {number} conceptId - Concept ID (optional)
  * @returns {Promise<Array>} Array of mapped quiz cards
- * @throws {Error} If no valid quiz level provided
+ * Fetches from global pool if no specific level provided
  */
 export async function fetchQuizByLevel(courseId, unitId, conceptId) {
   let quizCards;
@@ -26,7 +26,8 @@ export async function fetchQuizByLevel(courseId, unitId, conceptId) {
   } else if (courseId) {
     quizCards = await api.getCourseQuizCards(parseInt(courseId, 10));
   } else {
-    throw new Error('No valid quiz level provided (courseId, unitId, or conceptId required)');
+    // Global quiz - fetch random questions from all courses
+    quizCards = await api.getGlobalQuizCards();
   }
 
   return mapQuizCardsArray(quizCards);
@@ -39,6 +40,17 @@ export async function fetchQuizByLevel(courseId, unitId, conceptId) {
  */
 export function shuffleArray(array) {
   return [...array].sort(() => Math.random() - 0.5);
+}
+
+/**
+ * Get shuffled quiz questions limited to 5
+ * Shuffles the quiz cards and returns only the first 5
+ * @param {Array} quizCards - Array of quiz cards
+ * @returns {Array} First 5 shuffled quiz cards
+ */
+export function getShuffledQuizQuestions(quizCards) {
+  const shuffled = shuffleArray(quizCards);
+  return shuffled.slice(0, 5); // Limit to 5 questions
 }
 
 /**
