@@ -11,8 +11,9 @@ import './UnitCard.css';
  * @param {string} courseId - Parent course ID (course_id from URL)
  * @param {number} unitId - Unit ID (unit_id from DB schema)
  * @param {string} unitTitle - Unit title (e.g., "Problem-Solving")
+ * @param {number} orderIndex - Unit order index (1-based) for display
  */
-const UnitCard = ({ courseId, unitId, unitTitle }) => {
+const UnitCard = ({ courseId, unitId, unitTitle, orderIndex }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -21,7 +22,11 @@ const UnitCard = ({ courseId, unitId, unitTitle }) => {
 
   return (
     <div className="unit-card" onClick={handleClick} role="button" tabIndex={0}>
-      <p className="unit-card__name">{unitTitle}</p>
+      <p className="unit-card__name">
+        {orderIndex !== undefined && orderIndex !== null 
+          ? `Unit ${orderIndex + 1}: ${unitTitle}`
+          : unitTitle}
+      </p>
     </div>
   );
 };

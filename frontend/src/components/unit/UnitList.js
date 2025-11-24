@@ -16,14 +16,18 @@ import './UnitList.css';
  *   ]
  */
 const UnitList = ({ courseId, units }) => {
+  // Sort units by order_index to ensure consistent display order
+  const sortedUnits = [...units].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+  
   return (
     <div className="unit-list">
-      {units.map((unit) => (
+      {sortedUnits.map((unit) => (
         <UnitCard
           key={unit.unit_id}
           courseId={courseId}
           unitId={unit.unit_id}
           unitTitle={unit.title}
+          orderIndex={unit.order_index}
         />
       ))}
     </div>

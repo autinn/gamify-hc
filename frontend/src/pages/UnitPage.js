@@ -94,7 +94,7 @@ const UnitPage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/unit/${unitId}/quiz`}
       chartData={chartData}
-      chartLabel="Problem Solving HCs"
+      chartLabel="No. of questions answered"
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
       showBackButton={true}
       onBackClick={() => navigate(`/course/${courseId}`)}
