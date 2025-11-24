@@ -60,11 +60,17 @@ const CoursePage = () => {
   }, [courseIdInt]);
 
   // Chart data - performance within this course
-  // Sort units by order_index and use "Unit 1", "Unit 2", etc. for labels
-  // Note: order_index is 0-based in DB, so we add 1 for display
+  // Sort units by order_index and use order_index from DB (0-based, so add 1 for display)
   const sortedUnits = [...units].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
   const chartData = {
-    labels: sortedUnits.map((u, index) => `Unit ${(u.order_index !== undefined && u.order_index !== null ? u.order_index : index) + 1}`),
+    labels: sortedUnits.map((u) => {
+      // order_index is 0-based in DB (starts at 0), so add 1 for display (Unit 1, Unit 2, etc.)
+      if (u.order_index !== undefined && u.order_index !== null) {
+        return `Unit ${u.order_index + 1}`;
+      }
+      // Fallback if order_index is missing
+      return u.title;
+    }),
     values: sortedUnits.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
   };
 

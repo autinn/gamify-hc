@@ -74,7 +74,7 @@ const UnitPage = () => {
 
   // Chart data - concept performance within this unit
   const chartData = {
-    labels: concepts.map(c => c.title.replace('#', '')),
+    labels: concepts.map(c => c.title),
     values: concepts.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
   };
 

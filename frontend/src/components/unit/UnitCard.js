@@ -11,7 +11,7 @@ import './UnitCard.css';
  * @param {string} courseId - Parent course ID (course_id from URL)
  * @param {number} unitId - Unit ID (unit_id from DB schema)
  * @param {string} unitTitle - Unit title (e.g., "Problem-Solving")
- * @param {number} orderIndex - Unit order index (1-based) for display
+ * @param {number} orderIndex - Unit order index from database for display
  */
 const UnitCard = ({ courseId, unitId, unitTitle, orderIndex }) => {
   const navigate = useNavigate();
