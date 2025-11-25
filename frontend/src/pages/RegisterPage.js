@@ -27,41 +27,9 @@ const RegisterPage = () => {
     }));
   };
 
-  const validateForm = () => {
-    const normalizedEmail = formData.email.trim().toLowerCase();
-
-    if (!formData.username || !normalizedEmail || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields');
-      return false;
-    }
-
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters long');
-      return false;
-    }
-
-    if (!normalizedEmail.endsWith('@minerva.edu')) {
-      setError('Please use your @minerva.edu email');
-      return false;
-    }
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return false;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
     const { username, email, password, confirmPassword } = formData;
     await register(username, email, password, confirmPassword);
   };
