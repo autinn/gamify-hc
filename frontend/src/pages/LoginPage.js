@@ -31,8 +31,8 @@ const LoginPage = () => {
         return;
       }
 
-      if (!normalizedEmail.endsWith('@minerva.edu')) {
-        setError('Please use your @minerva.edu email');
+      if (!normalizedEmail.includes('minerva.edu')) {
+        setError('Please use an email that contains "minerva.edu"');
         setLoading(false);
         return;
       }
