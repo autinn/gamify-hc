@@ -1,6 +1,6 @@
 # gamify-hc
 
-A gamified learning platform for Harvard College courses.
+A gamified learning platform for Habits of Mind and Foundational Concepts.
 
 ## Quick Start
 
@@ -9,20 +9,17 @@ A gamified learning platform for Harvard College courses.
 pip install -r requirements.txt
 ```
 
-### 2. Create Database
-```bash
-python backend/database/database.py
-```
-
-### 3. Start Backend API
+### 2. Start Backend API
 ```bash
 python run.py
 ```
 ✅ API runs at: **http://localhost:5001**
 
+The database will be automatically created and seeded on first run.
+
 Test it: Open http://localhost:5001/api/health in your browser
 
-### 4. Start Frontend (in new terminal)
+### 3. Start Frontend (in new terminal)
 ```bash
 cd frontend
 npm install  # first time only
@@ -35,6 +32,11 @@ npm start
 ## API Endpoints
 
 All endpoints start with `/api/`:
+
+**Authentication:**
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login and receive JWT token
+- `GET /api/auth/me` - Get current user info (requires authentication)
 
 **Courses:**
 - `GET /api/courses` - Get all courses
@@ -53,7 +55,7 @@ All endpoints start with `/api/`:
 - `GET /api/quiz-cards/:id` - Get quiz card with answers
 - `POST /api/quiz-submit` - Submit answer
 
-**User:**
+**Users:**
 - `GET /api/users/:id` - Get user info
 - `GET /api/users/:id/progress` - Get user progress
 
@@ -80,16 +82,32 @@ const result = await api.submitQuizAnswer({
 
 ---
 
-## Files
+## Project Structure
 
 ```
 ├── backend/
-│   ├── app.py              # Flask API (all endpoints)
-│   └── database/
-│       ├── database.py     # Database models
-│       └── test.db        # SQLite database (created after setup)
-├── frontend/src/services/
-│   └── api.js             # API helper functions
-├── run.py                  # Start API server
-└── requirements.txt        # Python packages
+│   ├── app.py                    # Flask app factory with blueprint registration
+│   ├── routes/                   # API route blueprints (auth, courses, units, etc.)
+│   ├── database/
+│   │   ├── models.py            # SQLAlchemy database models
+│   │   ├── setup.py             # Database initialization
+│   │   ├── gamify_hc.db         # SQLite database (auto-created)
+│   │   └── seed_data/           # Seed data scripts
+│   ├── utils/
+│   │   └── database_manager.py  # Database session management
+│   └── tests/                   # Test suite
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   ├── pages/               # Page components
+│   │   └── services/api.js      # API helper functions
+│   └── package.json
+├── docs/                        # Project documentation
+├── run.py                       # Start API server
+└── requirements.txt             # Python packages
 ```
+
+For detailed documentation, see:
+- Backend: `backend/README.md`
+- Frontend: `frontend/README.md`
+- Contributing: `docs/USING_GITHUB.md`
