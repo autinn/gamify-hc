@@ -3,21 +3,38 @@
  * Use these functions in your React components to fetch data from the backend
  */
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';
+
+// Helper function to get auth token from localStorage
+export function getAuthToken() {
+  return localStorage.getItem('token');
+}
 
 // Helper function for API calls
 async function apiRequest(endpoint, options = {}) {
   try {
+    const token = getAuthToken();
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    // Automatically include Authorization header if token exists
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
       ...options,
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      const error = new Error(errorData.error || `API Error: ${response.status}`);
+      error.status = response.status;
+      error.data = errorData;
+      throw error;
     }
 
     return await response.json();
@@ -102,6 +119,44 @@ export async function getUser(userId) {
 
 export async function getUserProgress(userId) {
   return apiRequest(`/users/${userId}/progress`);
+}
+
+// ========================================
+// AUTHENTICATION
+// ========================================
+
+export async function register(username, email, password) {
+  return apiRequest('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ username, email, password }),
+  });
+}
+
+export async function login(username, password) {
+  return apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
+}
+
+export async function getCurrentUser() {
+  return apiRequest('/auth/me');
+}
+
+/**
+ * Logout function - client-side only
+ * 
+ * How it works:
+ * - Removes the JWT token from localStorage, preventing authenticated API requests
+ * - Clears all user data from localStorage
+ * - The token itself remains valid until expiration (24 hours), but without it in
+ *   localStorage, the user cannot make authenticated requests
+ */
+export function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('user_email');
+  localStorage.removeItem('user_username');
 }
 
 // ========================================
