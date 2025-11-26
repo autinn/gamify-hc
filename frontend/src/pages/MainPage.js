@@ -47,9 +47,10 @@ const MainPage = () => {
   }, []);
 
   // Chart data - shows performance across courses
+  // Realistic values: 0-20 questions answered per course
   const chartData = {
     labels: courses.map(c => c.title),
-    values: [65, 45, 55, 35], // Dummy performance values
+    values: courses.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
   };
 
   return (

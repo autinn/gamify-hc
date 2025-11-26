@@ -71,7 +71,7 @@ const CoursePage = () => {
       // Fallback if order_index is missing
       return u.title;
     }),
-    values: sortedUnits.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
+    values: sortedUnits.map(() => Math.floor(Math.random() * 21)), // 0-20 questions per unit
   };
 
   return (
