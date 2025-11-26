@@ -1,8 +1,40 @@
 /**
  * useQuiz Hook
  * 
- * Manages quiz state including questions, current index, answers tracking.
- * Handles multi-level quizzes (course, unit, concept).
+ * Manages quiz state including questions, current index, answers tracking, and scoring.
+ * Handles multi-level quizzes: course-level, unit-level, concept-level, and global random quizzes.
+ * Questions are automatically shuffled and limited to 5 per quiz.
+ * 
+ * @component
+ * @param {number} [courseId] - Course ID for course-level quiz (optional)
+ * @param {number} [unitId] - Unit ID for unit-level quiz (optional)
+ * @param {number} [conceptId] - Concept ID for concept-level quiz (optional)
+ * @returns {Object} Quiz object with state and handlers
+ * @returns {Array} returns.questions - Array of shuffled quiz questions (max 5)
+ * @returns {Object} returns.currentQuestion - Currently displayed question object
+ * @returns {number} returns.currentIndex - Index of current question (0-based)
+ * @returns {number} returns.correctCount - Number of correctly answered questions
+ * @returns {number} returns.totalCount - Total number of questions in quiz
+ * @returns {boolean} returns.isAnsweredCorrectly - Whether current question was answered correctly
+ * @returns {boolean} returns.isQuizDone - True when all questions have been answered
+ * @returns {boolean} returns.loading - True while quiz data is being fetched
+ * @returns {Error|null} returns.error - Error object if quiz loading failed
+ * @returns {Function} returns.handleCorrect - Handler to mark current question as correct
+ * @returns {Function} returns.handleNext - Handler to move to next question
+ * 
+ * @example
+ * // Global random quiz
+ * const quiz = useQuiz();
+ * 
+ * // Course-level quiz
+ * const quiz = useQuiz(courseId);
+ * 
+ * // Unit-level quiz
+ * const quiz = useQuiz(courseId, unitId);
+ * 
+ * // Concept-level quiz
+ * const quiz = useQuiz(courseId, unitId, conceptId);
+ * 
  * Used by: QuizPage
  */
 

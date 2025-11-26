@@ -1,7 +1,29 @@
 /**
  * useCourse Hook
  * 
- * Manages single course fetching with its units.
+ * Fetches a single course and all its units.
+ * Useful for displaying course details with available units.
+ * 
+ * @component
+ * @param {number|string} courseId - The ID of the course to fetch
+ * @returns {Object} Course data object
+ * @returns {Object|null} returns.course - Course object {course_id, title, description} or null
+ * @returns {Array} returns.units - Array of unit objects for this course
+ * @returns {boolean} returns.loading - True while course data is being fetched
+ * @returns {Error|null} returns.error - Error object if fetch failed
+ * 
+ * @example
+ * const { course, units, loading, error } = useCourse(courseId);
+ * 
+ * if (loading) return <div>Loading...</div>;
+ * if (error) return <div>Error: {error.message}</div>;
+ * return (
+ *   <>
+ *     <h1>{course.title}</h1>
+ *     {units.map(unit => <UnitCard key={unit.unit_id} unit={unit} />)}
+ *   </>
+ * );
+ * 
  * Used by: CoursePage
  */
 
