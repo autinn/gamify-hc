@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as api from '../../../services/api';
 import './Header.css';
 
+const isAuthenticated = () => {
+  return localStorage.getItem('token') !== null;
+};
+
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathParts = location.pathname.split('/');
   const courseId = pathParts[2];
   
@@ -61,6 +66,11 @@ const Header = () => {
     setOpenDropdown(null);
   };
 
+  const handleLogout = () => {
+    api.logout();
+    navigate('/login');
+  };
+
   return (
     <header className="header">
       <Link to="/" className="header__home-button">
@@ -76,7 +86,7 @@ const Header = () => {
           >
             <Link
               to={`/course/${course.id}`}
-              className={`header__course-link ${courseId === course.id ? 'header__course-link--active' : ''}`}
+              className={`header__course-link ${String(course.id) === courseId ? 'header__course-link--active' : ''}`}
             >
               {course.label}
             </Link>
@@ -96,6 +106,11 @@ const Header = () => {
           </div>
         ))}
       </nav>
+      {isAuthenticated() && (
+        <button className="header__logout-button" onClick={handleLogout}>
+          <span className="material-symbols-outlined">logout</span>
+        </button>
+      )}
     </header>
   );
 };

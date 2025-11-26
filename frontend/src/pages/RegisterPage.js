@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import * as api from '../services/api';
 import './AuthPage.css';
 
 /**
@@ -29,7 +30,9 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    const normalizedEmail = formData.email.trim().toLowerCase();
+
+    if (!formData.username || !normalizedEmail || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return false;
     }
@@ -39,13 +42,13 @@ const RegisterPage = () => {
       return false;
     }
 
-    if (!formData.email.includes('@')) {
-      setError('Please enter a valid email address');
+    if (!normalizedEmail.includes('minerva.edu')) {
+      setError('Please use an email that contains "minerva.edu"');
       return false;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
       return false;
     }
 
@@ -68,29 +71,30 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      // TODO: Replace with actual API call once backend authentication is ready
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     username: formData.username,
-      //     email: formData.email,
-      //     password: formData.password,
-      //   }),
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message);
+      // Register new user
+      const normalizedEmail = formData.email.trim().toLowerCase();
 
-      // Simulate API delay and success
-      setTimeout(() => {
-        localStorage.setItem('user_email', formData.email);
-        localStorage.setItem('user_username', formData.username);
-        localStorage.setItem('token', 'dummy_token_' + Date.now());
-        navigate('/');
-        setLoading(false);
-      }, 500);
+      await api.register(
+        formData.username,
+        normalizedEmail,
+        formData.password
+      );
+
+      // Automatically log in after successful registration
+      const loginData = await api.login(normalizedEmail, formData.password);
+      
+      // Store token and user data
+      localStorage.setItem('token', loginData.access_token);
+      localStorage.setItem('user_id', loginData.user_id);
+      localStorage.setItem('user_email', loginData.email);
+      localStorage.setItem('user_username', loginData.username);
+      
+      navigate('/');
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      // Display error message from backend if available
+      const errorMessage = err.data?.error || err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };

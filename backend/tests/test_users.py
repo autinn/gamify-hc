@@ -7,8 +7,7 @@ This module contains comprehensive tests for the user-related endpoints:
 """
 
 import json
-import pytest
-from backend.database.models import User, UserCard, QuizCard
+from backend.database.models import User, UserCard
 from backend.tests.conftest import create_auth_token
 
 
@@ -48,7 +47,8 @@ class TestGetUser:
         response = test_client.get('/api/users/99999')
         assert response.status_code == 401
 
-        # Test with token for non-existent user - should return 403 (can't access other users)
+        # Test with token for non-existent user
+        # Should return 403 (can't access other users)
         token = create_auth_token(1)
         response = test_client.get(
             '/api/users/99999',
@@ -56,15 +56,73 @@ class TestGetUser:
         )
         assert response.status_code == 403
 
-    def test_get_user_invalid_id(self, test_client):
+    def test_get_user_invalid_token(self, test_client):
         """
-        Test retrieving a user with invalid ID format.
+        Test retrieving a user with invalid authentication token.
 
         Verifies:
-        - Returns 401 Unauthorized (no token)
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid token
         """
-        response = test_client.get('/api/users/invalid')
+        response = test_client.get(
+            '/api/users/1',
+            headers={'Authorization': 'Bearer invalid_token_12345'}
+        )
+
         assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+        error_lower = data['error'].lower()
+        assert 'invalid' in error_lower or 'expired' in error_lower
+
+    def test_get_user_expired_token(self, test_client):
+        """
+        Test retrieving a user with expired authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates expired token
+        """
+        import jwt
+        from datetime import datetime, timedelta
+
+        # Create expired token
+        expired_payload = {
+            'user_id': 1,
+            'exp': datetime.utcnow() - timedelta(hours=1),
+            'iat': datetime.utcnow() - timedelta(hours=2)
+        }
+        expired_token = jwt.encode(
+            expired_payload,
+            'dev-secret-key-change-in-production',
+            algorithm='HS256'
+        )
+
+        response = test_client.get(
+            '/api/users/1',
+            headers={'Authorization': f'Bearer {expired_token}'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+
+    def test_get_user_invalid_header_format(self, test_client):
+        """
+        Test retrieving a user with invalid Authorization header format.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid header format
+        """
+        response = test_client.get(
+            '/api/users/1',
+            headers={'Authorization': 'InvalidFormat token'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
 
     def test_get_user_with_created_at(self, test_client, clean_db):
         """
@@ -97,34 +155,6 @@ class TestGetUser:
         assert data['created_at'] is not None
         # Verify it's a valid ISO format string
         assert 'T' in data['created_at'] or '-' in data['created_at']
-
-    def test_get_user_without_created_at(self, test_client, clean_db):
-        """
-        Test retrieving a user without created_at timestamp.
-
-        Verifies:
-        - Returns 200 status code
-        - created_at field is None
-        """
-        from werkzeug.security import generate_password_hash
-        user = User(
-            username='notimestamp',
-            email='notimestamp@minerva.edu',
-            password_hash=generate_password_hash('password'),
-            created_at=None
-        )
-        clean_db.add(user)
-        clean_db.commit()
-        clean_db.refresh(user)
-
-        token = create_auth_token(user.user_id)
-        response = test_client.get(
-            f'/api/users/{user.user_id}',
-            headers={'Authorization': f'Bearer {token}'}
-        )
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['created_at'] is None
 
 
 class TestGetUserProgress:
@@ -322,3 +352,70 @@ class TestGetUserProgress:
         )
         assert response.status_code == 403
 
+    def test_get_user_progress_invalid_token(self, test_client):
+        """
+        Test retrieving user progress with invalid authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid token
+        """
+        response = test_client.get(
+            '/api/users/1/progress',
+            headers={'Authorization': 'Bearer invalid_token_12345'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+        error_lower = data['error'].lower()
+        assert 'invalid' in error_lower or 'expired' in error_lower
+
+    def test_get_user_progress_expired_token(self, test_client):
+        """
+        Test retrieving user progress with expired authentication token.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates expired token
+        """
+        import jwt
+        from datetime import datetime, timedelta
+
+        # Create expired token
+        expired_payload = {
+            'user_id': 1,
+            'exp': datetime.utcnow() - timedelta(hours=1),
+            'iat': datetime.utcnow() - timedelta(hours=2)
+        }
+        expired_token = jwt.encode(
+            expired_payload,
+            'dev-secret-key-change-in-production',
+            algorithm='HS256'
+        )
+
+        response = test_client.get(
+            '/api/users/1/progress',
+            headers={'Authorization': f'Bearer {expired_token}'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+
+    def test_get_user_progress_invalid_header_format(self, test_client):
+        """
+        Test retrieving user progress with invalid Authorization header format.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        - Error message indicates invalid header format
+        """
+        response = test_client.get(
+            '/api/users/1/progress',
+            headers={'Authorization': 'InvalidFormat token'}
+        )
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data

@@ -42,11 +42,20 @@ pytest backend/tests/test_health.py::TestHealthEndpoint::test_health_check
 The test suite uses pytest fixtures defined in `conftest.py`:
 
 - `test_database_url` - In-memory SQLite database URL
+- `test_engine` - Shared test database engine
+- `test_session_factory` - Session factory for creating test sessions
 - `db_session` - Database session for tests
 - `clean_db` - Cleaned database before each test
-- `test_client` - Flask test client
-- `populated_test_data` - Database populated with test data
-- Individual fixtures for sample data (course, unit, concept, etc.)
+- `test_client` - Flask test client with test database
+- `populated_test_data` - Database populated with comprehensive test data
+- `auth_token` - JWT authentication token for testing protected endpoints
+- Individual fixtures for sample data:
+  - `sample_course` - Single course
+  - `sample_unit` - Single unit
+  - `sample_concept` - Single concept
+  - `sample_quiz_card` - Single quiz card
+  - `sample_quiz_answers` - Quiz answers for a card
+  - `sample_user` - Single user
 
 ## Test Data
 
@@ -55,7 +64,7 @@ Test data is populated using the `populated_test_data` fixture in `conftest.py`.
 - 3 units
 - 4 concepts
 - 3 quiz cards
-- 7 quiz answers
+- 4 quiz answers
 - 1 test user
 
 ## Dependencies

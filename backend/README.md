@@ -22,6 +22,9 @@ backend/
 │   ├── concepts.py      # Concept endpoints
 │   ├── quiz.py          # Quiz submission endpoints
 │   └── users.py         # User profile and progress endpoints
+├── tests/                # Test suite
+│   ├── conftest.py      # Pytest fixtures and configuration
+│   └── test_*.py        # Test files for each feature
 └── utils/
     └── database_manager.py  # Database session management
 ```
@@ -193,7 +196,7 @@ The API uses JWT (JSON Web Tokens) for authentication:
    ```
    Authorization: Bearer <access_token>
    ```
-3. Tokens expire after 24 hours (configurable via `JWT_EXPIRATION_HOURS`)
+3. Tokens expire after 24 hours
 
 ## Environment Variables
 
