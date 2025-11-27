@@ -5,6 +5,9 @@ import QuizAnswers from '../components/quiz/QuizAnswers';
 import QuizQuestion from '../components/quiz/QuizQuestion';
 import QuizResults from '../components/quiz/QuizResults';
 import { useQuiz } from '../hooks/useQuiz';
+import { useConcept } from '../hooks/useConcept';
+import { useUnit } from '../hooks/useUnit';
+import { useCourse } from '../hooks/useCourse';
 import { getQuizBackPath } from '../services/quizService';
 import '../components/quiz/Quiz.css';
 
@@ -29,8 +32,25 @@ const QuizPage = () => {
     handleNext
   } = useQuiz(courseId, unitId, conceptId);
 
-  const greeting = courseId ? `Quiz for ${courseId}` : 'Quiz';
-  const title = unitId ? `Unit ${unitId}` : courseId ? courseId : 'Practice';
+  const { concept } = useConcept(courseId, unitId, conceptId);
+  const { unit } = useUnit(courseId, unitId);
+  const { course } = useCourse(courseId);
+
+  const greeting = conceptId 
+    ? `Quiz for ${concept?.title || 'Concept'}`
+    : unitId 
+    ? `Quiz for ${unit?.title || 'Unit'}`
+    : courseId 
+    ? `Quiz for ${course?.title || courseId}`
+    : 'Quiz';
+
+  const title = conceptId 
+    ? concept?.title || `Concept ${conceptId}`
+    : unitId 
+    ? unit?.title || `Unit ${unitId}`
+    : courseId 
+    ? course?.title || courseId
+    : 'Practice';
 
   return (
     <PageLayout
