@@ -74,12 +74,14 @@ const UnitPage = () => {
 
   // Chart data - concept performance within this unit
   const chartData = {
-    labels: concepts.map(c => c.title.replace('#', '')),
-    values: concepts.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
+    labels: concepts.map(c => c.title),
+    values: concepts.map(() => Math.floor(Math.random() * 21)), // 0-20 questions per concept
   };
 
-  // Build greeting with course and unit names
-  const greeting = course && unit 
+  // Build greeting with course and unit number (using order_index + 1)
+  const greeting = course && unit && unit.order_index !== undefined && unit.order_index !== null
+    ? `${course.title} - Unit ${unit.order_index + 1}`
+    : course && unit
     ? `${course.title} - ${unit.title}`
     : course 
     ? `${course.title} - Unit ${unitId}`
@@ -94,7 +96,8 @@ const UnitPage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/unit/${unitId}/quiz`}
       chartData={chartData}
-      chartLabel="Problem Solving HCs"
+      chartLabel="No. of questions answered"
+      labelOffset={70}
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
       showBackButton={true}
       onBackClick={() => navigate(`/course/${courseId}`)}

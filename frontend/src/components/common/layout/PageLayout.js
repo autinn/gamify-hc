@@ -26,6 +26,7 @@ const PageLayout = ({
   chartData,
   chartLabel,
   rightContent,
+  labelOffset,
   // optional path to navigate to when Start Quiz is clicked
   startQuizPath,
   // optional custom left-side content to render instead of the PerformanceChart
@@ -72,7 +73,7 @@ const PageLayout = ({
 
         {/* Performance Chart Placeholder or custom leftContent (used by QuizPage) */}
         <div className="page-layout__chart-container">
-          {leftContent ? leftContent : <PerformanceChart data={chartData} label={chartLabel} />}
+          {leftContent ? leftContent : <PerformanceChart data={chartData} label={chartLabel} labelOffset={labelOffset} />}
         </div>
       </div>
 

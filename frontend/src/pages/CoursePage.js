@@ -60,9 +60,18 @@ const CoursePage = () => {
   }, [courseIdInt]);
 
   // Chart data - performance within this course
+  // Sort units by order_index and use order_index from DB (0-based, so add 1 for display)
+  const sortedUnits = [...units].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
   const chartData = {
-    labels: units.map(u => u.title),
-    values: units.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
+    labels: sortedUnits.map((u) => {
+      // order_index is 0-based in DB (starts at 0), so add 1 for display (Unit 1, Unit 2, etc.)
+      if (u.order_index !== undefined && u.order_index !== null) {
+        return `Unit ${u.order_index + 1}`;
+      }
+      // Fallback if order_index is missing
+      return u.title;
+    }),
+    values: sortedUnits.map(() => Math.floor(Math.random() * 21)), // 0-20 questions per unit
   };
 
   return (
@@ -72,8 +81,8 @@ const CoursePage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/quiz`}
       chartData={chartData}
-      chartLabel="Questions you answered correctly (% correct answered)"
-      rightContent={<UnitList courseId={courseId} units={units} />}
+      chartLabel="No. of questions answered"
+      rightContent={<UnitList courseId={courseId} units={sortedUnits} />}
       showBackButton={true}
       onBackClick={() => navigate('/')}
     />
