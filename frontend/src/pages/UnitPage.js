@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import ConceptList from '../components/concept/ConceptList';
 import { useUnit } from '../hooks/useUnit';
+import { useProgress } from '../hooks/useProgress';
 
 /**
  * UnitPage - Unit details page with concepts
@@ -16,12 +17,7 @@ const UnitPage = () => {
   const navigate = useNavigate();
   
   const { course, unit, concepts } = useUnit(courseId, unitId);
-
-  // Chart data - concept performance within this unit
-  const chartData = {
-    labels: concepts.map(c => c.title),
-    values: concepts.map(() => Math.floor(Math.random() * 21)), // 0-20 questions per concept
-  };
+  const { chartData } = useProgress('unit', unitId, courseId);
 
   // Build greeting with course and unit number (using order_index + 1)
   const greeting = course && unit && unit.order_index !== undefined && unit.order_index !== null
