@@ -25,7 +25,7 @@ const MainPage = () => {
       title={userName}
       showButton={true}
       chartData={chartData}
-      chartLabel="Questions you answered correctly (% correct answered)"
+      chartLabel="No. of Questions Answered"
       rightContent={<CourseList courses={courses} />}
     />
   );
