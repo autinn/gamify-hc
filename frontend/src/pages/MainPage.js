@@ -3,6 +3,7 @@ import PageLayout from '../components/common/layout/PageLayout';
 import CourseList from '../components/course/CourseList';
 import { useCourses } from '../hooks/useCourses';
 import { useCurrentUser } from '../hooks/useCurrentUser';
+import { useProgress } from '../hooks/useProgress';
 
 /**
  * MainPage - Main dashboard page
@@ -13,12 +14,7 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 const MainPage = () => {
   const { courses } = useCourses();
   const { user } = useCurrentUser();
-
-  // Chart data - shows performance across courses
-  const chartData = {
-    labels: courses.map(c => c.title),
-    values: [65, 45, 55, 35], // Dummy performance values
-  };
+  const { chartData } = useProgress('global');
 
   // Use API user data if available, otherwise fall back to stored username
   const userName = user?.username || localStorage.getItem('user_username') || 'Guest';

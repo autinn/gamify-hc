@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import UnitList from '../components/unit/UnitList';
 import { useCourse } from '../hooks/useCourse';
+import { useProgress } from '../hooks/useProgress';
 
 /**
  * CoursePage - Course details page with units
@@ -16,12 +17,10 @@ const CoursePage = () => {
   const navigate = useNavigate();
   
   const { course, units } = useCourse(courseId);
+  const { chartData } = useProgress('course', courseId);
 
-  // Chart data - performance within this course
-  const chartData = {
-    labels: units.map(u => u.title),
-    values: units.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
-  };
+  // Sort units by order_index for consistent display
+  const sortedUnits = [...units].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
 
   return (
     <PageLayout
@@ -31,7 +30,7 @@ const CoursePage = () => {
       startQuizPath={`/course/${courseId}/quiz`}
       chartData={chartData}
       chartLabel="Questions you answered correctly (% correct answered)"
-      rightContent={<UnitList courseId={courseId} units={units} />}
+      rightContent={<UnitList courseId={courseId} units={sortedUnits} />}
       showBackButton={true}
       onBackClick={() => navigate('/')}
     />
