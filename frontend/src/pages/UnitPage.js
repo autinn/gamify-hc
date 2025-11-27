@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/layout/PageLayout';
 import ConceptList from '../components/concept/ConceptList';
 import { useUnit } from '../hooks/useUnit';
-import { useProgress } from '../hooks/useProgress';
 
 /**
  * UnitPage - Unit details page with concepts
@@ -17,12 +16,15 @@ const UnitPage = () => {
   const navigate = useNavigate();
   
   const { course, unit, concepts } = useUnit(courseId, unitId);
-  const { chartData } = useProgress('unit', unitId, courseId);
 
-  // Build greeting with course and unit number (using order_index + 1)
-  const greeting = course && unit && unit.order_index !== undefined && unit.order_index !== null
-    ? `${course.title} - Unit ${unit.order_index + 1}`
-    : course && unit
+  // Chart data - concept performance within this unit
+  const chartData = {
+    labels: concepts.map(c => c.title.replace('#', '')),
+    values: concepts.map(() => Math.floor(Math.random() * 100)), // TODO: Replace with real progress data
+  };
+
+  // Build greeting with course and unit names
+  const greeting = course && unit 
     ? `${course.title} - ${unit.title}`
     : course 
     ? `${course.title} - Unit ${unitId}`
@@ -37,8 +39,7 @@ const UnitPage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/unit/${unitId}/quiz`}
       chartData={chartData}
-      chartLabel="No. of questions answered"
-      labelOffset={70}
+      chartLabel="Problem Solving HCs"
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
       showBackButton={true}
       onBackClick={() => navigate(`/course/${courseId}`)}

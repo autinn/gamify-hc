@@ -2,25 +2,7 @@
  * useAuth Hook
  * 
  * Manages authentication state and login/register logic.
- * Handles form validation, API communication, and token storage.
- * 
- * @component
- * @returns {Object} Auth object
- * @returns {Function} returns.login - Login function(email, password) - validates email/password, calls API, stores token
- * @returns {Function} returns.register - Register function(username, email, password, passwordConfirm) - validates form, calls API, stores token
- * @returns {string} returns.error - Current error message (empty string if no error)
- * @returns {boolean} returns.loading - Loading state (true while API call is in progress)
- * @returns {Function} returns.setError - Function to manually set error message
- * 
- * @example
- * const { login, register, error, loading } = useAuth();
- * 
- * // Login
- * await login('user@minerva.edu', 'password123');
- * 
- * // Register
- * await register('username', 'user@minerva.edu', 'password123', 'password123');
- * 
+ * Handles form validation and token storage.
  * Used by: LoginPage, RegisterPage
  */
 

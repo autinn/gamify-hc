@@ -1,20 +1,7 @@
 /**
  * useCourses Hook
  * 
- * Fetches and manages the list of all available courses.
- * Falls back to dummy course data if API fails (graceful degradation).
- * 
- * @component
- * @returns {Object} Courses object
- * @returns {Array} returns.courses - Array of course objects with IDs and titles
- * @returns {boolean} returns.loading - True while courses are being fetched from API
- * 
- * @example
- * const { courses, loading } = useCourses();
- * 
- * if (loading) return <div>Loading...</div>;
- * return courses.map(course => <CourseCard key={course.course_id} course={course} />);
- * 
+ * Manages course list fetching and state.
  * Used by: MainPage
  */
 

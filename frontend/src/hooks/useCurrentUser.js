@@ -1,25 +1,8 @@
 /**
  * useCurrentUser Hook
  * 
- * Fetches the currently logged-in user's profile data from the database.
- * Uses the JWT token from localStorage to identify and authenticate the user.
- * Returns null if no token is found (user is not logged in).
- * 
- * @component
- * @returns {Object} Current user data object
- * @returns {Object|null} returns.user - Current user object {user_id, username, email, created_at} or null if not logged in
- * @returns {boolean} returns.loading - True while user data is being fetched
- * @returns {Error|null} returns.error - Error object if fetch failed or user not authenticated
- * 
- * @example
- * const { user, loading, error } = useCurrentUser();
- * 
- * if (loading) return <div>Loading...</div>;
- * if (error) return <div>Not authenticated</div>;
- * if (!user) return <div>Please log in</div>;
- * 
- * return <div>Welcome, {user.username}!</div>;
- * 
+ * Fetches the current logged-in user's data from the database.
+ * Returns user information including username, email, etc.
  * Used by: MainPage, Header, and other authenticated pages
  */
 
