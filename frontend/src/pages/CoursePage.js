@@ -29,7 +29,7 @@ const CoursePage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/quiz`}
       chartData={chartData}
-      chartLabel="Questions you answered correctly (% correct answered)"
+      chartLabel="No. of Questions Answered"
       rightContent={<UnitList courseId={courseId} units={sortedUnits} />}
       showBackButton={true}
       onBackClick={() => navigate('/')}
