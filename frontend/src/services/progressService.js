@@ -53,7 +53,7 @@ export async function fetchCourseProgress(courseId) {
     }
 
     const courseIdInt = parseInt(courseId, 10);
-    const { course, units } = await fetchCourseWithUnits(courseIdInt);
+    const { units } = await fetchCourseWithUnits(courseIdInt);
 
     if (!units || units.length === 0) {
       return getEmptyChartData();
@@ -98,7 +98,7 @@ export async function fetchUnitProgress(courseId, unitId) {
 
     const courseIdInt = parseInt(courseId, 10);
     const unitIdInt = parseInt(unitId, 10);
-    const { course, unit, concepts } = await fetchCourseUnitWithConcepts(courseIdInt, unitIdInt);
+    const { concepts } = await fetchCourseUnitWithConcepts(courseIdInt, unitIdInt);
 
     if (!concepts || concepts.length === 0) {
       return getEmptyChartData();
@@ -137,7 +137,7 @@ export async function fetchConceptProgress(courseId, unitId, conceptId) {
     const courseIdInt = parseInt(courseId, 10);
     const unitIdInt = parseInt(unitId, 10);
     const conceptIdInt = parseInt(conceptId, 10);
-    const { course, unit, concept, quizCards } = await fetchConceptWithAllData(
+    const { quizCards } = await fetchConceptWithAllData(
       courseIdInt,
       unitIdInt,
       conceptIdInt
