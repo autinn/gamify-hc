@@ -21,7 +21,7 @@ export function validateEmail(email) {
     return { valid: false, error: 'Please enter a valid email' };
   }
 
-  if (!trimmedEmail.endsWith('@minerva.edu')) {
+  if (!trimmedEmail.endsWith('minerva.edu')) {
     return { valid: false, error: 'Please use your @minerva.edu email' };
   }
 
