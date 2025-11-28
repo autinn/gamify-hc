@@ -61,7 +61,7 @@ const QuizPage = () => {
       onBackClick={() => navigate(getQuizBackPath(courseId, unitId, conceptId))}
       leftContent={
         isQuizDone ? (
-          <QuizResults correctCount={correctCount} totalCount={totalCount} />
+          <h2 className="quiz-results__title">Quiz Complete!</h2>
         ) : (
           <QuizQuestion
             question={currentQuestion}
@@ -70,7 +70,12 @@ const QuizPage = () => {
         )
       }
       rightContent={
-        !isQuizDone && (
+        isQuizDone ? (
+          <QuizResults 
+            correctCount={correctCount} 
+            totalCount={totalCount} 
+          />
+        ) : (
           <>
             <QuizAnswers
               key={currentQuestion?.id}
