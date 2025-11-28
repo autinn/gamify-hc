@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PageLayout from '../components/common/layout/PageLayout';
 import CourseList from '../components/course/CourseList';
-import * as api from '../services/api';
+import { useCourses } from '../hooks/useCourses';
+import { useCurrentUser } from '../hooks/useCurrentUser';
+import { useProgress } from '../hooks/useProgress';
 
 /**
  * MainPage - Main dashboard page
@@ -10,56 +12,20 @@ import * as api from '../services/api';
  * Uses PageLayout for consistent two-column structure.
  */
 const MainPage = () => {
-  // Default dummy data for nice display
-  const dummyCourses = [
-    { course_id: 1, title: 'EA50', description: 'Problem Solving and Analysis' },
-    { course_id: 2, title: 'FA50', description: 'Fundamental Analysis' },
-    { course_id: 3, title: 'MC50', description: 'Metacognition and Critical Thinking' },
-    { course_id: 4, title: 'CX50', description: 'Complex Systems and Design' },
-  ];
+  const { courses } = useCourses();
+  const { user } = useCurrentUser();
+  const { chartData } = useProgress('global');
 
-  const [courses, setCourses] = useState(dummyCourses);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // CHANGED: Added field mapping to convert API response format to component expectations
-    // Backend returns: {id, name/code, description} -> Component expects: {course_id, title, description}
-    // Try to fetch real courses from API
-    api.getCourses()
-      .then(data => {
-        if (data && data.length > 0) {
-          // Map API response to component expectations
-          const mappedCourses = data.map(c => ({
-            course_id: c.id,
-            title: c.name || c.code,
-            description: c.description
-          }));
-          setCourses(mappedCourses);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching courses:', err);
-        console.log('Using dummy data instead');
-        // Keep dummy data if API fails
-        setLoading(false);
-      });
-  }, []);
-
-  // Chart data - shows performance across courses
-  // Realistic values: 0-20 questions answered per course
-  const chartData = {
-    labels: courses.map(c => c.title),
-    values: courses.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
-  };
+  // Use API user data if available, otherwise fall back to stored username
+  const userName = user?.username || localStorage.getItem('user_username') || 'Guest';
 
   return (
     <PageLayout
       greeting="Hello,"
-      title="NAME"
+      title={userName}
       showButton={true}
       chartData={chartData}
-      chartLabel="No. of questions answered"
+      chartLabel="No. of Questions Answered"
       rightContent={<CourseList courses={courses} />}
     />
   );

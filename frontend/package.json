@@ -13,10 +13,20 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "jsdom": "^23.0.0",
+    "vitest": "^1.0.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "vitest",
+    "test:summary": "vitest --run 2>&1 | grep -E '(Tests|Test Files|✓|PASS)' | tail -5",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

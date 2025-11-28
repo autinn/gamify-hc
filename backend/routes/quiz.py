@@ -269,6 +269,64 @@ def get_unit_quiz_cards(unit_id):
         db.close()
 
 
+@quiz_bp.route('/quiz-cards/random', methods=['GET'])
+def get_random_quiz_cards():
+    """
+    Retrieve all quiz cards from all courses (for global random quiz).
+
+    This endpoint fetches all quiz cards across all courses, units, and
+    concepts. Used for practice mode where users want random questions
+    from the entire system. The frontend will shuffle these and limit
+    to a specific number.
+
+    Returns:
+        JSON response containing a list of all quiz cards with the
+        following structure:
+        [
+            {
+                'id': int,                    # Quiz card ID
+                'concept_id': int,             # Associated concept ID
+                'question': str,               # Quiz question text
+                'answers': [                   # List of possible answers
+                    {
+                        'id': int,             # Answer ID
+                        'answer_text': str,    # Answer option text
+                        'is_correct': bool,    # Whether this answer is
+                                               # correct
+                        'explanation': str     # Explanation for this
+                                               # answer
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
+
+    HTTP Status Codes:
+        200: Success - Returns list of all quiz cards
+
+    Example:
+        GET /api/quiz-cards/random
+        Returns: [{"id": 1, "concept_id": 1, "question": "...",
+            "answers": [...]}, ...]
+    """
+    db = get_db()
+    try:
+        # Get ALL quiz cards from the database (no filtering)
+        quiz_cards = db.query(QuizCard).all()
+
+        result = []
+        for qc in quiz_cards:
+            answers = db.query(QuizAnswer).filter(
+                QuizAnswer.quiz_card_id == qc.quiz_card_id
+            ).all()
+            result.append(_serialize_quiz_card_with_answers(qc, answers))
+
+        return jsonify(result)
+    finally:
+        db.close()
+
+
 @quiz_bp.route('/quiz-submit', methods=['POST'])
 @jwt_required
 def submit_quiz_answer():

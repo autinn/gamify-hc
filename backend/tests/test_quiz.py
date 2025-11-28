@@ -375,6 +375,160 @@ class TestGetUnitQuizCards:
         assert len(data) == 0
 
 
+class TestGetRandomQuizCards:
+    """Tests for get random quiz cards endpoint (global quiz)."""
+
+    def test_get_random_quiz_cards_success(
+        self, test_client, populated_test_data
+    ):
+        """
+        Test successfully retrieving random quiz cards from all courses.
+
+        Verifies:
+        - Returns 200 status code
+        - Response is a list of quiz cards
+        - Each quiz card has proper structure (id, concept_id, question, answers)
+        """
+        response = test_client.get('/api/quiz-cards/random')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert isinstance(data, list)
+        assert len(data) >= 1
+
+        # Verify structure of returned cards
+        quiz_card = data[0]
+        assert 'id' in quiz_card
+        assert 'concept_id' in quiz_card
+        assert 'question' in quiz_card
+        assert 'answers' in quiz_card
+        assert isinstance(quiz_card['answers'], list)
+
+    def test_get_random_quiz_cards_mixed_courses(
+        self, test_client, clean_db, populated_test_data
+    ):
+        """
+        Test that random quiz cards come from multiple courses.
+
+        Verifies:
+        - Returns cards from different courses mixed together
+        - Endpoint returns all courses' quiz cards, not filtered by course
+        """
+        response = test_client.get('/api/quiz-cards/random')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert len(data) >= 1
+
+        # Collect all concept IDs from all courses
+        courses = populated_test_data['courses']
+        all_concept_ids = set()
+        for course in courses:
+            units = clean_db.query(Unit).filter(
+                Unit.course_id == course.course_id
+            ).all()
+            unit_ids = [u.unit_id for u in units]
+            concepts = clean_db.query(Concept).filter(
+                Concept.unit_id.in_(unit_ids)
+            ).all()
+            all_concept_ids.update([c.concept_id for c in concepts])
+
+        # Verify returned cards belong to various concepts
+        returned_concept_ids = {card['concept_id'] for card in data}
+        assert len(returned_concept_ids) > 0
+        # At least some cards should come from different concepts
+        assert returned_concept_ids.issubset(all_concept_ids)
+
+    def test_get_random_quiz_cards_empty_database(
+        self, test_client, clean_db
+    ):
+        """
+        Test retrieving random quiz cards when database is empty.
+
+        Verifies:
+        - Returns 200 status code
+        - Response is an empty list
+        """
+        response = test_client.get('/api/quiz-cards/random')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert isinstance(data, list)
+        assert len(data) == 0
+
+    def test_get_random_quiz_cards_answer_structure(
+        self, test_client, populated_test_data
+    ):
+        """
+        Test that random quiz cards include properly structured answers.
+
+        Verifies:
+        - Each answer has id, answer_text, is_correct, explanation
+        - Answers are properly associated with quiz cards
+        """
+        response = test_client.get('/api/quiz-cards/random')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert len(data) >= 1
+
+        # Check first card's answers structure
+        quiz_card = data[0]
+        assert len(quiz_card['answers']) >= 1
+
+        for answer in quiz_card['answers']:
+            assert 'id' in answer
+            assert 'answer_text' in answer
+            assert 'is_correct' in answer
+            assert 'explanation' in answer
+
+    def test_get_random_quiz_cards_returns_all_cards(
+        self, test_client, clean_db, sample_course
+    ):
+        """
+        Test that random endpoint returns all quiz cards from database.
+
+        Verifies:
+        - When you call the endpoint, all quiz cards are returned (not paginated/limited)
+        - Useful for frontend to shuffle and limit as needed
+        """
+        # Create specific number of quiz cards
+        unit = Unit(
+            course_id=sample_course.course_id,
+            title="Test Unit",
+            description="Test",
+            order_index=1
+        )
+        clean_db.add(unit)
+        clean_db.commit()
+        clean_db.refresh(unit)
+
+        concept = Concept(
+            unit_id=unit.unit_id,
+            title="Test Concept",
+            definition="Test"
+        )
+        clean_db.add(concept)
+        clean_db.commit()
+        clean_db.refresh(concept)
+
+        # Create 3 quiz cards
+        for i in range(3):
+            qc = QuizCard(
+                concept_id=concept.concept_id,
+                question=f"Test Question {i+1}"
+            )
+            clean_db.add(qc)
+        clean_db.commit()
+
+        response = test_client.get('/api/quiz-cards/random')
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        # Should return all 3 cards (frontend will shuffle and limit to 5)
+        assert len(data) == 3
+
+
 class TestSubmitQuizAnswer:
     """Tests for submit quiz answer endpoint."""
 
