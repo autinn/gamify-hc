@@ -6,7 +6,7 @@ Pure data models with no side effects
 from datetime import datetime
 from sqlalchemy import (
     Boolean, CheckConstraint, Column, DateTime, Float, ForeignKey,
-    Integer, Text
+    Index, Integer, Text
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -65,7 +65,7 @@ class Unit(Base):
         'Concept', back_populates='unit', cascade='all, delete-orphan'
     )
 
-    # Constraints
+    # Constraints and Indices
     __table_args__ = (
         CheckConstraint(
             'length(title) > 0', name='check_title_length'
@@ -76,6 +76,9 @@ class Unit(Base):
         CheckConstraint(
             'order_index >= 0', name='check_order_index_non_negative'
         ),
+        # Index: fast joins/aggregations by course
+        # For use in quiz routes and progress graphs
+        Index('idx_units_course', 'course_id'),
     )
 
     def __repr__(self):
@@ -102,7 +105,7 @@ class Concept(Base):
         'QuizCard', back_populates='concept', cascade='all, delete-orphan'
     )
 
-    # Constraints
+    # Constraints and Indices
     __table_args__ = (
         CheckConstraint(
             'length(title) > 0', name='check_title_length'
@@ -110,6 +113,9 @@ class Concept(Base):
         CheckConstraint(
             'length(definition) > 0', name='check_definition_length'
         ),
+        # Index: fast joins/aggregations by unit
+        # For use in quiz routes and progress graphs
+        Index('idx_concepts_unit', 'unit_id'),
     )
 
     def __repr__(self):
@@ -146,11 +152,14 @@ class QuizCard(Base):
         cascade='all, delete-orphan'
     )
 
-    # Constraints
+    # Constraints and Indices
     __table_args__ = (
         CheckConstraint(
             'length(question) > 0', name='check_question_length'
         ),
+        # Index: fast joins/aggregations by concept
+        # For use in quiz routes and progress graphs
+        Index('idx_quiz_cards_concept', 'concept_id'),
     )
 
     def __repr__(self):
@@ -182,11 +191,13 @@ class QuizAnswer(Base):
     # Relationships
     quiz_card = relationship('QuizCard', back_populates='answers')
 
-    # Constraints
+    # Constraints and Indices
     __table_args__ = (
         CheckConstraint(
             'length(answer_text) > 0', name='check_answer_text_length'
         ),
+        # Index: fast answer retrieval by quiz_card_id (quiz routes)
+        Index('idx_quiz_answers_quiz', 'quiz_card_id'),
     )
 
     def __repr__(self):
@@ -217,6 +228,7 @@ class User(Base):
     )
 
     # Constraints
+    # Note: unique=True on username/email already creates unique indices
     __table_args__ = (
         CheckConstraint(
             'length(username) >= 3 AND length(username) <= 50',
@@ -269,7 +281,8 @@ class UserCard(Base):
     user = relationship('User', back_populates='user_cards')
     quiz_card = relationship('QuizCard', back_populates='user_cards')
 
-    # Constraints
+    # Constraints and Indices
+    # Note: composite PK (user_id, quiz_card_id) already ensures uniqueness
     __table_args__ = (
         CheckConstraint(
             'ease_factor >= 1.3 AND ease_factor <= 3.0',
@@ -291,6 +304,12 @@ class UserCard(Base):
             'failure_count >= 0',
             name='check_failure_count_non_negative'
         ),
+        # Index: fast user progress lookups
+        # Used in progress endpoint and quiz submissions
+        Index('idx_user_card_user', 'user_id'),
+        # Index: fast joins user_card → quiz_cards (aggregations by quiz_card)
+        Index('idx_user_card_quiz', 'quiz_card_id'),
+        # Index: fast due card queries ordered by due_date (spaced repetition)
     )
 
     @property
@@ -305,4 +324,3 @@ class UserCard(Base):
                 f"ease_factor={self.ease_factor}, "
                 f"successes={self.success_count}, "
                 f"failures={self.failure_count})>")
-
