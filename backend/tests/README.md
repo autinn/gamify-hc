@@ -36,6 +36,7 @@ pytest backend/tests/test_health.py::TestHealthEndpoint::test_health_check
 - `test_units.py` - Unit endpoint tests
 - `test_concepts.py` - Concept endpoint tests
 - `test_quiz.py` - Quiz endpoint tests
+- `test_index_usage.py` - Database index existence and usage tests
 
 ## Test Fixtures
 
