@@ -49,7 +49,7 @@ export function useQuiz(courseId, unitId, conceptId) {
   // Derived state
   const currentQuestion = questions[currentIndex];
   const totalCount = questions.length;
-  const isQuizDone = currentIndex >= totalCount;
+  const isQuizDone = !loading && currentIndex >= totalCount;
 
   /**
    * MAIN LOGIC:
