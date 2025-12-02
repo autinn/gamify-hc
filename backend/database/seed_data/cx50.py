@@ -94,7 +94,7 @@ CX50_DATA = {
                                 {'text': 'Regulation was perfectly designed', 'correct': False, 'explanation': 'No regulation is perfect; there are always unintended consequences.'},
                                 {'text': 'Risk migrated through system boundaries', 'correct': True, 'explanation': 'Correct! The risk did not disappear; it was transferred to less regulated areas of the financial system.'},
                                 {'text': 'Banks became more responsible', 'correct': False, 'explanation': 'There is no evidence that banks became more responsible after the regulation.'},
-                                {'text': 'Shadow banks caused the original problem', 'correct': False, 'explanation': 'Shadow banks are part of the system's response to regulation, not the source of the original problem.'},
+                                {'text': 'Shadow banks caused the original problem', 'correct': False, 'explanation': 'Shadow banks are part of the system\'s response to regulation, not the source of the original problem.'},
                             ],
                         },
                         {
