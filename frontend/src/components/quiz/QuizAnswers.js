@@ -11,11 +11,13 @@ import './Quiz.css';
 const QuizAnswers = ({ options, questionId, onCorrect }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // ✅ Reset state when question changes
   useEffect(() => {
     setSelectedOption(null);
     setIsLocked(false);
+    setAttempted(false);
   }, [questionId]);
 
   const handleSelect = (option) => {
@@ -23,8 +25,11 @@ const QuizAnswers = ({ options, questionId, onCorrect }) => {
     setSelectedOption(option.id);
 
     if (option.is_correct) {
+      const isFirstAttempt = !attempted;
       setIsLocked(true);
-      onCorrect?.();
+      onCorrect?.(isFirstAttempt);
+    } else if (!option.is_correct) {
+      setAttempted(true);
     }
   };
 

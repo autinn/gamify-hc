@@ -46,9 +46,11 @@ export function useQuiz(courseId, unitId, conceptId) {
   const isQuizDone = currentIndex >= totalCount;
 
   // Handlers
-  const handleCorrect = () => {
+  const handleCorrect = (isFirstAttempt = true) => {
     setIsAnsweredCorrectly(true);
-    setCorrectCount(prev => prev + 1);
+    if (isFirstAttempt) {
+      setCorrectCount(prev => prev + 1);
+    }
   };
 
   const handleNext = () => {
