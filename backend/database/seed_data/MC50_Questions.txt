@@ -1,0 +1,585 @@
+================================================================================
+MC50 - CLOSE READING: COMPLETE QUESTION BANK
+================================================================================
+How does language shape and represent reality?
+Total Hard Concepts: 5
+Total Questions: 50 (10 per HC)
+
+================================================================================
+HARD CONCEPT #1: #connotation
+================================================================================
+Definition: Understand and use connotations, tone, and style.
+
+---
+Question 1:
+A report calls a policy "regime change" instead of "administration transition." What analysis best explains the effect?
+
+A) Semantic equivalence
+B) Neutral framing
+C) Negative connotative shift ✓
+D) Genre confusion
+
+Explanation: "Regime" carries hostile/authoritarian connotations, shifting audience perception.
+
+---
+Question 2:
+A scientific abstract uses "breakthrough" and "revolutionary." What's the likely issue?
+
+A) Understatement
+B) Incongruent tone for genre ✓
+C) Ambiguous denotation only
+D) Missing citations
+
+Explanation: Hype-y tone clashes with scientific genre expectations; connotation misaligns with audience.
+
+---
+Question 3:
+Which pair most changes reader attitude despite similar denotation?
+
+A) "Large" vs "big"
+B) "Frugal" vs "cheap" ✓
+C) "Begin" vs "start"
+D) "Assist" vs "help"
+
+Explanation: "Cheap" implies low quality; "frugal" implies prudence—classic connotative divergence.
+
+---
+Question 4:
+A job posting describes candidates as "resilient" vs. "stubborn." Both denote persistence. What differs?
+
+A) Nothing—they are synonyms
+B) Connotation: "resilient" is positive; "stubborn" is negative ✓
+C) Denotation completely changes
+D) Grammar rules
+
+Explanation: Connotation shapes emotional valence independent of literal meaning.
+
+---
+Question 5:
+An article replaces "elderly" with "senior citizens." What rhetorical effect occurs?
+
+A) Completely changes meaning
+B) Shifts to a more respectful, neutral connotation ✓
+C) Makes the text less formal
+D) No effect whatsoever
+
+Explanation: "Elderly" can carry condescending overtones; "senior citizens" sounds more dignified.
+
+---
+Question 6:
+A restaurant menu lists "artisanal" bread vs. "handmade" bread. Same denotation. Why choose "artisanal"?
+
+A) It's shorter
+B) It connotes premium quality and craftsmanship ✓
+C) It's more technical
+D) It removes all connotation
+
+Explanation: Connotative associations with "artisanal" suggest higher value and traditional methods.
+
+---
+Question 7:
+A politician calls opponents' proposal "radical" instead of "progressive." What does this reveal about connotation use?
+
+A) Both terms are equally neutral
+B) Word choice strategically frames the proposal negatively vs. positively ✓
+C) The denotation changes completely
+D) Connotation doesn't matter in politics
+
+Explanation: Strategic connotation shapes audience perception; "radical" implies danger, "progressive" implies improvement.
+
+---
+Question 8:
+A product review calls a device "simple" vs. "simplistic." Why does tone shift?
+
+A) They mean exactly the same thing
+B) "Simple" is neutral/positive; "simplistic" implies oversimplification ✓
+C) "Simplistic" is more formal
+D) No tonal difference exists
+
+Explanation: Connotative weight: "simple" = user-friendly; "simplistic" = inadequately thought-out.
+
+---
+Question 9:
+A news headline uses "migrant" vs. "immigrant" vs. "refugee." Each carries different connotations. What should a writer consider?
+
+A) All three are interchangeable
+B) Each term's connotations affect audience empathy and perceived legitimacy ✓
+C) Only denotation matters
+D) Connotation is irrelevant in journalism
+
+Explanation: Precise word choice acknowledges legal status and human circumstances; connotations shape public discourse.
+
+---
+Question 10:
+An email describes a plan as "ambitious" vs. "unrealistic." Both note scale, but what differs?
+
+A) Denotation—they describe different scales
+B) Connotation—"ambitious" inspires, "unrealistic" dismisses ✓
+C) Grammar and syntax
+D) Nothing at all
+
+Explanation: Connotation reveals the speaker's stance: support vs. skepticism.
+
+================================================================================
+HARD CONCEPT #2: #professionalism
+================================================================================
+Definition: Follow established guidelines to present yourself and your work products professionally.
+
+---
+Question 1:
+A paper mixes APA in-text citations with Chicago footnotes. What's the fix prioritized by this HC?
+
+A) Rewrite argument
+B) Choose and apply one citation style consistently ✓
+C) Add more quotations
+D) Remove references
+
+Explanation: Professional presentation demands consistent, field-appropriate conventions.
+
+---
+Question 2:
+A cover letter includes emojis and slang. What violates professionalism?
+
+A) Word count
+B) Informal register misaligned with audience ✓
+C) Lack of headings
+D) Present-tense verbs
+
+Explanation: Professional tone should match expectations of the hiring context.
+
+---
+Question 3:
+Before submitting a client report, the best professional action is to:
+
+A) Increase adjective use
+B) Run a style/grammar pass and standardize visuals ✓
+C) Replace all passive voice
+D) Add jokes for warmth
+
+Explanation: Proofing and formatting ensure reliability and credibility.
+
+---
+Question 4:
+A resume uses three different fonts, inconsistent bullet styles, and varied margins. What professional standard is violated?
+
+A) Content quality
+B) Visual consistency and formatting standards ✓
+C) Grammar rules
+D) Length requirements
+
+Explanation: Professional documents require uniform visual design to convey attention to detail.
+
+---
+Question 5:
+An academic paper due in MLA format uses APA style throughout. What should be corrected?
+
+A) The argument structure
+B) Convert all citations and formatting to MLA guidelines ✓
+C) Add more sources
+D) Change the topic
+
+Explanation: Following specified guidelines demonstrates professionalism and respect for conventions.
+
+---
+Question 6:
+A business email addressing executives uses "Hey!" and closes with "Later!" What professional issue exists?
+
+A) Email is too short
+B) Inappropriate level of formality for the audience and context ✓
+C) Missing attachments
+D) Too many paragraphs
+
+Explanation: Register and tone must match professional hierarchies and contexts.
+
+---
+Question 7:
+A grant proposal has typos, inconsistent section numbering, and missing page numbers. What does this signal?
+
+A) Creative freedom
+B) Lack of attention to detail, reducing credibility ✓
+C) Strong content
+D) Appropriate informality
+
+Explanation: Professional polish reflects competence; errors undermine trust in your work.
+
+---
+Question 8:
+Which action best demonstrates professional self-presentation in a portfolio?
+
+A) Including unfinished drafts
+B) Curating polished, relevant work with clear descriptions ✓
+C) Adding personal photos unrelated to work
+D) Using casual language throughout
+
+Explanation: Professionalism means presenting your best, most relevant work with appropriate context.
+
+---
+Question 9:
+A lab report uses first-person "I" throughout, contradicting field conventions for objective reporting. What should change?
+
+A) Nothing—personal voice is always best
+B) Shift to third-person or passive constructions per scientific writing norms ✓
+C) Add more personal anecdotes
+D) Remove all verbs
+
+Explanation: Disciplinary conventions guide professional writing; scientific reports typically avoid first-person.
+
+---
+Question 10:
+You submit a presentation with garish color schemes, unreadable fonts, and cluttered slides. What professional principle is violated?
+
+A) Creativity is discouraged
+B) Visual clarity and audience accessibility ✓
+C) Content must be controversial
+D) Presentations should be text-only
+
+Explanation: Professional design prioritizes audience comprehension over decorative excess.
+
+================================================================================
+HARD CONCEPT #3: #context
+================================================================================
+Definition: Situate a work in its relevant context (e.g., historical, disciplinary, cultural).
+
+---
+Question 1:
+A 1930s pamphlet references "breadlines." Understanding the persuasive force requires:
+
+A) Author's favorite foods
+B) Great Depression socio-economic context ✓
+C) Printer's typeface choice
+D) The author's Instagram
+
+Explanation: Historical conditions frame the text's stakes and meanings.
+
+---
+Question 2:
+A piece labeled "satire" uses exaggerated claims. Proper interpretation depends on:
+
+A) Ignoring intent
+B) Recognizing satirical genre conventions ✓
+C) Translating to another language
+D) Counting adjectives
+
+Explanation: Genre context guides how we parse exaggeration and irony.
+
+---
+Question 3:
+A speech opens, "Fellow veterans…" To analyze appeals, you should first:
+
+A) Assume a general public audience
+B) Identify intended audience and communal norms ✓
+C) Focus only on sentence length
+D) Ignore speaker identity
+
+Explanation: Intended audience is a core contextual factor shaping interpretation.
+
+---
+Question 4:
+A 1920s essay uses "race" terminology now considered outdated. What helps explain this?
+
+A) Author was careless
+B) Historical linguistic norms differed; vocabulary evolved ✓
+C) Typo in the text
+D) Modern readers misunderstand
+
+Explanation: Historical context clarifies why past texts used language their era accepted.
+
+---
+Question 5:
+An economist writes "perfectly competitive market" assuming rational actors. What disciplinary context matters?
+
+A) Economics sometimes uses idealized models to test theory ✓
+B) Author is unaware of reality
+C) All markets are perfectly competitive
+D) No context needed
+
+Explanation: Disciplinary frameworks shape how fields construct arguments and models.
+
+---
+Question 6:
+A physics paper uses jargon like "Hamiltonian" without definition. What contextual assumption is made?
+
+A) The author is being deliberately obscure
+B) The target audience has disciplinary training in physics ✓
+C) Jargon should never be used
+D) The term is self-explanatory
+
+Explanation: Disciplinary context shapes vocabulary; experts write for expert peers.
+
+---
+Question 7:
+A novel set during WWII includes rationing and blackout curtains. What context enriches interpretation?
+
+A) Author's personal color preferences
+B) Historical wartime conditions that shaped daily life ✓
+C) Modern energy-saving tips
+D) Random plot devices
+
+Explanation: Historical context reveals how real conditions inform setting and characterization.
+
+---
+Question 8:
+A manifesto written by a marginalized activist uses confrontational tone. What biographical/cultural context matters?
+
+A) Author is inherently aggressive
+B) Lived experience of oppression shapes rhetorical urgency ✓
+C) Tone is irrelevant
+D) All manifestos are calm
+
+Explanation: Biographical and cultural contexts explain why authors choose certain rhetorical strategies.
+
+---
+Question 9:
+A scientific paper from 1850 lacks modern statistical methods. What context explains this?
+
+A) Author was incompetent
+B) Statistical tools developed later; historical context of methodology ✓
+C) Statistics are never needed
+D) Modern methods are always wrong
+
+Explanation: Historical disciplinary context shows how methods evolve over time.
+
+---
+Question 10:
+A religious text uses metaphors unfamiliar to modern readers. What context helps?
+
+A) Author wrote poorly
+B) Historical, cultural, and religious traditions shape symbolic language ✓
+C) Metaphors are universal
+D) Modern readers are always correct
+
+Explanation: Cultural and historical context unlocks symbolic meanings rooted in tradition.
+
+================================================================================
+HARD CONCEPT #4: #critique
+================================================================================
+Definition: Actively and critically engage with texts and other forms of communication.
+
+---
+Question 1:
+An op-ed cites a single anecdote to generalize a national trend. The critique should first note:
+
+A) Strong external validity
+B) Sampling/representativeness weakness ✓
+C) Perfect causal identification
+D) Tone neutrality
+
+Explanation: One case is insufficient evidence for broad claims.
+
+---
+Question 2:
+A paper's discussion repeats the introduction but adds no analysis. Which critique applies?
+
+A) Coherence improved
+B) Redundancy; weak progression of claims ✓
+C) Excessive operationalization
+D) Over-citation
+
+Explanation: Good structure advances claims; repetition signals weak argumentative development.
+
+---
+Question 3:
+A public health brief uses dense jargon for lay readers. What should critique emphasize?
+
+A) Ethos only
+B) Mismatch between rhetorical choices and audience needs ✓
+C) MLA vs APA choice
+D) Margins and line spacing
+
+Explanation: Effective critique aligns medium, message, and audience comprehension.
+
+---
+Question 4:
+A study claims causation but only shows correlation. What critical question arises?
+
+A) Is the font size appropriate?
+B) Does the evidence support the causal claim, or are confounds present? ✓
+C) Is the author famous?
+D) Was the study published recently?
+
+Explanation: Critical readers distinguish correlation from causation and identify logical gaps.
+
+---
+Question 5:
+A politician's speech uses emotional appeals but provides no data. What critique is warranted?
+
+A) Emotional appeals are always effective
+B) Heavy reliance on pathos without logos weakens substantive argument ✓
+C) All rhetoric is equally valid
+D) Data is irrelevant in speeches
+
+Explanation: Balanced critique assesses whether rhetorical strategies are backed by evidence.
+
+---
+Question 6:
+An advertisement claims "9 out of 10 doctors recommend" without source. What should critics question?
+
+A) The claim is automatically credible
+B) Source transparency, sample size, and potential bias ✓
+C) Nothing—statistics are always accurate
+D) The product color
+
+Explanation: Critical engagement demands verification of statistical claims and sources.
+
+---
+Question 7:
+A research paper cherry-picks data supporting its hypothesis while ignoring contradictory findings. What's the critique?
+
+A) The paper has strong confirmation bias ✓
+B) This is standard scientific practice
+C) The writing style is excellent
+D) References are well-formatted
+
+Explanation: Critical reading identifies selective use of evidence and methodological flaws.
+
+---
+Question 8:
+A blog post makes sweeping generalizations without evidence. Which critical approach applies?
+
+A) Accept claims at face value
+B) Question the basis for generalizations and demand supporting evidence ✓
+C) Praise the author's confidence
+D) Ignore the lack of evidence
+
+Explanation: Critical engagement requires assessing whether claims are substantiated.
+
+---
+Question 9:
+A news article quotes only sources supporting one political perspective. What critique is appropriate?
+
+A) The article shows perfect balance
+B) Lack of diverse perspectives suggests potential bias ✓
+C) All journalism is inherently neutral
+D) Headlines don't matter
+
+Explanation: Critical readers evaluate whether multiple perspectives are represented fairly.
+
+---
+Question 10:
+An academic argument relies on outdated theories discredited by recent research. What should critics note?
+
+A) Age of sources is irrelevant
+B) The argument fails to engage current scholarship and evidence ✓
+C) Older theories are always superior
+D) Recent research doesn't matter
+
+Explanation: Critical analysis assesses whether arguments account for updated knowledge.
+
+================================================================================
+HARD CONCEPT #5: #interpretivelens
+================================================================================
+Definition: Be mindful of how prior experiences, expectations, and judgments affect inferences drawn from different forms of communication and react accordingly.
+
+---
+Question 1:
+After a stressful exam, you read a neutral text as hostile. Best reflection?
+
+A) Text is objectively hostile
+B) Your current affect skewed interpretation ✓
+C) The author intended irony
+D) The font caused misreading
+
+Explanation: Prior state shapes perceived tone—recognize and adjust for lens effects.
+
+---
+Question 2:
+Before reviewing a memoir on migration, you interview migrants with varied backgrounds. This practice:
+
+A) Eliminates bias entirely
+B) Broadens your interpretive lens via direct perspectives ✓
+C) Replaces close reading
+D) Determines the "one true" meaning
+
+Explanation: Perspective-getting widens interpretive bandwidth while acknowledging subjectivity.
+
+---
+Question 3:
+You produce two analyses of a protest photo: one as a local, one as an outsider. This demonstrates:
+
+A) Context only
+B) Conscious lens shifting and meta-awareness ✓
+C) Professionalism
+D) Denotative cataloging
+
+Explanation: Explicitly toggling vantage points foregrounds lens effects on meaning.
+
+---
+Question 4:
+You notice you interpret economic data differently when presented by sources you trust vs distrust. What does this reveal?
+
+A) All data is inherently biased
+B) Your prior beliefs and source credibility shape interpretation ✓
+C) Numbers never lie
+D) Statistics are always objective
+
+Explanation: Recognizing how trust and expectations filter evidence demonstrates interpretive self-awareness.
+
+---
+Question 5:
+Reading a novel set in a culture unfamiliar to you, you initially misinterpret social norms. How should you respond?
+
+A) Assume your first interpretation is correct
+B) Seek cultural context and revise understanding accordingly ✓
+C) Blame the author for poor writing
+D) Ignore unfamiliar elements
+
+Explanation: Lens awareness means recognizing your interpretive limits and seeking context.
+
+---
+Question 6:
+Two readers from different political backgrounds reach opposite conclusions about the same policy brief. What explains this?
+
+A) One reader is wrong, the other right
+B) Interpretive lenses shaped by prior beliefs influence meaning-making ✓
+C) The brief was poorly written
+D) Political backgrounds are irrelevant
+
+Explanation: Different lenses can yield different but valid interpretations based on perspective.
+
+---
+Question 7:
+You realize you're reading a scientific study more skeptically because it contradicts your existing views. What should you do?
+
+A) Dismiss the study immediately
+B) Acknowledge confirmation bias and evaluate evidence more objectively ✓
+C) Trust your instincts without question
+D) Only read studies supporting your views
+
+Explanation: Interpretive lens awareness involves recognizing and correcting for cognitive biases.
+
+---
+Question 8:
+A student from an urban background interprets a rural poem differently than a rural student. This illustrates:
+
+A) One interpretation is objectively correct
+B) Lived experience shapes interpretive frameworks and meanings ✓
+C) The poem failed to communicate
+D) Location has no impact on reading
+
+Explanation: Personal experience forms an interpretive lens that colors understanding.
+
+---
+Question 9:
+You find yourself assuming a business memo is aggressive because similar past memos preceded layoffs. What's happening?
+
+A) The memo is objectively aggressive
+B) Past experience creates an interpretive lens that colors current reading ✓
+C) All business memos are aggressive
+D) Your reading skills are inadequate
+
+Explanation: Prior experiences shape expectations and interpretations of new texts.
+
+---
+Question 10:
+To reduce interpretive bias when analyzing a controversial speech, you should:
+
+A) Only read sources you agree with
+B) Consider multiple perspectives and question your own assumptions ✓
+C) Trust your first impression completely
+D) Ignore context and background
+
+Explanation: Lens awareness involves actively seeking diverse viewpoints and self-reflection.
+
+================================================================================
+END OF MC50 QUESTION BANK
+================================================================================
