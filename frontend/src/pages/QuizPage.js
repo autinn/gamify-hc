@@ -11,12 +11,6 @@ import { useCourse } from '../hooks/useCourse';
 import { getQuizBackPath } from '../services/quizService';
 import '../components/quiz/Quiz.css';
 
-/**
- * QuizPage - Quiz interface for course, unit, or concept level quizzes
- *
- * Displays quiz questions and answers.
- * Handles multi-level quizzes (course, unit, or concept).
- */
 const QuizPage = () => {
   const { courseId, unitId, conceptId } = useParams();
   const navigate = useNavigate();
@@ -28,7 +22,7 @@ const QuizPage = () => {
     totalCount,
     isAnsweredCorrectly,
     isQuizDone,
-    handleCorrect,
+    handleSelect,
     handleNext
   } = useQuiz(courseId, unitId, conceptId);
 
@@ -44,18 +38,9 @@ const QuizPage = () => {
     ? `Quiz for ${course?.title || courseId}`
     : 'Quiz';
 
-  const title = conceptId 
-    ? concept?.title || `Concept ${conceptId}`
-    : unitId 
-    ? unit?.title || `Unit ${unitId}`
-    : courseId 
-    ? course?.title || courseId
-    : 'Practice';
-
   return (
     <PageLayout
       greeting={greeting}
-      title={title}
       showButton={false}
       showBackButton={true}
       onBackClick={() => navigate(getQuizBackPath(courseId, unitId, conceptId))}
@@ -81,8 +66,10 @@ const QuizPage = () => {
               key={currentQuestion?.id}
               questionId={currentQuestion?.id}
               options={currentQuestion?.options || []}
-              onCorrect={handleCorrect}
+              onSelect={handleSelect}
+              isAnsweredCorrectly={isAnsweredCorrectly}
             />
+
             {isAnsweredCorrectly && (
               <div className="quiz-next-container">
                 <button className="quiz-next-button" onClick={handleNext}>

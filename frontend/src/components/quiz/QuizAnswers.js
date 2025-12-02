@@ -1,38 +1,42 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './Quiz.css';
 
-const QuizAnswers = ({ options, questionId, onCorrect }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
+const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => {
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
 
-  // 🔀 Shuffle options only when the question changes
+  // Shuffle once per question
   const shuffledOptions = useMemo(() => {
     if (!options) return [];
-    const copy = [...options];
-    return copy.sort(() => Math.random() - 0.5);
-  }, [questionId]); // re-randomize when a *new question* arrives
+    return [...options].sort(() => Math.random() - 0.5);
+  }, [questionId]);
 
   useEffect(() => {
-    setSelectedOption(null);
+    setSelectedOptions([]);
     setIsLocked(false);
   }, [questionId]);
 
   const handleSelect = (option) => {
     if (isLocked) return;
-    setSelectedOption(option.id);
 
+    setSelectedOptions((prev) => [...prev, option.id]);
+
+    // report selection upward
+    onSelect(option);
+
+    // lock after correct
     if (option.is_correct) {
       setIsLocked(true);
-      onCorrect?.();
     }
   };
 
   return (
     <div className="quiz-answers">
       {shuffledOptions.map((option) => {
-        const isSelected = selectedOption === option.id;
-        const isCorrect = option.is_correct && isSelected;
-        const isIncorrect = !option.is_correct && isSelected;
+        const wasSelected = selectedOptions.includes(option.id);
+
+        const isCorrect = option.is_correct && wasSelected;
+        const isIncorrect = !option.is_correct && wasSelected;
 
         return (
           <div key={option.id} className="quiz-answers__block">
@@ -43,12 +47,12 @@ const QuizAnswers = ({ options, questionId, onCorrect }) => {
                   : isIncorrect
                   ? 'quiz-answers__option--incorrect'
                   : ''
-              } ${isSelected ? 'quiz-answers__option--expanded' : ''}`}
+              } ${wasSelected ? 'quiz-answers__option--expanded' : ''}`}
               onClick={() => handleSelect(option)}
             >
               <div className="quiz-answers__text">{option.text}</div>
 
-              {isSelected && option.explanation && (
+              {wasSelected && option.explanation && (
                 <>
                   <div className="quiz-answers__divider" />
                   <div className="quiz-answers__explanation">

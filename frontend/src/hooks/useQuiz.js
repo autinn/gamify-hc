@@ -1,9 +1,10 @@
 /**
- * useQuiz Hook
- * 
- * Manages quiz state including questions, current index, answers tracking.
- * Handles multi-level quizzes (course, unit, concept).
- * Used by: QuizPage
+ * useQuiz Hook (Updated)
+ *
+ * - Tracks first selection to score only if first attempt is correct
+ * - Allows multiple tries
+ * - Marks question correct so Next button appears
+ * - Resets properly on each question
  */
 
 import { useState, useEffect } from 'react';
@@ -14,46 +15,67 @@ export function useQuiz(courseId, unitId, conceptId) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isAnsweredCorrectly, setIsAnsweredCorrectly] = useState(false);
+
+  // NEW: track the first option the user clicks
+  const [firstSelection, setFirstSelection] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Load quiz
   useEffect(() => {
-    // Fetch quiz - works for both specific level (course/unit/concept) and global quiz
     setLoading(true);
     setError(null);
+
     setCurrentIndex(0);
     setCorrectCount(0);
     setIsAnsweredCorrectly(false);
+    setFirstSelection(null);
 
     fetchQuizByLevel(courseId, unitId, conceptId)
-      .then(quizCards => {
+      .then((quizCards) => {
         if (quizCards && quizCards.length > 0) {
-          // Shuffle and limit to 5 questions
           const selected = getShuffledQuizQuestions(quizCards);
           setQuestions(selected);
         }
       })
-      .catch(err => {
-        console.error('Error fetching quiz cards:', err);
+      .catch((err) => {
+        console.error("Error fetching quiz cards:", err);
         setError(err);
       })
       .finally(() => setLoading(false));
   }, [courseId, unitId, conceptId]);
 
-  // Quiz state calculations
+  // Derived state
   const currentQuestion = questions[currentIndex];
   const totalCount = questions.length;
   const isQuizDone = currentIndex >= totalCount;
 
-  // Handlers
-  const handleCorrect = () => {
-    setIsAnsweredCorrectly(true);
-    setCorrectCount(prev => prev + 1);
+  /**
+   * MAIN LOGIC:
+   * Called by QuizAnswers every time user clicks an option.
+   */
+  const handleSelect = (option) => {
+    // Only record first attempt
+    if (firstSelection === null) {
+      setFirstSelection(option.id);
+
+      // FIRST TRY CORRECT → increase score
+      if (option.is_correct) {
+        setCorrectCount((prev) => prev + 1);
+      }
+    }
+
+    // Eventually correct → show next button
+    if (option.is_correct) {
+      setIsAnsweredCorrectly(true);
+    }
   };
 
   const handleNext = () => {
+    setCurrentIndex((i) => i + 1);
     setIsAnsweredCorrectly(false);
-    setCurrentIndex(i => i + 1);
+    setFirstSelection(null); // reset first-attempt tracking
   };
 
   return {
@@ -66,7 +88,7 @@ export function useQuiz(courseId, unitId, conceptId) {
     isQuizDone,
     loading,
     error,
-    handleCorrect,
-    handleNext
+    handleSelect,
+    handleNext,
   };
 }
