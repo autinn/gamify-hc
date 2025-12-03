@@ -30,17 +30,20 @@ const QuizPage = () => {
   const { unit } = useUnit(courseId, unitId);
   const { course } = useCourse(courseId);
 
-  const greeting = conceptId 
-    ? `Quiz for ${concept?.title || 'Concept'}`
+  const greeting = 'Quiz for'
+
+  const title = conceptId 
+    ? concept?.title || `Concept ${conceptId}`
     : unitId 
-    ? `Quiz for ${unit?.title || 'Unit'}`
+    ? unit?.title || `Unit ${unitId}`
     : courseId 
-    ? `Quiz for ${course?.title || courseId}`
-    : 'Quiz';
+    ? course?.title || courseId
+    : 'Practice';
 
   return (
     <PageLayout
       greeting={greeting}
+      title={title}
       showButton={false}
       showBackButton={true}
       onBackClick={() => navigate(getQuizBackPath(courseId, unitId, conceptId))}
