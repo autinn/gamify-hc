@@ -1,39 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './Quiz.css';
 
-/**
- * QuizAnswers - displays multiple-choice options for a given question.
- * Props:
- *  - options: [{ id, text, is_correct, explanation }]
- *  - questionId: string or number (used to reset between questions)
- *  - onCorrect: callback when user selects the correct answer
- */
-const QuizAnswers = ({ options, questionId, onCorrect }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
+const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => {
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
 
-  // ✅ Reset state when question changes
+  // Shuffle once per question
+  const shuffledOptions = useMemo(() => {
+    if (!options) return [];
+    return [...options].sort(() => Math.random() - 0.5);
+  }, [questionId]);
+
   useEffect(() => {
-    setSelectedOption(null);
+    setSelectedOptions([]);
     setIsLocked(false);
   }, [questionId]);
 
   const handleSelect = (option) => {
-    if (isLocked) return; // stop after correct answer
-    setSelectedOption(option.id);
+    if (isLocked) return;
 
+    setSelectedOptions((prev) => [...prev, option.id]);
+
+    // report selection upward
+    onSelect(option);
+
+    // lock after correct
     if (option.is_correct) {
       setIsLocked(true);
-      onCorrect?.();
     }
   };
 
   return (
     <div className="quiz-answers">
-      {options.map((option) => {
-        const isSelected = selectedOption === option.id;
-        const isCorrect = option.is_correct && isSelected;
-        const isIncorrect = !option.is_correct && isSelected;
+      {shuffledOptions.map((option) => {
+        const wasSelected = selectedOptions.includes(option.id);
+
+        const isCorrect = option.is_correct && wasSelected;
+        const isIncorrect = !option.is_correct && wasSelected;
 
         return (
           <div key={option.id} className="quiz-answers__block">
@@ -44,20 +47,20 @@ const QuizAnswers = ({ options, questionId, onCorrect }) => {
                   : isIncorrect
                   ? 'quiz-answers__option--incorrect'
                   : ''
-              }`}
+              } ${wasSelected ? 'quiz-answers__option--expanded' : ''}`}
               onClick={() => handleSelect(option)}
             >
-              <div className="quiz-answers__label">
-                {String.fromCharCode(65 + options.indexOf(option))}
-              </div>
               <div className="quiz-answers__text">{option.text}</div>
-            </div>
 
-            {isSelected && option.explanation && (
-              <div className="quiz-answers__explanation">
-                {option.explanation}
-              </div>
-            )}
+              {wasSelected && option.explanation && (
+                <>
+                  <div className="quiz-answers__divider" />
+                  <div className="quiz-answers__explanation">
+                    {option.explanation}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         );
       })}

@@ -14,7 +14,6 @@ const QuizResults = ({ correctCount, totalCount }) => {
 
   return (
     <div className="quiz-results">
-      <h2 className="quiz-results__title">Quiz Complete!</h2>
 
       <p className="quiz-results__score">
         You answered <strong>{correctCount}</strong> out of <strong>{totalCount}</strong> questions correctly
