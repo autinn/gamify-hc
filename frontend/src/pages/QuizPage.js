@@ -11,12 +11,6 @@ import { useCourse } from '../hooks/useCourse';
 import { getQuizBackPath } from '../services/quizService';
 import '../components/quiz/Quiz.css';
 
-/**
- * QuizPage - Quiz interface for course, unit, or concept level quizzes
- *
- * Displays quiz questions and answers.
- * Handles multi-level quizzes (course, unit, or concept).
- */
 const QuizPage = () => {
   const { courseId, unitId, conceptId } = useParams();
   const navigate = useNavigate();
@@ -28,7 +22,7 @@ const QuizPage = () => {
     totalCount,
     isAnsweredCorrectly,
     isQuizDone,
-    handleCorrect,
+    handleSelect,
     handleNext
   } = useQuiz(courseId, unitId, conceptId);
 
@@ -36,13 +30,7 @@ const QuizPage = () => {
   const { unit } = useUnit(courseId, unitId);
   const { course } = useCourse(courseId);
 
-  const greeting = conceptId 
-    ? `Quiz for ${concept?.title || 'Concept'}`
-    : unitId 
-    ? `Quiz for ${unit?.title || 'Unit'}`
-    : courseId 
-    ? `Quiz for ${course?.title || courseId}`
-    : 'Quiz';
+  const greeting = 'Quiz for'
 
   const title = conceptId 
     ? concept?.title || `Concept ${conceptId}`
@@ -50,7 +38,7 @@ const QuizPage = () => {
     ? unit?.title || `Unit ${unitId}`
     : courseId 
     ? course?.title || courseId
-    : 'Practice';
+    : 'All Courses';
 
   return (
     <PageLayout
@@ -61,7 +49,7 @@ const QuizPage = () => {
       onBackClick={() => navigate(getQuizBackPath(courseId, unitId, conceptId))}
       leftContent={
         isQuizDone ? (
-          <QuizResults correctCount={correctCount} totalCount={totalCount} />
+          <h2 className="quiz-results__title">Quiz Complete!</h2>
         ) : (
           <QuizQuestion
             question={currentQuestion}
@@ -70,14 +58,21 @@ const QuizPage = () => {
         )
       }
       rightContent={
-        !isQuizDone && (
+        isQuizDone ? (
+          <QuizResults 
+            correctCount={correctCount} 
+            totalCount={totalCount} 
+          />
+        ) : (
           <>
             <QuizAnswers
               key={currentQuestion?.id}
               questionId={currentQuestion?.id}
               options={currentQuestion?.options || []}
-              onCorrect={handleCorrect}
+              onSelect={handleSelect}
+              isAnsweredCorrectly={isAnsweredCorrectly}
             />
+
             {isAnsweredCorrectly && (
               <div className="quiz-next-container">
                 <button className="quiz-next-button" onClick={handleNext}>

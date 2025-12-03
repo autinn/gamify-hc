@@ -47,7 +47,7 @@ describe('useQuiz Hook', () => {
     expect(quizService.fetchQuizByLevel).toHaveBeenCalledWith(1, 2, undefined);
   });
 
-  it('should increment correctCount on handleCorrect', async () => {
+  it('should increment correctCount on handleSelect with correct option', async () => {
     quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
     quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
 
@@ -58,7 +58,7 @@ describe('useQuiz Hook', () => {
     });
 
     act(() => {
-      result.current.handleCorrect();
+      result.current.handleSelect({ id: 1, is_correct: true, text: 'Correct' });
     });
 
     expect(result.current.correctCount).toBe(1);
@@ -93,5 +93,82 @@ describe('useQuiz Hook', () => {
     });
 
     expect(result.current.error).toBeTruthy();
+  });
+
+  it('should only score first correct answer on a question', async () => {
+    quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
+    quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
+
+    const { result } = renderHook(() => useQuiz(1));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    act(() => {
+      result.current.handleSelect({ id: 1, is_correct: true, text: 'Correct' });
+    });
+
+    expect(result.current.correctCount).toBe(1);
+
+    // User selects a wrong answer after the first correct one
+    act(() => {
+      result.current.handleSelect({ id: 2, is_correct: false, text: 'Wrong' });
+    });
+
+    // Score should remain 1 (not incremented again)
+    expect(result.current.correctCount).toBe(1);
+  });
+
+  it('should not increment score if first selection is incorrect', async () => {
+    quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
+    quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
+
+    const { result } = renderHook(() => useQuiz(1));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    act(() => {
+      result.current.handleSelect({ id: 2, is_correct: false, text: 'Wrong' });
+    });
+
+    expect(result.current.correctCount).toBe(0);
+  });
+
+  it('should mark isAnsweredCorrectly when any correct option is selected', async () => {
+    quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
+    quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
+
+    const { result } = renderHook(() => useQuiz(1));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    act(() => {
+      result.current.handleSelect({ id: 1, is_correct: true, text: 'Correct' });
+    });
+
+    expect(result.current.isAnsweredCorrectly).toBe(true);
+  });
+
+  it('should reset firstSelection on handleNext', async () => {
+    quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
+    quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
+
+    const { result } = renderHook(() => useQuiz(1));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    act(() => {
+      result.current.handleSelect({ id: 1, is_correct: true, text: 'Correct' });
+      result.current.handleNext();
+    });
+
+    expect(result.current.isAnsweredCorrectly).toBe(false);
   });
 });
