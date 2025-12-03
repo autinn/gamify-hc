@@ -4,6 +4,7 @@ import './Quiz.css';
 const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // Shuffle once per question
   const shuffledOptions = useMemo(() => {
@@ -14,6 +15,7 @@ const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => 
   useEffect(() => {
     setSelectedOptions([]);
     setIsLocked(false);
+    setAttempted(false);
   }, [questionId]);
 
   const handleSelect = (option) => {
@@ -26,6 +28,7 @@ const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => 
 
     // lock after correct
     if (option.is_correct) {
+      const isFirstAttempt = !attempted;
       setIsLocked(true);
     }
   };
