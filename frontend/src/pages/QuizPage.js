@@ -38,7 +38,7 @@ const QuizPage = () => {
     ? unit?.title || `Unit ${unitId}`
     : courseId 
     ? course?.title || courseId
-    : 'Practice';
+    : 'All Courses';
 
   return (
     <PageLayout
