@@ -54,10 +54,14 @@ export function useQuiz(courseId, unitId, conceptId) {
   /**
    * MAIN LOGIC:
    * Called by QuizAnswers every time user clicks an option.
+   * Submits answer to backend with first-attempt flag for progress tracking.
    */
-  const handleSelect = (option) => {
-    // Only record first attempt
-    if (firstSelection === null) {
+  const handleSelect = async (option) => {
+    // Determine if this is first attempt
+    const isFirstAttempt = firstSelection === null;
+    
+    // Only record first attempt locally
+    if (isFirstAttempt) {
       setFirstSelection(option.id);
 
       // FIRST TRY CORRECT → increase score
@@ -69,6 +73,30 @@ export function useQuiz(courseId, unitId, conceptId) {
     // Eventually correct → show next button
     if (option.is_correct) {
       setIsAnsweredCorrectly(true);
+    }
+
+    // Submit to backend for persistence (quiz answers, UserCard tracking)
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/quiz-submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          quiz_card_id: currentQuestion.id,
+          answer_id: option.id,
+          is_first_attempt: isFirstAttempt
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Quiz submission error:', errorData);
+      }
+    } catch (err) {
+      console.error('Error submitting quiz answer:', err);
     }
   };
 
