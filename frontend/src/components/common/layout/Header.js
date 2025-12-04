@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useHeaderNavigation } from '../../../hooks/useHeaderNavigation';
 import * as api from '../../../services/api';
 import './Header.css';
 
@@ -13,50 +14,11 @@ const Header = () => {
   const pathParts = location.pathname.split('/');
   const courseId = pathParts[2];
   
+  // UI state only
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [courseUnits, setCourseUnits] = useState({});
-
-  useEffect(() => {
-    // Fetch all courses from API
-    api.getCourses()
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          // Map API response to component expectations
-          const mappedCourses = data.map(c => ({
-            id: c.id || c.course_id,
-            label: c.name || c.code || c.title
-          }));
-          setCourses(mappedCourses);
-          
-          // Fetch units for each course
-          const unitsMap = {};
-          Promise.all(
-            mappedCourses.map(course =>
-              api.getCourseUnits(course.id)
-                .then(units => {
-                  if (Array.isArray(units)) {
-                    unitsMap[course.id] = units.map(u => ({
-                      id: u.id || u.unit_id,
-                      name: u.name || u.title
-                    }));
-                  }
-                })
-                .catch(err => {
-                  console.error(`Error fetching units for course ${course.id}:`, err);
-                  unitsMap[course.id] = [];
-                })
-            )
-          ).then(() => {
-            setCourseUnits(unitsMap);
-          });
-        }
-      })
-      .catch(err => {
-        console.error('Error fetching courses:', err);
-        setCourses([]);
-      });
-  }, []);
+  
+  // Data from hook
+  const { courses, courseUnits } = useHeaderNavigation();
 
   const handleMouseEnter = (courseId) => {
     setOpenDropdown(courseId);
