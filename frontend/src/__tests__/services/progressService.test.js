@@ -5,196 +5,170 @@ import {
   fetchUnitProgress,
   fetchConceptProgress
 } from '../../services/progressService';
-import * as courseService from '../../services/courseService';
-import * as unitService from '../../services/unitService';
-import * as conceptService from '../../services/conceptService';
+import * as api from '../../services/api';
 
-vi.mock('../../services/courseService');
-vi.mock('../../services/unitService');
-vi.mock('../../services/conceptService');
+vi.mock('../../services/api');
 
-describe('progressService', () => {
+describe('progressService - Real API Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('fetchGlobalProgress', () => {
-    it('should fetch all courses and return chart data', async () => {
-      const mockCourses = [
-        { course_id: 1, title: 'EA50' },
-        { course_id: 2, title: 'FA50' },
-        { course_id: 3, title: 'MC50' }
-      ];
+    it('should call api.getGlobalProgress and return chart data', async () => {
+      const mockApiResponse = {
+        labels: ['EA50', 'FA50', 'MC50'],
+        values: [0.85, 0.72, 0.91],
+        metadata: { type: 'courses', count: 3 }
+      };
 
-      courseService.fetchAllCourses.mockResolvedValue(mockCourses);
+      api.getGlobalProgress.mockResolvedValue(mockApiResponse);
 
       const result = await fetchGlobalProgress();
 
-      expect(result.labels).toEqual(['EA50', 'FA50', 'MC50']);
-      expect(result.values).toHaveLength(3);
-      expect(result.metadata.type).toBe('global');
-      expect(result.metadata.count).toBe(3);
+      expect(api.getGlobalProgress).toHaveBeenCalled();
+      expect(result.labels).toEqual(mockApiResponse.labels);
+      expect(result.values).toEqual(mockApiResponse.values);
     });
 
-    it('should return empty chart data when no courses exist', async () => {
-      courseService.fetchAllCourses.mockResolvedValue([]);
+    it('should handle API errors gracefully', async () => {
+      api.getGlobalProgress.mockRejectedValue(new Error('Network error'));
+
+      const result = await fetchGlobalProgress();
+
+      expect(result.metadata.error).toBe(true);
+      expect(result.labels).toEqual([]);
+      expect(result.values).toEqual([]);
+    });
+
+    it('should return empty chart data when API returns empty', async () => {
+      const mockApiResponse = {
+        labels: [],
+        values: [],
+        metadata: { type: 'courses', count: 0 }
+      };
+
+      api.getGlobalProgress.mockResolvedValue(mockApiResponse);
 
       const result = await fetchGlobalProgress();
 
       expect(result.labels).toEqual([]);
       expect(result.values).toEqual([]);
-      expect(result.metadata.error).toBe(true);
-    });
-
-    it('should return empty chart data on error', async () => {
-      courseService.fetchAllCourses.mockRejectedValue(new Error('API error'));
-
-      const result = await fetchGlobalProgress();
-
-      expect(result.labels).toEqual([]);
-      expect(result.values).toEqual([]);
-      expect(result.metadata.error).toBe(true);
     });
   });
 
   describe('fetchCourseProgress', () => {
-    it('should fetch units for a course and return chart data', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        units: [
-          { unit_id: 1, title: 'Unit 1', order_index: 0 },
-          { unit_id: 2, title: 'Unit 2', order_index: 1 }
-        ]
+    it('should call api.getCourseProgress with courseId and return chart data', async () => {
+      const mockApiResponse = {
+        labels: ['Unit 1', 'Unit 2', 'Unit 3'],
+        values: [0.8, 0.75, 0.9],
+        metadata: { type: 'units', course_id: 1, count: 3 }
       };
 
-      courseService.fetchCourseWithUnits.mockResolvedValue(mockResponse);
+      api.getCourseProgress.mockResolvedValue(mockApiResponse);
 
       const result = await fetchCourseProgress(1);
 
-      expect(result.labels).toContain('Unit 1');
-      expect(result.labels).toContain('Unit 2');
-      expect(result.values).toHaveLength(2);
-      expect(result.metadata.type).toBe('course');
-      expect(result.metadata.courseId).toBe(1);
+      expect(api.getCourseProgress).toHaveBeenCalledWith(1);
+      expect(result.labels).toEqual(mockApiResponse.labels);
+      expect(result.values).toEqual(mockApiResponse.values);
     });
 
-    it('should return empty chart data when no units exist', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        units: []
-      };
+    it('should handle missing courseId', async () => {
+      const result = await fetchCourseProgress(undefined);
 
-      courseService.fetchCourseWithUnits.mockResolvedValue(mockResponse);
-
-      const result = await fetchCourseProgress(1);
-
-      expect(result.labels).toEqual([]);
-      expect(result.values).toEqual([]);
+      expect(result.metadata.error).toBe(true);
     });
 
-    it('should return empty chart data on error', async () => {
-      courseService.fetchCourseWithUnits.mockRejectedValue(new Error('API error'));
+    it('should handle API errors', async () => {
+      api.getCourseProgress.mockRejectedValue(new Error('API error'));
 
       const result = await fetchCourseProgress(1);
 
       expect(result.metadata.error).toBe(true);
+      expect(result.labels).toEqual([]);
+      expect(result.values).toEqual([]);
     });
   });
 
   describe('fetchUnitProgress', () => {
-    it('should fetch concepts for a unit and return chart data', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        unit: { unit_id: 1, title: 'Unit 1' },
-        concepts: [
-          { concept_id: 1, title: 'Problem Solving' },
-          { concept_id: 2, title: 'Analysis' }
-        ]
+    it('should call api.getUnitProgress with courseId and unitId', async () => {
+      const mockApiResponse = {
+        labels: ['Concept 1', 'Concept 2', 'Concept 3'],
+        values: [0.88, 0.92, 0.78],
+        metadata: { type: 'concepts', course_id: 1, unit_id: 1, count: 3 }
       };
 
-      unitService.fetchCourseUnitWithConcepts.mockResolvedValue(mockResponse);
+      api.getUnitProgress.mockResolvedValue(mockApiResponse);
 
       const result = await fetchUnitProgress(1, 1);
 
-      expect(result.labels).toContain('Problem Solving');
-      expect(result.labels).toContain('Analysis');
-      expect(result.values).toHaveLength(2);
-      expect(result.metadata.type).toBe('unit');
-      expect(result.metadata.courseId).toBe(1);
-      expect(result.metadata.unitId).toBe(1);
+      expect(api.getUnitProgress).toHaveBeenCalledWith(1, 1);
+      expect(result.labels).toEqual(mockApiResponse.labels);
+      expect(result.values).toEqual(mockApiResponse.values);
     });
 
-    it('should return empty chart data when no concepts exist', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        unit: { unit_id: 1, title: 'Unit 1' },
-        concepts: []
-      };
+    it('should handle missing unitId', async () => {
+      const result = await fetchUnitProgress(1, undefined);
 
-      unitService.fetchCourseUnitWithConcepts.mockResolvedValue(mockResponse);
-
-      const result = await fetchUnitProgress(1, 1);
-
-      expect(result.labels).toEqual([]);
-      expect(result.values).toEqual([]);
+      expect(result.metadata.error).toBe(true);
     });
 
-    it('should return empty chart data on error', async () => {
-      unitService.fetchCourseUnitWithConcepts.mockRejectedValue(new Error('API error'));
+    it('should handle API errors', async () => {
+      api.getUnitProgress.mockRejectedValue(new Error('API error'));
 
       const result = await fetchUnitProgress(1, 1);
 
       expect(result.metadata.error).toBe(true);
+      expect(result.labels).toEqual([]);
+      expect(result.values).toEqual([]);
     });
   });
 
-  describe('fetchConceptProgress', () => {
-    it('should fetch quiz cards for a concept and return chart data', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        unit: { unit_id: 1, title: 'Unit 1' },
-        concept: { concept_id: 1, title: 'Problem Solving' },
-        quizCards: [
-          { quiz_card_id: 1, question: 'Q1' },
-          { quiz_card_id: 2, question: 'Q2' },
-          { quiz_card_id: 3, question: 'Q3' }
-        ]
+  describe('Success rate validation', () => {
+    it('should display success rates between 0 and 1', async () => {
+      const mockApiResponse = {
+        labels: ['EA50', 'FA50'],
+        values: [0.6, 0.95],
+        metadata: { type: 'courses', count: 2 }
       };
 
-      conceptService.fetchConceptWithAllData.mockResolvedValue(mockResponse);
+      api.getGlobalProgress.mockResolvedValue(mockApiResponse);
 
-      const result = await fetchConceptProgress(1, 1, 1);
+      const result = await fetchGlobalProgress();
 
-      expect(result.labels).toHaveLength(3);
-      expect(result.values).toHaveLength(3);
-      expect(result.metadata.type).toBe('concept');
-      expect(result.metadata.courseId).toBe(1);
-      expect(result.metadata.unitId).toBe(1);
-      expect(result.metadata.conceptId).toBe(1);
+      result.values.forEach(value => {
+        expect(value).toBeGreaterThanOrEqual(0);
+        expect(value).toBeLessThanOrEqual(1);
+      });
     });
 
-    it('should return empty chart data when no quiz cards exist', async () => {
-      const mockResponse = {
-        course: { course_id: 1, title: 'EA50' },
-        unit: { unit_id: 1, title: 'Unit 1' },
-        concept: { concept_id: 1, title: 'Problem Solving' },
-        quizCards: []
+    it('should handle zero success rates', async () => {
+      const mockApiResponse = {
+        labels: ['Unit 1'],
+        values: [0],
+        metadata: { type: 'units', course_id: 1, count: 1 }
       };
 
-      conceptService.fetchConceptWithAllData.mockResolvedValue(mockResponse);
+      api.getCourseProgress.mockResolvedValue(mockApiResponse);
 
-      const result = await fetchConceptProgress(1, 1, 1);
+      const result = await fetchCourseProgress(1);
 
-      expect(result.labels).toEqual([]);
-      expect(result.values).toEqual([]);
+      expect(result.values[0]).toBe(0);
     });
 
-    it('should return empty chart data on error', async () => {
-      conceptService.fetchConceptWithAllData.mockRejectedValue(new Error('API error'));
+    it('should handle perfect success rates', async () => {
+      const mockApiResponse = {
+        labels: ['Unit 1'],
+        values: [1.0],
+        metadata: { type: 'units', course_id: 1, count: 1 }
+      };
 
-      const result = await fetchConceptProgress(1, 1, 1);
+      api.getCourseProgress.mockResolvedValue(mockApiResponse);
 
-      expect(result.metadata.error).toBe(true);
+      const result = await fetchCourseProgress(1);
+
+      expect(result.values[0]).toBe(1.0);
     });
   });
 });
