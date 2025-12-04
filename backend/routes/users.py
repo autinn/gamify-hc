@@ -193,6 +193,8 @@ def get_courses_progress():
         user_id = request.user_id
         
         # Query: Group by course, sum success and repetitions (total attempts) for each course
+        # Optimized: Direct join from QuizCard.course_id (denormalized field)
+        # This eliminates unnecessary joins through Concept and Unit
         results = db.query(
             Course.title,
             func.sum(UserCard.success_count).label('total_success'),
@@ -200,17 +202,13 @@ def get_courses_progress():
         ).join(
             QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
         ).join(
-            Concept, QuizCard.concept_id == Concept.concept_id
-        ).join(
-            Unit, Concept.unit_id == Unit.unit_id
-        ).join(
-            Course, Unit.course_id == Course.course_id
+            Course, QuizCard.course_id == Course.course_id
         ).filter(
             UserCard.user_id == user_id
         ).group_by(
-            Course.course_id, Course.title
+            QuizCard.course_id, Course.title
         ).order_by(
-            Course.course_id
+            QuizCard.course_id
         ).all()
         
         labels = [r[0] for r in results]
@@ -267,6 +265,8 @@ def get_units_progress(course_id):
         user_id = request.user_id
         
         # Query: Group by unit (within course), sum success and repetitions (total attempts) for each unit
+        # Optimized: Direct join from QuizCard.unit_id (denormalized field)
+        # This eliminates unnecessary join through Concept. Course filter can happen at QuizCard level.
         results = db.query(
             Unit.order_index,
             Unit.title,
@@ -275,14 +275,12 @@ def get_units_progress(course_id):
         ).join(
             QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
         ).join(
-            Concept, QuizCard.concept_id == Concept.concept_id
-        ).join(
-            Unit, Concept.unit_id == Unit.unit_id
+            Unit, QuizCard.unit_id == Unit.unit_id
         ).filter(
             UserCard.user_id == user_id,
-            Unit.course_id == course_id
+            QuizCard.course_id == course_id
         ).group_by(
-            Unit.unit_id, Unit.order_index, Unit.title
+            QuizCard.unit_id, Unit.order_index, Unit.title
         ).order_by(
             Unit.order_index
         ).all()

@@ -132,7 +132,28 @@
   
   
   /* ============================
-     Placeholder Message
+     Empty State
+     ============================ */
+  .performance-chart__empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 200px;
+    padding: 32px;
+    box-sizing: border-box;
+  }
+
+  .performance-chart__empty-message {
+    font-size: 16px;
+    color: #999;
+    text-align: center;
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  /* ============================
+     Placeholder Message (Legacy)
      ============================ */
   .performance-chart__placeholder {
     font-size: 16px;

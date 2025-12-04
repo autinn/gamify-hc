@@ -57,7 +57,7 @@ const PerformanceChart = ({ data, label, labelOffset = 50 }) => {
       {/* Hidden element for measuring text width */}
       <div ref={measureRef} style={{ visibility: 'hidden', position: 'absolute', top: '-9999px' }} />
       
-      {data && data.labels ? (
+      {data && data.labels && data.labels.length > 0 ? (
         <div className="performance-chart__content">
           <div 
             className="performance-chart__bars"
@@ -105,7 +105,9 @@ const PerformanceChart = ({ data, label, labelOffset = 50 }) => {
           )}
         </div>
       ) : (
-        <p className="performance-chart__placeholder">Chart data not available</p>
+        <div className="performance-chart__empty-state">
+          <p className="performance-chart__empty-message">Start taking quizzes to see your progress!</p>
+        </div>
       )}
     </div>
   );
