@@ -2,10 +2,64 @@
 
 A gamified learning platform for Habits of Mind and Foundational Concepts.
 
-## Quick Start
+## Quick Start (Docker)
+
+The easiest way to run the application is with Docker.
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Run with Docker
+
+```bash
+docker-compose up
+```
+
+That's it! The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5001
+
+The database will be automatically created and seeded on first run.
+
+### Docker Commands
+
+```bash
+# Start services (foreground)
+docker-compose up
+
+# Start services (background)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild after code changes
+docker-compose up --build
+```
+
+### Environment Variables
+
+You can customize the application with environment variables:
+
+```bash
+# Set JWT secret for production
+JWT_SECRET_KEY=your-secure-secret docker-compose up
+```
+
+---
+
+## Development Setup (Without Docker)
+
+For development, you may want to run the services directly.
 
 ### 1. Install Python Dependencies
 ```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -87,6 +141,7 @@ const result = await api.submitQuizAnswer({
 ```
 ├── backend/
 │   ├── app.py                    # Flask app factory with blueprint registration
+│   ├── Dockerfile                # Backend Docker configuration
 │   ├── routes/                   # API route blueprints (auth, courses, units, etc.)
 │   ├── database/
 │   │   ├── models.py            # SQLAlchemy database models
@@ -97,13 +152,19 @@ const result = await api.submitQuizAnswer({
 │   │   └── database_manager.py  # Database session management
 │   └── tests/                   # Test suite
 ├── frontend/
+│   ├── Dockerfile               # Frontend Docker configuration
+│   ├── nginx.conf               # Nginx configuration for production
 │   ├── src/
 │   │   ├── components/          # React components
 │   │   ├── pages/               # Page components
 │   │   └── services/api.js      # API helper functions
 │   └── package.json
+├── .github/
+│   └── workflows/
+│       └── ci.yaml              # GitHub Actions CI workflow
+├── docker-compose.yml           # Docker Compose configuration
 ├── docs/                        # Project documentation
-├── run.py                       # Start API server
+├── run.py                       # Start API server (for development)
 └── requirements.txt             # Python packages
 ```
 
