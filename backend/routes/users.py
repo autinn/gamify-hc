@@ -9,10 +9,14 @@ Endpoints:
     GET /api/users/<user_id>: Retrieve a specific user by ID
     GET /api/users/<user_id>/progress: Retrieve user's quiz card
         progress
+    GET /api/progress/courses: Get user's progress aggregated by courses
+    GET /api/progress/courses/<id>/units: Get user's progress aggregated by units in a course
+    GET /api/progress/courses/<id>/units/<id>/concepts: Get user's progress aggregated by concepts in a unit
 """
 
 from flask import Blueprint, jsonify, request
-from backend.database.models import User, UserCard
+from sqlalchemy import func, join
+from backend.database.models import User, UserCard, QuizCard, Concept, Unit, Course
 from backend.utils.database_manager import get_db
 from backend.routes.auth import jwt_required
 
@@ -156,4 +160,225 @@ def get_user_progress(user_id):
         } for uc in user_cards])
     finally:
         # Always close the database session to prevent connection leaks
+        db.close()
+
+
+@users_bp.route('/progress/courses', methods=['GET'])
+@jwt_required
+def get_courses_progress():
+    """
+    Get user's progress aggregated by courses.
+    
+    Returns the success rate (success_count / total_attempts) for each course.
+    
+    Returns:
+        JSON response with chart data:
+        {
+            'labels': ['Course 1', 'Course 2', ...],
+            'values': [0.8, 0.6, ...],  # success_rate per course (0-1)
+            'metadata': {...}
+        }
+    
+    HTTP Status Codes:
+        200: Success - Returns progress data
+        401: Unauthorized - Invalid or missing token
+    
+    Example:
+        GET /api/progress/courses
+        Headers: Authorization: Bearer <jwt_token>
+        Returns: {"labels": ["EA50", "FA50"], "values": [0.8, 0.6], ...}
+    """
+    db = get_db()
+    try:
+        user_id = request.user_id
+        
+        # Query: Group by course, sum success and repetitions (total attempts) for each course
+        results = db.query(
+            Course.title,
+            func.sum(UserCard.success_count).label('total_success'),
+            func.sum(UserCard.repetitions).label('total_repetitions')
+        ).join(
+            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
+        ).join(
+            Concept, QuizCard.concept_id == Concept.concept_id
+        ).join(
+            Unit, Concept.unit_id == Unit.unit_id
+        ).join(
+            Course, Unit.course_id == Course.course_id
+        ).filter(
+            UserCard.user_id == user_id
+        ).group_by(
+            Course.course_id, Course.title
+        ).order_by(
+            Course.course_id
+        ).all()
+        
+        labels = [r[0] for r in results]
+        values = []
+        for r in results:
+            success = r[1] or 0
+            total = r[2] or 0
+            rate = success / total if total > 0 else 0
+            values.append(round(rate, 2))
+        
+        return jsonify({
+            'labels': labels,
+            'values': values,
+            'metadata': {
+                'type': 'courses',
+                'count': len(labels),
+                'timestamp': None
+            }
+        })
+    finally:
+        db.close()
+
+
+@users_bp.route('/progress/courses/<int:course_id>/units', methods=['GET'])
+@jwt_required
+def get_units_progress(course_id):
+    """
+    Get user's progress aggregated by units in a course.
+    
+    Returns the total number of correct answers for each unit in the course.
+    
+    Args:
+        course_id (int): The course ID
+    
+    Returns:
+        JSON response with chart data:
+        {
+            'labels': ['Unit 1', 'Unit 2', ...],
+            'values': [5, 3, ...],  # success_count per unit
+            'metadata': {...}
+        }
+    
+    HTTP Status Codes:
+        200: Success - Returns progress data
+        401: Unauthorized - Invalid or missing token
+    
+    Example:
+        GET /api/progress/courses/1/units
+        Headers: Authorization: Bearer <jwt_token>
+        Returns: {"labels": ["Unit 1", "Unit 2"], "values": [5, 3], ...}
+    """
+    db = get_db()
+    try:
+        user_id = request.user_id
+        
+        # Query: Group by unit (within course), sum success and repetitions (total attempts) for each unit
+        results = db.query(
+            Unit.order_index,
+            Unit.title,
+            func.sum(UserCard.success_count).label('total_success'),
+            func.sum(UserCard.repetitions).label('total_repetitions')
+        ).join(
+            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
+        ).join(
+            Concept, QuizCard.concept_id == Concept.concept_id
+        ).join(
+            Unit, Concept.unit_id == Unit.unit_id
+        ).filter(
+            UserCard.user_id == user_id,
+            Unit.course_id == course_id
+        ).group_by(
+            Unit.unit_id, Unit.order_index, Unit.title
+        ).order_by(
+            Unit.order_index
+        ).all()
+        
+        # Format labels as "Unit 1", "Unit 2", etc. based on order_index
+        labels = [f"Unit {r[0] + 1}" if r[0] is not None else r[1] for r in results]
+        values = []
+        for r in results:
+            success = r[2] or 0
+            total = r[3] or 0
+            rate = success / total if total > 0 else 0
+            values.append(round(rate, 2))
+        
+        return jsonify({
+            'labels': labels,
+            'values': values,
+            'metadata': {
+                'type': 'units',
+                'course_id': course_id,
+                'count': len(labels),
+                'timestamp': None
+            }
+        })
+    finally:
+        db.close()
+
+
+@users_bp.route('/progress/courses/<int:course_id>/units/<int:unit_id>/concepts', methods=['GET'])
+@jwt_required
+def get_concepts_progress(course_id, unit_id):
+    """
+    Get user's progress aggregated by concepts in a unit.
+    
+    Returns the total number of correct answers for each concept in the unit.
+    
+    Args:
+        course_id (int): The course ID
+        unit_id (int): The unit ID
+    
+    Returns:
+        JSON response with chart data:
+        {
+            'labels': ['Concept 1', 'Concept 2', ...],
+            'values': [5, 3, ...],  # success_count per concept
+            'metadata': {...}
+        }
+    
+    HTTP Status Codes:
+        200: Success - Returns progress data
+        401: Unauthorized - Invalid or missing token
+    
+    Example:
+        GET /api/progress/courses/1/units/1/concepts
+        Headers: Authorization: Bearer <jwt_token>
+        Returns: {"labels": ["Variables", "Loops"], "values": [5, 3], ...}
+    """
+    db = get_db()
+    try:
+        user_id = request.user_id
+        
+        # Query: Group by concept (within unit), sum success and repetitions (total attempts) for each concept
+        results = db.query(
+            Concept.title,
+            func.sum(UserCard.success_count).label('total_success'),
+            func.sum(UserCard.repetitions).label('total_repetitions')
+        ).join(
+            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
+        ).join(
+            Concept, QuizCard.concept_id == Concept.concept_id
+        ).filter(
+            UserCard.user_id == user_id,
+            Concept.unit_id == unit_id
+        ).group_by(
+            Concept.concept_id, Concept.title
+        ).order_by(
+            Concept.concept_id
+        ).all()
+        
+        labels = [r[0] for r in results]
+        values = []
+        for r in results:
+            success = r[1] or 0
+            total = r[2] or 0
+            rate = success / total if total > 0 else 0
+            values.append(round(rate, 2))
+        
+        return jsonify({
+            'labels': labels,
+            'values': values,
+            'metadata': {
+                'type': 'concepts',
+                'course_id': course_id,
+                'unit_id': unit_id,
+                'count': len(labels),
+                'timestamp': None
+            }
+        })
+    finally:
         db.close()

@@ -17,7 +17,7 @@ const PerformanceChart = ({ data, label, labelOffset = 50 }) => {
   const measureRef = useRef(null);
   
   // Simple bar chart visualization using divs
-  const maxValue = data && data.values ? Math.max(...data.values, 1) : 100;
+  const maxValue = 1; // Success rates are between 0 and 1
   const maxBarHeight = 150; // Maximum height for bars in pixels
   
   // Calculate dynamic padding based on longest label
@@ -75,10 +75,10 @@ const PerformanceChart = ({ data, label, labelOffset = 50 }) => {
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
-                  {/* Hover tooltip showing the value */}
+                  {/* Hover tooltip showing the value as percentage */}
                   {hoveredIndex === index && (
                     <div className="performance-chart__tooltip">
-                      {value}
+                      {`${(value * 100).toFixed(1)}%`}
                     </div>
                   )}
                   <div

@@ -217,6 +217,33 @@ export async function getUserProgress(userId) {
   return apiRequest(`/users/${userId}/progress`);
 }
 
+/**
+ * Fetch global progress (all courses)
+ * @returns {Promise<Object>} Chart data {labels, values, metadata}
+ */
+export async function getGlobalProgress() {
+  return apiRequest('/progress/courses');
+}
+
+/**
+ * Fetch course progress (all units in a course)
+ * @param {number} courseId - The course ID
+ * @returns {Promise<Object>} Chart data {labels, values, metadata}
+ */
+export async function getCourseProgress(courseId) {
+  return apiRequest(`/progress/courses/${courseId}/units`);
+}
+
+/**
+ * Fetch unit progress (all concepts in a unit)
+ * @param {number} courseId - The course ID
+ * @param {number} unitId - The unit ID
+ * @returns {Promise<Object>} Chart data {labels, values, metadata}
+ */
+export async function getUnitProgress(courseId, unitId) {
+  return apiRequest(`/progress/courses/${courseId}/units/${unitId}/concepts`);
+}
+
 // ========================================
 // AUTHENTICATION
 // ========================================
