@@ -105,6 +105,8 @@ class TestGetQuizCard:
         """
         quiz_card = QuizCard(
             concept_id=sample_concept.concept_id,
+            unit_id=sample_concept.unit_id,
+            course_id=sample_concept.unit.course_id,
             question="Question with no answers"
         )
         clean_db.add(quiz_card)
@@ -263,10 +265,14 @@ class TestGetCourseQuizCards:
 
         quiz1 = QuizCard(
             concept_id=concept1.concept_id,
+            unit_id=unit1.unit_id,
+            course_id=sample_course.course_id,
             question="Question 1"
         )
         quiz2 = QuizCard(
             concept_id=concept2.concept_id,
+            unit_id=unit2.unit_id,
+            course_id=sample_course.course_id,
             question="Question 2"
         )
         clean_db.add_all([quiz1, quiz2])
@@ -516,6 +522,8 @@ class TestGetRandomQuizCards:
         for i in range(3):
             qc = QuizCard(
                 concept_id=concept.concept_id,
+                unit_id=unit.unit_id,
+                course_id=sample_course.course_id,
                 question=f"Test Question {i+1}"
             )
             clean_db.add(qc)

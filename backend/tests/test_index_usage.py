@@ -19,6 +19,9 @@ class TestIndexExistence:
             ('units', 'idx_units_course'),
             ('concepts', 'idx_concepts_unit'),
             ('quiz_cards', 'idx_quiz_cards_concept'),
+            ('quiz_cards', 'idx_quiz_cards_unit'),
+            ('quiz_cards', 'idx_quiz_cards_course'),
+            ('quiz_cards', 'idx_quiz_cards_unit_concept'),
             ('quiz_answers', 'idx_quiz_answers_quiz'),
             ('user_card', 'idx_user_card_user'),
             ('user_card', 'idx_user_card_quiz'),
@@ -73,6 +76,16 @@ class TestIndexUsage:
                 'name': 'quiz_answers_by_quiz_card',
                 'query': "SELECT * FROM quiz_answers WHERE quiz_card_id = 1",
                 'index': 'idx_quiz_answers_quiz'
+            },
+            {
+                'name': 'quiz_cards_by_unit',
+                'query': "SELECT * FROM quiz_cards WHERE unit_id = 1",
+                'index': 'idx_quiz_cards_unit'
+            },
+            {
+                'name': 'quiz_cards_by_course',
+                'query': "SELECT * FROM quiz_cards WHERE course_id = 1",
+                'index': 'idx_quiz_cards_course'
             },
         ]
 

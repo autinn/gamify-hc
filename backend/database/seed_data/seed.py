@@ -26,7 +26,9 @@ try:
 except ImportError:
     # Fall back to absolute imports (when run from database directory)
     try:
-        from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer
+        from backend.database.models import (
+            Course, Unit, Concept, QuizCard, QuizAnswer
+        )
     except ImportError:
         from database.models import Course, Unit, Concept, QuizCard, QuizAnswer
     from seed_data.cx50 import CX50_DATA
@@ -142,6 +144,9 @@ def populate_database(session):
                     quiz_card = get_or_create(
                         session, QuizCard,
                         concept_id=concept.concept_id,
+                        # Denormalized for performance
+                        unit_id=unit.unit_id,
+                        course_id=course.course_id,
                         question=question_data['question']
                     )
 

@@ -137,6 +137,17 @@ class QuizCard(Base):
         ForeignKey('concepts.concept_id', ondelete='CASCADE'),
         nullable=False
     )
+    # Denormalized fields for faster aggregations (set once at initialization)
+    unit_id = Column(
+        Integer,
+        ForeignKey('units.unit_id', ondelete='CASCADE'),
+        nullable=False
+    )
+    course_id = Column(
+        Integer,
+        ForeignKey('courses.course_id', ondelete='CASCADE'),
+        nullable=False
+    )
     question = Column(Text, nullable=False)
 
     # Relationships
@@ -160,6 +171,12 @@ class QuizCard(Base):
         # Index: fast joins/aggregations by concept
         # For use in quiz routes and progress graphs
         Index('idx_quiz_cards_concept', 'concept_id'),
+        # Index: fast aggregations by unit (denormalized for performance)
+        Index('idx_quiz_cards_unit', 'unit_id'),
+        # Index: fast aggregations by course (denormalized for performance)
+        Index('idx_quiz_cards_course', 'course_id'),
+        # Composite index: fast unit+concept filtering for aggregations
+        Index('idx_quiz_cards_unit_concept', 'unit_id', 'concept_id'),
     )
 
     def __repr__(self):
