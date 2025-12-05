@@ -78,7 +78,8 @@ export function useQuiz(courseId, unitId, conceptId) {
     // Submit to backend for persistence (quiz answers, UserCard tracking)
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/quiz-submit', {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${apiUrl}/quiz-submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
