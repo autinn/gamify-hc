@@ -35,7 +35,7 @@ backend/
 The simplest way to run the application is with Docker Compose, which starts all services together:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 This starts:
@@ -61,7 +61,7 @@ If you want to run the backend Flask app directly on your machine (outside Docke
 PostgreSQL is required. Start it with Docker:
 
 ```bash
-docker-compose up postgres -d
+docker compose up postgres -d
 ```
 
 This starts PostgreSQL with the `gamify_hc` database for development.
@@ -251,7 +251,7 @@ JWT_SECRET_KEY="your-secret-key-here" \
 python run.py
 ```
 
-**Note**: When using `docker-compose up`, all environment variables are automatically configured - you don't need to set them manually.
+**Note**: When using `docker compose up`, all environment variables are automatically configured - you don't need to set them manually.
 
 ## Testing
 

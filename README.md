@@ -13,7 +13,7 @@ The easiest way to run the application is with Docker.
 ### Run with Docker
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 That's it! The application will be available at:
@@ -26,19 +26,22 @@ The database will be automatically created and seeded on first run.
 
 ```bash
 # Start services (foreground)
-docker-compose up
+docker compose up
 
 # Start services (background)
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
 
 # Rebuild after code changes
-docker-compose up --build
+docker compose up --build
+
+# Delete the database (for reinitialization later)
+docker compose down -v
 ```
 
 ### Environment Variables
@@ -47,7 +50,7 @@ You can customize the application with environment variables:
 
 ```bash
 # Set JWT secret for production
-JWT_SECRET_KEY=your-secure-secret docker-compose up
+JWT_SECRET_KEY=your-secure-secret docker compose up
 ```
 
 ---
@@ -62,7 +65,7 @@ For development, you may want to run the services directly on your machine inste
 
 1. **Start PostgreSQL** (required for backend):
    ```bash
-   docker-compose up postgres -d
+   docker compose up postgres -d
    ```
    This starts only the PostgreSQL container. The backend and frontend will run directly on your machine.
 

@@ -36,7 +36,7 @@ def _resolve_database_url(database_url: Optional[str]) -> str:
     if not url:
         raise ValueError(
             "DATABASE_URL environment variable is required. "
-            "Start PostgreSQL with: docker-compose up postgres -d\n"
+            "Start PostgreSQL with: docker compose up postgres -d\n"
             "Then set: DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc"
         )
     return url
