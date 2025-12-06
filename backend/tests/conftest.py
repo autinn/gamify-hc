@@ -158,10 +158,12 @@ def sample_concept(clean_db, sample_unit):
 
 
 @pytest.fixture
-def sample_quiz_card(clean_db, sample_concept):
+def sample_quiz_card(clean_db, sample_concept, sample_unit, sample_course):
     """Create a sample quiz card for testing."""
     quiz_card = QuizCard(
         concept_id=sample_concept.concept_id,
+        unit_id=sample_unit.unit_id,
+        course_id=sample_course.course_id,
         question="Which visualization is best for showing proportions of a whole?"
     )
     clean_db.add(quiz_card)
@@ -280,14 +282,20 @@ def populated_test_data(clean_db):
     # Create quiz cards
     quiz1 = QuizCard(
         concept_id=concept1.concept_id,
+        unit_id=unit1.unit_id,
+        course_id=course1.course_id,
         question="Which visualization is best for showing proportions of a whole?"
     )
     quiz2 = QuizCard(
         concept_id=concept3.concept_id,
+        unit_id=unit2.unit_id,
+        course_id=course1.course_id,
         question="What is the availability heuristic?"
     )
     quiz3 = QuizCard(
         concept_id=concept4.concept_id,
+        unit_id=unit3.unit_id,
+        course_id=course2.course_id,
         question="Which of the following is an example of deductive reasoning?"
     )
     clean_db.add_all([quiz1, quiz2, quiz3])

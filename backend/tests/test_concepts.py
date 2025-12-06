@@ -279,6 +279,8 @@ class TestGetConceptQuizCards:
         """
         quiz_card = QuizCard(
             concept_id=sample_concept.concept_id,
+            unit_id=sample_concept.unit_id,
+            course_id=sample_concept.unit.course_id,
             question="Test question"
         )
         clean_db.add(quiz_card)
@@ -325,6 +327,8 @@ class TestGetConceptQuizCards:
         """
         quiz_card = QuizCard(
             concept_id=sample_concept.concept_id,
+            unit_id=sample_concept.unit_id,
+            course_id=sample_concept.unit.course_id,
             question="Question with no answers"
         )
         clean_db.add(quiz_card)
