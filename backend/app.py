@@ -14,13 +14,19 @@ from backend.routes.quiz import quiz_bp
 from backend.routes.users import users_bp
 
 
-def create_app(database_url=None):
-    """Create and configure Flask app with blueprints"""
+def create_app(database_url=None, auto_seed=True):
+    """Create and configure Flask app with blueprints
+    
+    Args:
+        database_url: Database connection string (required, or set DATABASE_URL env var)
+        auto_seed: If True, seed database with initial data if empty. Default True.
+                   Set to False for testing.
+    """
     app = Flask(__name__)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     
     # Setup database manager
-    db_manager = DatabaseManager(database_url)
+    db_manager = DatabaseManager(database_url, auto_seed=auto_seed)
     
     # Make db session available to blueprints via app context
     app.db_session = db_manager.get_session

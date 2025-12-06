@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gamify-hc-postgres
+    environment:
+      POSTGRES_USER: gamify
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gamify_secret}
+      POSTGRES_DB: gamify_hc
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gamify -d gamify_hc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
   backend:
     build:
       context: .
@@ -9,18 +28,18 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - DATABASE_URL=sqlite:////app/backend/database/gamify_hc.db
+      - DATABASE_URL=postgresql://gamify:${POSTGRES_PASSWORD:-gamify_secret}@postgres:5432/gamify_hc
       - FLASK_ENV=production
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
-    volumes:
-      # Persist database between container restarts
-      - ./backend/database:/app/backend/database
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
     restart: unless-stopped
 
   frontend:
@@ -28,7 +47,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_BASE_URL: http://backend:5001/api
+        REACT_APP_API_BASE_URL: http://localhost:5001/api
     container_name: gamify-hc-frontend
     ports:
       - "3000:80"
@@ -40,3 +59,6 @@ services:
       sh -c "echo '🔷📣🔷 OPEN THE APP AT: http://localhost:3000' &&
             echo '🔷📣🔷 Backend API: http://localhost:5001/api' &&
             nginx -g 'daemon off;'"
+
+volumes:
+  postgres_data:

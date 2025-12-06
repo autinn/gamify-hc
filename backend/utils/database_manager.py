@@ -10,7 +10,7 @@ from backend.database.setup import create_database, DEFAULT_DATABASE_URL
 class DatabaseManager:
     """Manages database connections and sessions"""
 
-    def __init__(self, database_url=None, engine=None, SessionLocal=None):
+    def __init__(self, database_url=None, engine=None, SessionLocal=None, auto_seed=True):
         """
         Initialize database manager with optional custom database URL or engine.
 
@@ -18,6 +18,7 @@ class DatabaseManager:
             database_url: Database connection string (ignored if engine provided)
             engine: Optional SQLAlchemy engine to use (for testing)
             SessionLocal: Optional session factory to use (for testing)
+            auto_seed: If True, seed database with initial data if empty. Default True.
         """
         if engine is not None and SessionLocal is not None:
             # Use provided engine and session factory (for testing)
@@ -30,7 +31,7 @@ class DatabaseManager:
             # Use create_database() to ensure proper initialization and seeding
             self.engine, self.SessionLocal = create_database(
                 database_url=self.db_url,
-                auto_seed=True
+                auto_seed=auto_seed
             )
 
     def get_session(self) -> Session:
