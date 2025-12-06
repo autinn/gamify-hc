@@ -54,7 +54,17 @@ JWT_SECRET_KEY=your-secure-secret docker-compose up
 
 ## Development Setup (Without Docker)
 
-For development, you may want to run the services directly.
+For development, you may want to run the services directly on your machine instead of in Docker containers.
+
+**Note**: This requires more setup than using Docker. The Docker approach (above) is recommended for simplicity.
+
+### Prerequisites
+
+1. **Start PostgreSQL** (required for backend):
+   ```bash
+   docker-compose up postgres -d
+   ```
+   This starts only the PostgreSQL container. The backend and frontend will run directly on your machine.
 
 ### 1. Install Python Dependencies
 ```bash
@@ -65,7 +75,7 @@ pip install -r requirements.txt
 
 ### 2. Start Backend API
 ```bash
-python run.py
+DATABASE_URL="postgresql://gamify:gamify_secret@localhost:5432/gamify_hc" python run.py
 ```
 ✅ API runs at: **http://localhost:5001**
 
@@ -145,8 +155,7 @@ const result = await api.submitQuizAnswer({
 │   ├── routes/                   # API route blueprints (auth, courses, units, etc.)
 │   ├── database/
 │   │   ├── models.py            # SQLAlchemy database models
-│   │   ├── setup.py             # Database initialization
-│   │   ├── gamify_hc.db         # SQLite database (auto-created)
+│   │   ├── setup.py             # Database initialization (PostgreSQL)
 │   │   └── seed_data/           # Seed data scripts
 │   ├── utils/
 │   │   └── database_manager.py  # Database session management

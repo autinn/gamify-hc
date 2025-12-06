@@ -13,7 +13,6 @@ backend/
 ├── database/
 │   ├── models.py         # SQLAlchemy database models
 │   ├── setup.py          # Database setup and initialization
-│   ├── gamify_hc.db      # SQLite database (auto-created on startup)
 │   └── seed_data/        # Database seeding scripts
 ├── routes/               # API route blueprints
 │   ├── auth.py          # Authentication endpoints (register, login, JWT)
@@ -31,9 +30,46 @@ backend/
 
 ## Local Setup
 
-### Step 1: Create Virtual Environment
+### Quick Start: Run Everything with Docker (Recommended)
 
-Create and activate a Python virtual environment (if you have not already):
+The simplest way to run the application is with Docker Compose, which starts all services together:
+
+```bash
+docker-compose up --build
+```
+
+This starts:
+- PostgreSQL on port 5432
+- Backend API on port 5001
+- Frontend on port 3000
+
+**Verify it's working:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5001/api/health
+- You should see: `{"status": "ok", "message": "Gamify-HC API is running"}`
+
+All environment variables (including `DATABASE_URL`) are automatically configured by `docker-compose.yml`.
+
+---
+
+### Alternative: Run Components Individually (Outside Docker)
+
+If you want to run the backend Flask app directly on your machine (outside Docker), follow these steps:
+
+#### Step 1: Start PostgreSQL
+
+PostgreSQL is required. Start it with Docker:
+
+```bash
+docker-compose up postgres -d
+```
+
+This starts PostgreSQL with the `gamify_hc` database for development.
+(Tests use testcontainers and don't require this step.)
+
+#### Step 2: Create Virtual Environment
+
+Create and activate a Python virtual environment:
 
 ```bash
 python3 -m venv venv
@@ -41,12 +77,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Step 2: Initialize Database & Start API
+#### Step 3: Start the API
 
 From the **project root directory**, run:
 
 ```bash
-python run.py
+DATABASE_URL="postgresql://gamify:gamify_secret@localhost:5432/gamify_hc" python run.py
 ```
 
 **What happens when you run this:**
@@ -55,7 +91,7 @@ python run.py
    - `run.py` → calls `create_app()` from `backend/app.py`
    - `create_app()` → creates `DatabaseManager` instance
    - `DatabaseManager` → calls `create_database()` from `backend/database/setup.py`
-   - `create_database()` → creates SQLite database file at `backend/database/gamify_hc.db`
+   - `create_database()` → connects to PostgreSQL and creates tables
    - Tables are created automatically from SQLAlchemy models
    - If database is empty, it automatically seeds with initial data from `database/seed_data/`
 
@@ -66,12 +102,6 @@ python run.py
 **Verify it's working:**
 - Open http://localhost:5001/api/health in your browser
 - You should see: `{"status": "ok", "message": "Gamify-HC API is running"}`
-
-### Step 3: (Optional) Configure Environment Variables
-
-Defaults are provided, so you can skip this for a quick start. See the
-[Environment Variables](#environment-variables) section below for customization
-options.
 
 ## Backend Architecture
 
@@ -202,40 +232,51 @@ The API uses JWT (JSON Web Tokens) for authentication:
 
 The application looks for the following environment variables:
 
-- `DATABASE_URL` – SQLAlchemy connection string. Defaults to a bundled SQLite
-  file (`sqlite:///backend/database/gamify_hc.db`). Override this when you want to
-  point the app at a different database (for example a temporary test database
-  during CI or a local Postgres instance).
+- `DATABASE_URL` – PostgreSQL connection string.
+  - **With Docker**: Automatically set by `docker-compose.yml` (no action needed)
+  - **Without Docker**: Must be set manually before running `python run.py`
 - `SQLALCHEMY_ECHO` – controls SQLAlchemy's query logging. Set to `1`,
   `true`, `yes`, etc. to enable verbose SQL logging. Defaults to `0` (disabled).
 - `JWT_SECRET_KEY` – Secret key for JWT token signing. Defaults to a dev key
   (change in production). Should be a secure random string.
+- `POSTGRES_PASSWORD` – (Docker only) PostgreSQL password. Defaults to `gamify_secret`.
+- `TEST_DATABASE_URL` – (Testing only) Override the test database URL.
 
-Example usage:
+Example usage (running Flask outside Docker):
 
 ```bash
-DATABASE_URL="sqlite:///backend/database/dev.db" \
+DATABASE_URL="postgresql://gamify:gamify_secret@localhost:5432/gamify_hc" \
 SQLALCHEMY_ECHO=1 \
 JWT_SECRET_KEY="your-secret-key-here" \
 python run.py
 ```
 
+**Note**: When using `docker-compose up`, all environment variables are automatically configured - you don't need to set them manually.
+
 ## Testing
 
-Run the test suite from the project root:
+Tests use testcontainers to automatically spin up a PostgreSQL container.
+No manual database setup required - just run pytest:
 
 ```bash
 pytest
 ```
 
 Tests are located in `backend/tests/` and use pytest fixtures for database
-setup and teardown.
+setup and teardown. The test database is automatically created and destroyed
+for each test session.
 
 ## Database
 
 - **ORM**: SQLAlchemy
-- **Database**: SQLite (default, can be configured for PostgreSQL, MySQL, etc.)
+- **Database**: PostgreSQL 16 (required for both development and production)
 - **Migrations**: Currently handled via `database/setup.py`. Consider Alembic
   for production migrations.
 - **Seeding**: Automatic on first startup. Seed data scripts are in
   `database/seed_data/`
+
+### Why PostgreSQL Only?
+
+We standardized on PostgreSQL to ensure consistency between development, testing,
+and production environments. This avoids "works on my machine" bugs caused by
+SQL dialect differences between SQLite and PostgreSQL.
