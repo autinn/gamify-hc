@@ -340,8 +340,11 @@ def submit_quiz_answer():
 
     Request Body (JSON):
         {
-            'quiz_card_id': int,   # ID of the quiz card being answered
-            'answer_id': int       # ID of the selected answer
+            'quiz_card_id': int,          # ID of the quiz card being answered
+            'answer_id': int,             # ID of the selected answer
+            'is_first_attempt': bool      # True if this was the user's first try
+                                          # at this question (optional, defaults
+                                          # to True for backwards compatibility)
         }
 
     Headers:
@@ -354,10 +357,10 @@ def submit_quiz_answer():
                                    # correct
             'explanation': str,    # Explanation for the answer (may be
                                    # null)
-            'times_seen': int,     # Total number of times user has seen
-                                   # this quiz card
-            'times_correct': int   # Number of times user answered
-                                   # correctly
+            'times_seen': int,     # Total number of submission attempts
+                                   # for this quiz card
+            'times_correct': int   # Number of times user answered correctly
+                                   # on the first attempt
         }
 
     HTTP Status Codes:
@@ -369,13 +372,17 @@ def submit_quiz_answer():
     Example:
         POST /api/quiz-submit
         Headers: Authorization: Bearer <jwt_token>
-        Body: {"quiz_card_id": 1, "answer_id": 2}
+        Body: {"quiz_card_id": 1, "answer_id": 2, "is_first_attempt": true}
         Returns: {"is_correct": true, "explanation": "...",
             "times_seen": 3, "times_correct": 2}
     """
     db = get_db()
     try:
         data = request.get_json()
+        # Default to True so existing clients still count first-try correctness
+        is_first_attempt = True if data is None else data.get(
+            'is_first_attempt', True
+        )
 
         # Use authenticated user_id from JWT token instead of request body
         user_id = request.user_id
@@ -396,6 +403,7 @@ def submit_quiz_answer():
             return jsonify({'error': 'Invalid answer_id'}), 400
 
         is_correct = answer.is_correct
+        is_first_attempt = bool(is_first_attempt)
 
         # Find or create UserCard to track progress
         user_card = db.query(UserCard).filter(
@@ -406,11 +414,11 @@ def submit_quiz_answer():
         if user_card:
             # Update existing progress record
             user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct:
+            if is_correct and is_first_attempt:
                 user_card.success_count = (
                     user_card.success_count or 0
                 ) + 1
-            else:
+            elif not is_correct:
                 user_card.failure_count = (
                     user_card.failure_count or 0
                 ) + 1
@@ -421,7 +429,7 @@ def submit_quiz_answer():
                 user_id=user_id,
                 quiz_card_id=quiz_card_id,
                 repetitions=1,
-                success_count=1 if is_correct else 0,
+                success_count=1 if (is_correct and is_first_attempt) else 0,
                 failure_count=0 if is_correct else 1,
                 last_reviewed=datetime.utcnow()
             )
@@ -431,9 +439,7 @@ def submit_quiz_answer():
         db.refresh(user_card)
 
         # Calculate total reviews for response
-        total_reviews = (
-            user_card.success_count + user_card.failure_count
-        )
+        total_reviews = user_card.repetitions or 0
 
         return jsonify({
             'is_correct': is_correct,
@@ -451,18 +457,18 @@ def submit_quiz_answer():
         if user_card:
             # Update existing progress record
             user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct:
+            if is_correct and is_first_attempt:
                 user_card.success_count = (
                     user_card.success_count or 0
                 ) + 1
-            else:
+            elif not is_correct:
                 user_card.failure_count = (
                     user_card.failure_count or 0
                 ) + 1
             user_card.last_reviewed = datetime.utcnow()
             db.commit()
             db.refresh(user_card)
-            total_reviews = user_card.success_count + user_card.failure_count
+            total_reviews = user_card.repetitions or 0
             return jsonify({
                 'is_correct': is_correct,
                 'explanation': answer.explanation,

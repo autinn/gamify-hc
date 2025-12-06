@@ -43,6 +43,16 @@ export function shuffleArray(array) {
 }
 
 /**
+ * Shuffle quiz answer options
+ * Alias for shuffleArray, used specifically for answer shuffling
+ * @param {Array} options - Array of answer options
+ * @returns {Array} New shuffled answer options
+ */
+export function shuffleAnswerOptions(options) {
+  return shuffleArray(options);
+}
+
+/**
  * Get shuffled quiz questions limited to 5
  * Shuffles the quiz cards and returns only the first 5
  * @param {Array} quizCards - Array of quiz cards

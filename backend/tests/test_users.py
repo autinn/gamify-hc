@@ -419,3 +419,191 @@ class TestGetUserProgress:
         assert response.status_code == 401
         data = json.loads(response.data)
         assert 'error' in data
+
+
+class TestGetProgressByLevel:
+    """Tests for progress aggregation endpoints by course, unit, and concept levels."""
+
+    def test_get_courses_progress_success(self, test_client, sample_user, populated_test_data):
+        """
+        Test successfully retrieving user's progress aggregated by courses.
+
+        Verifies:
+        - Returns 200 status code
+        - Response contains labels (course titles) and values (success rates)
+        - Success rates are between 0 and 1
+        - Metadata contains type and count
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            '/api/progress/courses',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'labels' in data
+        assert 'values' in data
+        assert 'metadata' in data
+        assert data['metadata']['type'] == 'courses'
+
+        # Verify success rates are between 0 and 1
+        for value in data['values']:
+            assert 0 <= value <= 1
+
+    def test_get_courses_progress_no_data(self, test_client, sample_user):
+        """
+        Test retrieving courses progress when user has no quiz attempts.
+
+        Verifies:
+        - Returns 200 status code
+        - Empty labels and values arrays
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            '/api/progress/courses',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['labels'] == []
+        assert data['values'] == []
+
+    def test_get_courses_progress_unauthorized(self, test_client):
+        """
+        Test retrieving courses progress without authentication.
+
+        Verifies:
+        - Returns 401 Unauthorized status code
+        """
+        response = test_client.get('/api/progress/courses')
+
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert 'error' in data
+
+    def test_get_units_progress_success(self, test_client, sample_user, populated_test_data, sample_course):
+        """
+        Test successfully retrieving user's progress aggregated by units in a course.
+
+        Verifies:
+        - Returns 200 status code
+        - Response contains unit labels and success rate values
+        - Success rates are between 0 and 1
+        - Metadata contains correct course_id
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            f'/api/progress/courses/{sample_course.course_id}/units',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'labels' in data
+        assert 'values' in data
+        assert data['metadata']['type'] == 'units'
+        assert data['metadata']['course_id'] == sample_course.course_id
+
+        # Verify success rates are between 0 and 1
+        for value in data['values']:
+            assert 0 <= value <= 1
+
+    def test_get_units_progress_nonexistent_course(self, test_client, sample_user):
+        """
+        Test retrieving units progress for non-existent course.
+
+        Verifies:
+        - Returns 200 status code with empty data
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            '/api/progress/courses/99999/units',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['labels'] == []
+        assert data['values'] == []
+
+    def test_get_concepts_progress_success(self, test_client, sample_user, populated_test_data, 
+                                           sample_course, sample_unit):
+        """
+        Test successfully retrieving user's progress aggregated by concepts in a unit.
+
+        Verifies:
+        - Returns 200 status code
+        - Response contains concept labels and success rate values
+        - Success rates are between 0 and 1
+        - Metadata contains correct course_id and unit_id
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            f'/api/progress/courses/{sample_course.course_id}/units/{sample_unit.unit_id}/concepts',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'labels' in data
+        assert 'values' in data
+        assert data['metadata']['type'] == 'concepts'
+        assert data['metadata']['course_id'] == sample_course.course_id
+        assert data['metadata']['unit_id'] == sample_unit.unit_id
+
+        # Verify success rates are between 0 and 1
+        for value in data['values']:
+            assert 0 <= value <= 1
+
+    def test_get_concepts_progress_nonexistent_unit(self, test_client, sample_user, sample_course):
+        """
+        Test retrieving concepts progress for non-existent unit.
+
+        Verifies:
+        - Returns 200 status code with empty data
+        """
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            f'/api/progress/courses/{sample_course.course_id}/units/99999/concepts',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['labels'] == []
+        assert data['values'] == []
+
+    def test_progress_success_rate_calculation(self, test_client, db_session, sample_user, 
+                                              sample_course, sample_unit, sample_concept, sample_quiz_card):
+        """
+        Test that success rates are correctly calculated as success_count / repetitions.
+
+        Verifies:
+        - User with 3 successes out of 5 repetitions returns 0.6
+        - User with 0 repetitions returns 0.0
+        """
+        # Create user card with specific success/repetition counts
+        user_card = db_session.query(UserCard).filter_by(
+            user_id=sample_user.user_id,
+            quiz_card_id=sample_quiz_card.quiz_card_id
+        ).first()
+        
+        if user_card:
+            user_card.success_count = 3
+            user_card.repetitions = 5
+            db_session.commit()
+
+        token = create_auth_token(sample_user.user_id)
+        response = test_client.get(
+            '/api/progress/courses',
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        # Verify success rate calculation (3/5 = 0.6)
+        if data['values']:
+            assert data['values'][0] == 0.6

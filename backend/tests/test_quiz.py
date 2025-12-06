@@ -105,6 +105,8 @@ class TestGetQuizCard:
         """
         quiz_card = QuizCard(
             concept_id=sample_concept.concept_id,
+            unit_id=sample_concept.unit_id,
+            course_id=sample_concept.unit.course_id,
             question="Question with no answers"
         )
         clean_db.add(quiz_card)
@@ -263,10 +265,14 @@ class TestGetCourseQuizCards:
 
         quiz1 = QuizCard(
             concept_id=concept1.concept_id,
+            unit_id=unit1.unit_id,
+            course_id=sample_course.course_id,
             question="Question 1"
         )
         quiz2 = QuizCard(
             concept_id=concept2.concept_id,
+            unit_id=unit2.unit_id,
+            course_id=sample_course.course_id,
             question="Question 2"
         )
         clean_db.add_all([quiz1, quiz2])
@@ -516,6 +522,8 @@ class TestGetRandomQuizCards:
         for i in range(3):
             qc = QuizCard(
                 concept_id=concept.concept_id,
+                unit_id=unit.unit_id,
+                course_id=sample_course.course_id,
                 question=f"Test Question {i+1}"
             )
             clean_db.add(qc)
@@ -647,8 +655,8 @@ class TestSubmitQuizAnswer:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data['is_correct'] is True
-        assert data['times_seen'] == 4  # 2 + 1 + 1
-        assert data['times_correct'] == 3  # 2 + 1
+        assert data['times_seen'] == 4  # existing repetitions (3) + this attempt
+        assert data['times_correct'] == 3  # success_count incremented once
 
         # Verify UserCard was updated, not duplicated
         user_cards = clean_db.query(UserCard).filter(
@@ -657,6 +665,69 @@ class TestSubmitQuizAnswer:
         ).all()
         assert len(user_cards) == 1
         assert user_cards[0].success_count == 3
+
+    def test_submit_quiz_answer_correct_second_attempt_not_counted(
+        self, test_client, clean_db, sample_user, sample_quiz_card,
+        sample_quiz_answers
+    ):
+        """
+        Test that a correct answer on a second attempt does not count as success.
+
+        Verifies:
+        - First attempt incorrect increments failure_count and times_seen
+        - Second attempt correct with is_first_attempt=False does not increment
+          success_count, but repetitions/times_seen are updated
+        """
+        incorrect_answer = next(
+            a for a in sample_quiz_answers if not a.is_correct
+        )
+        correct_answer = next(
+            a for a in sample_quiz_answers if a.is_correct
+        )
+
+        token = create_auth_token(sample_user.user_id)
+
+        # First attempt: incorrect
+        first_response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': incorrect_answer.answer_id,
+                'is_first_attempt': True
+            },
+            headers={'Authorization': f'Bearer {token}'}
+        )
+        assert first_response.status_code == 200
+        first_data = json.loads(first_response.data)
+        assert first_data['is_correct'] is False
+        assert first_data['times_seen'] == 1
+        assert first_data['times_correct'] == 0
+
+        # Second attempt: correct but not first attempt
+        second_response = test_client.post(
+            '/api/quiz-submit',
+            json={
+                'quiz_card_id': sample_quiz_card.quiz_card_id,
+                'answer_id': correct_answer.answer_id,
+                'is_first_attempt': False
+            },
+            headers={'Authorization': f'Bearer {token}'}
+        )
+
+        assert second_response.status_code == 200
+        second_data = json.loads(second_response.data)
+        assert second_data['is_correct'] is True
+        assert second_data['times_seen'] == 2
+        assert second_data['times_correct'] == 0
+
+        # Verify DB state
+        user_card = clean_db.query(UserCard).filter(
+            UserCard.user_id == sample_user.user_id,
+            UserCard.quiz_card_id == sample_quiz_card.quiz_card_id
+        ).first()
+        assert user_card.repetitions == 2
+        assert user_card.success_count == 0
+        assert user_card.failure_count == 1
 
     def test_submit_quiz_answer_missing_fields(self, test_client, sample_user):
         """
@@ -911,4 +982,3 @@ class TestSubmitQuizAnswer:
         assert response.status_code == 401
         data = json.loads(response.data)
         assert 'error' in data
-
