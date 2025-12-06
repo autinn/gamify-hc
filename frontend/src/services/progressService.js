@@ -1,18 +1,11 @@
 /**
  * Progress Service
  * 
- * Handles fetching and transforming user progress data at different levels:
- * - Global: All courses
- * - Course: All units in a course
- * - Unit: All concepts in a unit
- * - Concept: Quiz cards for a concept
- * 
- * Returns standardized chart data format with labels and values.
+ * Handles fetching user progress data from the backend API.
+ * Returns chart data aggregated by courses, units, or concepts.
  */
 
-import { fetchAllCourses, fetchCourseWithUnits } from './courseService';
-import { fetchCourseUnitWithConcepts } from './unitService';
-import { fetchConceptWithAllData } from './conceptService';
+import * as api from './api';
 
 /**
  * Fetch global progress (all courses)
@@ -20,20 +13,11 @@ import { fetchConceptWithAllData } from './conceptService';
  */
 export async function fetchGlobalProgress() {
   try {
-    const courses = await fetchAllCourses();
-    
-    if (!courses || courses.length === 0) {
-      return getEmptyChartData();
-    }
-
+    const data = await api.getGlobalProgress();
     return {
-      labels: courses.map(c => c.title),
-      values: courses.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
-      metadata: {
-        type: 'global',
-        count: courses.length,
-        timestamp: Date.now()
-      }
+      labels: data.labels || [],
+      values: data.values || [],
+      metadata: data.metadata || {}
     };
   } catch (err) {
     console.error('Error fetching global progress:', err);
@@ -52,31 +36,11 @@ export async function fetchCourseProgress(courseId) {
       return getEmptyChartData();
     }
 
-    const courseIdInt = parseInt(courseId, 10);
-    const { units } = await fetchCourseWithUnits(courseIdInt);
-
-    if (!units || units.length === 0) {
-      return getEmptyChartData();
-    }
-
-    // Sort units by order_index
-    const sortedUnits = [...units].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-
+    const data = await api.getCourseProgress(courseId);
     return {
-      labels: sortedUnits.map((u) => {
-        // order_index is 0-based in DB, so add 1 for display
-        if (u.order_index !== undefined && u.order_index !== null) {
-          return `Unit ${u.order_index + 1}`;
-        }
-        return u.title;
-      }),
-      values: sortedUnits.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
-      metadata: {
-        type: 'course',
-        courseId: courseIdInt,
-        count: sortedUnits.length,
-        timestamp: Date.now()
-      }
+      labels: data.labels || [],
+      values: data.values || [],
+      metadata: data.metadata || {}
     };
   } catch (err) {
     console.error('Error fetching course progress:', err);
@@ -96,24 +60,11 @@ export async function fetchUnitProgress(courseId, unitId) {
       return getEmptyChartData();
     }
 
-    const courseIdInt = parseInt(courseId, 10);
-    const unitIdInt = parseInt(unitId, 10);
-    const { concepts } = await fetchCourseUnitWithConcepts(courseIdInt, unitIdInt);
-
-    if (!concepts || concepts.length === 0) {
-      return getEmptyChartData();
-    }
-
+    const data = await api.getUnitProgress(courseId, unitId);
     return {
-      labels: concepts.map(c => c.title),
-      values: concepts.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
-      metadata: {
-        type: 'unit',
-        courseId: courseIdInt,
-        unitId: unitIdInt,
-        count: concepts.length,
-        timestamp: Date.now()
-      }
+      labels: data.labels || [],
+      values: data.values || [],
+      metadata: data.metadata || {}
     };
   } catch (err) {
     console.error('Error fetching unit progress:', err);
@@ -134,30 +85,16 @@ export async function fetchConceptProgress(courseId, unitId, conceptId) {
       return getEmptyChartData();
     }
 
-    const courseIdInt = parseInt(courseId, 10);
-    const unitIdInt = parseInt(unitId, 10);
-    const conceptIdInt = parseInt(conceptId, 10);
-    const { quizCards } = await fetchConceptWithAllData(
-      courseIdInt,
-      unitIdInt,
-      conceptIdInt
-    );
-
-    if (!quizCards || quizCards.length === 0) {
-      return getEmptyChartData();
-    }
-
-    // For concept progress, we can show individual quiz cards or group them
-    // For now, return placeholder data
+    // For now, return empty data for concept level
+    // This could be expanded to show individual quiz card progress
     return {
-      labels: quizCards.map((_, i) => `Question ${i + 1}`),
-      values: quizCards.map(() => Math.floor(Math.random() * 21)), // 0-20 questions
+      labels: [],
+      values: [],
       metadata: {
         type: 'concept',
-        courseId: courseIdInt,
-        unitId: unitIdInt,
-        conceptId: conceptIdInt,
-        count: quizCards.length,
+        courseId,
+        unitId,
+        conceptId,
         timestamp: Date.now()
       }
     };

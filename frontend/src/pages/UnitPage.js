@@ -35,7 +35,7 @@ const UnitPage = () => {
       showButton={true}
       startQuizPath={`/course/${courseId}/unit/${unitId}/quiz`}
       chartData={chartData}
-      chartLabel="No. of Questions Answered"
+      chartLabel="Success Rate (%)"
       labelOffset={70}
       rightContent={<ConceptList concepts={concepts} courseId={courseId} unitId={unitId} />}
       showBackButton={true}
