@@ -1,17 +1,29 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { shuffleAnswerOptions } from '../../services/quizService';
 import './Quiz.css';
 
+/**
+ * QuizAnswers - Component for displaying and handling quiz answer selection
+ *
+ * Displays shuffled answer options, tracks selection state, and provides feedback.
+ * All business logic (shuffling) is delegated to quizService.
+ *
+ * @param {Array} options - Array of answer option objects with { id, text, is_correct, explanation }
+ * @param {number} questionId - ID of current question (used to reset state on question change)
+ * @param {Function} onSelect - Callback when option is selected
+ * @param {boolean} isAnsweredCorrectly - Whether current question was answered correctly
+ */
 const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
   const [attempted, setAttempted] = useState(false);
 
-  // Shuffle once per question
+  // Shuffle answers once per question using service function
   const shuffledOptions = useMemo(() => {
-    if (!options) return [];
-    return [...options].sort(() => Math.random() - 0.5);
-  }, [questionId]);
+    return shuffleAnswerOptions(options);
+  }, [questionId, options]);
 
+  // Reset state when question changes
   useEffect(() => {
     setSelectedOptions([]);
     setIsLocked(false);
@@ -23,12 +35,11 @@ const QuizAnswers = ({ options, questionId, onSelect, isAnsweredCorrectly }) => 
 
     setSelectedOptions((prev) => [...prev, option.id]);
 
-    // report selection upward
+    // Report selection upward
     onSelect(option);
 
-    // lock after correct
+    // Lock after correct answer
     if (option.is_correct) {
-      const isFirstAttempt = !attempted;
       setIsLocked(true);
     }
   };
