@@ -4,7 +4,6 @@ Configuration and database initialization functions with side effects
 """
 
 import os
-from pathlib import Path
 from typing import Optional, Union
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,12 +18,8 @@ def _str_to_bool(value: Optional[str], default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "t", "yes", "y"}
 
 
-_DATABASE_DIR = Path(__file__).resolve().parent
-_DEFAULT_SQLITE_PATH = _DATABASE_DIR / "gamify_hc.db"
-DEFAULT_DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    f"sqlite:///{_DEFAULT_SQLITE_PATH}"
-)
+# PostgreSQL is required - no SQLite fallback
+DEFAULT_DATABASE_URL = os.getenv("DATABASE_URL")
 DEFAULT_SQLALCHEMY_ECHO = _str_to_bool(
     os.getenv("SQLALCHEMY_ECHO"),
     default=False,
@@ -35,8 +30,16 @@ def _resolve_database_url(database_url: Optional[str]) -> str:
     """Resolve the database URL.
 
     Prefers explicit arguments to environment defaults.
+    Raises an error if no database URL is configured.
     """
-    return database_url or DEFAULT_DATABASE_URL
+    url = database_url or DEFAULT_DATABASE_URL
+    if not url:
+        raise ValueError(
+            "DATABASE_URL environment variable is required. "
+            "Start PostgreSQL with: docker compose up postgres -d\n"
+            "Then set: DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc"
+        )
+    return url
 
 
 def _resolve_echo(echo: Union[bool, str, None]) -> bool:
@@ -62,8 +65,8 @@ def create_database(
 
     Args:
         database_url: Explicit database connection string. When omitted, the
-            value of the ``DATABASE_URL`` environment variable is used, falling
-            back to a bundled SQLite file.
+            value of the ``DATABASE_URL`` environment variable is used.
+            PostgreSQL is required.
         echo: Whether to log SQL statements. Accepts bools or truthy strings.
             When omitted, the ``SQLALCHEMY_ECHO`` environment variable is used.
         auto_seed: If True, automatically seed database with initial data if
@@ -71,10 +74,23 @@ def create_database(
 
     Returns:
         tuple: (engine, Session class)
+
+    Raises:
+        ValueError: If DATABASE_URL is not set.
     """
     database_url = _resolve_database_url(database_url)
     echo_flag = _resolve_echo(echo)
-    engine = create_engine(database_url, echo=echo_flag)
+    
+    # PostgreSQL connection pool configuration
+    engine = create_engine(
+        database_url,
+        echo=echo_flag,
+        pool_size=10,
+        max_overflow=20,
+        pool_pre_ping=True,
+        pool_recycle=300,  # Recycle connections after 5 min
+    )
+    
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
 
@@ -114,10 +130,18 @@ def get_session(database_url: Optional[str] = None):
 
     Returns:
         Session instance
+
+    Raises:
+        ValueError: If DATABASE_URL is not set.
     """
     database_url = _resolve_database_url(database_url)
     echo_flag = _resolve_echo(None)
-    engine = create_engine(database_url, echo=echo_flag)
+    
+    engine = create_engine(
+        database_url,
+        echo=echo_flag,
+        pool_pre_ping=True,
+    )
     Session = sessionmaker(bind=engine)
     return Session()
 
@@ -192,4 +216,3 @@ if __name__ == '__main__':
 
     finally:
         session.close()
-
