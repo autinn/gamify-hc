@@ -1,12 +1,19 @@
 /**
- * API Service for Gamify-HC
- * 
- * Centralized API client for all backend communication.
- * - Automatically includes authentication tokens in requests
- * - Handles error formatting and logging
- * - Provides typed endpoints for courses, units, concepts, quizzes, and users
- * 
- * Use these functions in your React components to fetch data from the backend.
+ * API Service - Centralized backend communication layer
+ *
+ * Handles all HTTP requests to the Gamify-HC backend API with automatic token
+ * management and error handling. Provides organized endpoints grouped by feature.
+ *
+ * Features:
+ * - Automatic JWT token inclusion in Authorization headers
+ * - Centralized error handling and logging
+ * - Organized endpoint groups: courses, units, concepts, quiz, users, progress
+ * - Environment-based API URL configuration
+ *
+ * Usage: Import and call endpoint functions directly in components or hooks.
+ * Example: const courses = await api.getCourses();
+ *
+ * @module api
  */
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';

@@ -1,15 +1,54 @@
 /**
- * Progress Service
- * 
- * Handles fetching user progress data from the backend API.
- * Returns chart data aggregated by courses, units, or concepts.
+ * Progress Service - User progress data fetching and aggregation
+ *
+ * Fetches user progress at different levels (global, course, unit, concept).
+ * Returns standardized chart data format with labels, values, and metadata.
+ * Includes error handling with graceful fallbacks to empty state.
+ *
+ * @module progressService
  */
 
 import * as api from './api';
 
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
 /**
- * Fetch global progress (all courses)
- * @returns {Promise<{labels: string[], values: number[], metadata: object}>}
+ * Get empty chart data structure for graceful error handling
+ *
+ * Returns a standardized empty chart format when data is unavailable,
+ * preventing null/undefined errors in chart components.
+ *
+ * @returns {Object} Empty chart data {labels: [], values: [], metadata: {error: true}}
+ */
+function getEmptyChartData() {
+  return {
+    labels: [],
+    values: [],
+    metadata: {
+      timestamp: Date.now(),
+      error: true
+    }
+  };
+}
+
+// ============================================================================
+// GLOBAL PROGRESS
+// ============================================================================
+
+/**
+ * Fetch global progress across all courses
+ *
+ * Aggregates success rates for all courses user is enrolled in.
+ *
+ * @async
+ * @returns {Promise<{labels: string[], values: number[], metadata: object}>} Chart data with course labels and success rates
+ *
+ * @example
+ * const { labels, values } = await fetchGlobalProgress();
+ * // labels: ['EA50', 'FA50', 'MC50', 'CX50']
+ * // values: [0.75, 0.82, 0.68, 0.91]
  */
 export async function fetchGlobalProgress() {
   try {
@@ -25,10 +64,24 @@ export async function fetchGlobalProgress() {
   }
 }
 
+// ============================================================================
+// COURSE PROGRESS
+// ============================================================================
+
 /**
- * Fetch course progress (all units in a course)
- * @param {number} courseId - Course ID
- * @returns {Promise<{labels: string[], values: number[], metadata: object}>}
+ * Fetch progress for all units in a course
+ *
+ * Aggregates success rates for all units within a specific course.
+ * Used to display unit-level progress on CoursePage.
+ *
+ * @async
+ * @param {number} courseId - The course ID
+ * @returns {Promise<{labels: string[], values: number[], metadata: object}>} Chart data with unit labels and success rates
+ *
+ * @example
+ * const { labels, values } = await fetchCourseProgress(1);
+ * // labels: ['Unit 1: Problem-Solving', 'Unit 2: Analysis', ...]
+ * // values: [0.75, 0.82, ...]
  */
 export async function fetchCourseProgress(courseId) {
   try {
@@ -48,11 +101,25 @@ export async function fetchCourseProgress(courseId) {
   }
 }
 
+// ============================================================================
+// UNIT PROGRESS
+// ============================================================================
+
 /**
- * Fetch unit progress (all concepts in a unit)
- * @param {number} courseId - Course ID
- * @param {number} unitId - Unit ID
- * @returns {Promise<{labels: string[], values: number[], metadata: object}>}
+ * Fetch progress for all concepts in a unit
+ *
+ * Aggregates success rates for all concepts within a specific unit.
+ * Used to display concept-level progress on UnitPage.
+ *
+ * @async
+ * @param {number} courseId - The parent course ID
+ * @param {number} unitId - The unit ID
+ * @returns {Promise<{labels: string[], values: number[], metadata: object}>} Chart data with concept labels and success rates
+ *
+ * @example
+ * const { labels, values } = await fetchUnitProgress(1, 2);
+ * // labels: ['Concept A', 'Concept B', ...]
+ * // values: [0.75, 0.82, ...]
  */
 export async function fetchUnitProgress(courseId, unitId) {
   try {
@@ -72,12 +139,27 @@ export async function fetchUnitProgress(courseId, unitId) {
   }
 }
 
+// ============================================================================
+// CONCEPT PROGRESS
+// ============================================================================
+
 /**
- * Fetch concept progress (quiz cards for a concept)
- * @param {number} courseId - Course ID
- * @param {number} unitId - Unit ID
- * @param {number} conceptId - Concept ID
- * @returns {Promise<{labels: string[], values: number[], metadata: object}>}
+ * Fetch progress for all quiz cards in a concept
+ *
+ * Returns concept-level progress data. Currently returns empty data structure
+ * but can be expanded to track individual quiz card success rates.
+ * Used to display quiz card progress on ConceptPage.
+ *
+ * @async
+ * @param {number} courseId - The parent course ID
+ * @param {number} unitId - The parent unit ID
+ * @param {number} conceptId - The concept ID
+ * @returns {Promise<{labels: string[], values: number[], metadata: object}>} Chart data with quiz labels and success rates
+ *
+ * @example
+ * const { labels, values } = await fetchConceptProgress(1, 2, 3);
+ * // labels: ['Quiz Card 1', 'Quiz Card 2', ...]
+ * // values: [1, 0.5, ...] // 1 = correct, 0 = incorrect, 0.5 = partial
  */
 export async function fetchConceptProgress(courseId, unitId, conceptId) {
   try {
@@ -85,8 +167,7 @@ export async function fetchConceptProgress(courseId, unitId, conceptId) {
       return getEmptyChartData();
     }
 
-    // For now, return empty data for concept level
-    // This could be expanded to show individual quiz card progress
+    // Return empty data for concept level - can be expanded for individual quiz card progress
     return {
       labels: [],
       values: [],
@@ -102,19 +183,4 @@ export async function fetchConceptProgress(courseId, unitId, conceptId) {
     console.error('Error fetching concept progress:', err);
     return getEmptyChartData();
   }
-}
-
-/**
- * Helper: Return empty chart data
- * @returns {object} Empty chart data structure
- */
-function getEmptyChartData() {
-  return {
-    labels: [],
-    values: [],
-    metadata: {
-      timestamp: Date.now(),
-      error: true
-    }
-  };
 }
