@@ -1,7 +1,26 @@
 /**
- * useConcept Hook
- * 
- * Manages concept fetching with course, unit, and quiz cards.
+ * useConcept Hook - Single concept data management
+ *
+ * Fetches a single concept with its parent course, unit, and all quiz cards.
+ * Provides complete data structure for concept detail pages.
+ *
+ * @hook
+ * @param {number} courseId - Parent course ID from URL
+ * @param {number} unitId - Parent unit ID from URL
+ * @param {number} conceptId - Concept ID from URL
+ * @returns {Object} Concept data and state
+ * @returns {Object|null} returns.course - Parent course object
+ * @returns {Object|null} returns.unit - Parent unit object
+ * @returns {Object|null} returns.concept - Concept object {concept_id, unit_id, title, definition}
+ * @returns {Array} returns.quizCards - Array of quiz card objects for the concept
+ * @returns {boolean} returns.loading - True while fetching
+ * @returns {Error|null} returns.error - Error object if fetch failed
+ *
+ * @example
+ * const { concept, quizCards, loading } = useConcept(courseId, unitId, conceptId);
+ * if (loading) return <Loading />;
+ * return <ConceptPage concept={concept} quizCards={quizCards} />;
+ *
  * Used by: ConceptPage
  */
 

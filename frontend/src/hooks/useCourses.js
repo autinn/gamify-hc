@@ -1,7 +1,19 @@
 /**
- * useCourses Hook
- * 
- * Manages course list fetching and state.
+ * useCourses Hook - Course list management
+ *
+ * Fetches all available courses. Provides fallback to dummy data if API fails
+ * to ensure app remains usable during development or API outages.
+ *
+ * @hook
+ * @returns {Object} Course list state
+ * @returns {Array} returns.courses - Array of course objects {course_id, title, description}
+ * @returns {boolean} returns.loading - True while fetching
+ *
+ * @example
+ * const { courses, loading } = useCourses();
+ * if (loading) return <LoadingSpinner />;
+ * return <CourseList courses={courses} />;
+ *
  * Used by: MainPage
  */
 

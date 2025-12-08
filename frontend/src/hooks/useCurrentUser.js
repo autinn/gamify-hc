@@ -1,9 +1,22 @@
 /**
- * useCurrentUser Hook
- * 
- * Fetches the current logged-in user's data from the database.
- * Returns user information including username, email, etc.
- * Used by: MainPage, Header, and other authenticated pages
+ * useCurrentUser Hook - Current logged-in user data management
+ *
+ * Fetches and caches the authenticated user's profile information from the backend.
+ * Validates token presence before making request. Falls back gracefully if fetch fails.
+ *
+ * @hook
+ * @returns {Object} User data and state
+ * @returns {Object|null} returns.user - User object {user_id, username, email, ...}
+ * @returns {boolean} returns.loading - True while fetching (initial load only)
+ * @returns {string|null} returns.error - Error message if fetch failed, null on success
+ *
+ * @example
+ * const { user, loading, error } = useCurrentUser();
+ * if (loading) return <Loading />;
+ * if (error) return <Error message={error} />;
+ * return <UserGreeting name={user.username} />;
+ *
+ * Used by: MainPage, Header, and authenticated pages
  */
 
 import { useState, useEffect } from 'react';

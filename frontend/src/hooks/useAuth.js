@@ -1,8 +1,21 @@
 /**
- * useAuth Hook
- * 
- * Manages authentication state and login/register logic.
- * Handles form validation and token storage.
+ * useAuth Hook - Authentication state management
+ *
+ * Manages user login and registration with form validation and token handling.
+ * Provides error reporting and loading states for async operations.
+ *
+ * @hook
+ * @returns {Object} Auth methods and state
+ * @returns {Function} returns.login - Async login function(email, password)
+ * @returns {Function} returns.register - Async register function(username, email, password, passwordConfirm)
+ * @returns {string} returns.error - Error message if login/register failed
+ * @returns {boolean} returns.loading - True while request in flight
+ * @returns {Function} returns.setError - Manually clear error message
+ *
+ * @example
+ * const { login, error, loading } = useAuth();
+ * await login('user@minerva.edu', 'password123');
+ *
  * Used by: LoginPage, RegisterPage
  */
 
