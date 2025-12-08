@@ -1,8 +1,24 @@
+/**
+ * CoursePage Integration Tests
+ * 
+ * Tests the course detail page functionality including:
+ * - Fetching course data with associated units
+ * - Loading course-specific progress metrics
+ * - Handling courses with zero units
+ * - Displaying course progress (completion, success rate)
+ * - Error handling for missing courses and failed API calls
+ * 
+ * CoursePage displays the units within a course and the user's
+ * progress through that specific course's content.
+ * 
+ * @module CoursePage.test
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as courseService from '../../services/courseService';
 import * as progressService from '../../services/progressService';
 
-// Mock services
+// Mock all course and progress service functions
 vi.mock('../../services/courseService');
 vi.mock('../../services/progressService');
 
@@ -13,6 +29,17 @@ describe('CoursePage - Course Content & Progress', () => {
     localStorage.setItem('token', 'test-token');
   });
 
+  /**
+   * Test: Fetch course with units
+   * 
+   * Verifies that the page loads a single course and its associated units.
+   * Unit structure provides the navigation hierarchy within a course.
+   * 
+   * Expected response includes:
+   * - course_id: Unique identifier
+   * - title: Course name/code
+   * - units: Array of unit objects with unit_id and title
+   */
   it('should fetch course with units', async () => {
     const mockCourse = {
       course_id: 1,
@@ -33,6 +60,17 @@ describe('CoursePage - Course Content & Progress', () => {
     expect(result.units[0].unit_id).toBe(1);
   });
 
+  /**
+   * Test: Fetch course progress
+   * 
+   * Verifies that course-specific progress metrics are loaded,
+   * including success rate and units completion status.
+   * 
+   * Metrics tracked:
+   * - success_rate: Overall accuracy on quiz questions in this course
+   * - units_completed: Number of units completed by user
+   * - total_units: Total units available in course
+   */
   it('should fetch course progress', async () => {
     const mockProgress = {
       course_id: 1,
@@ -50,6 +88,17 @@ describe('CoursePage - Course Content & Progress', () => {
     expect(result.units_completed).toBe(2);
   });
 
+  /**
+   * Test: Handle course with no units
+   * 
+   * Verifies graceful handling of empty courses (edge case).
+   * A course may exist but have no units yet (in setup phase).
+   * 
+   * Expected behavior:
+   * - Returns course object with empty units array
+   * - Page shows "No units available" message
+   * - Does not crash when rendering empty list
+   */
   it('should handle course with no units', async () => {
     const mockCourse = {
       course_id: 1,
@@ -65,6 +114,17 @@ describe('CoursePage - Course Content & Progress', () => {
     expect(result.units).toEqual([]);
   });
 
+  /**
+   * Test: Handle course fetch errors
+   * 
+   * Verifies error handling when requested course doesn't exist
+   * or is not accessible to the user.
+   * 
+   * Expected behavior:
+   * - Catches 404 or authorization errors
+   * - Shows "Course not found" error message
+   * - Allows user to navigate back to course list
+   */
   it('should handle course fetch errors', async () => {
     const error = new Error('Course not found');
     courseService.fetchCourseWithUnits.mockRejectedValue(error);
@@ -77,6 +137,17 @@ describe('CoursePage - Course Content & Progress', () => {
     }
   });
 
+  /**
+   * Test: Update course progress on unit completion
+   * 
+   * Verifies that progress metrics update when user completes a unit.
+   * Tests the dynamic nature of progress tracking.
+   * 
+   * Simulates user progression:
+   * - Initial state: 2 units completed out of 4
+   * - After action: 3 units completed out of 4
+   * - Progress metric: 75% course completion
+   */
   it('should update course progress on unit completion', async () => {
     progressService.fetchCourseProgress.mockResolvedValue({
       course_id: 1,

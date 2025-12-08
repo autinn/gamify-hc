@@ -47,6 +47,14 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toBeNull();
   });
 
+  /**
+   * Test: Reject non-Minerva email addresses
+   * 
+   * Verifies that the system enforces institutional email requirement.
+   * Only @minerva.edu domain emails are accepted (security/enrollment policy).
+   * 
+   * Invalid inputs tested: gmail.com, yahoo.com, etc.
+   */
   it('should reject non-minerva email', () => {
     const result = validateRegisterForm(
       'username123',
@@ -58,6 +66,11 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toBeDefined();
   });
 
+  /**
+   * Test: Reject empty username
+   * 
+   * Verifies that username field is required and cannot be blank.
+   */
   it('should reject empty username', () => {
     const result = validateRegisterForm(
       '',
@@ -69,6 +82,12 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toContain('Username');
   });
 
+  /**
+   * Test: Reject short username
+   * 
+   * Verifies minimum username length requirement (3 characters).
+   * Prevents trivial/low-quality usernames.
+   */
   it('should reject short username', () => {
     const result = validateRegisterForm(
       'ab',
@@ -80,6 +99,12 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toContain('Username');
   });
 
+  /**
+   * Test: Reject short password
+   * 
+   * Verifies minimum password length requirement (6 characters).
+   * Ensures basic password security standards.
+   */
   it('should reject short password', () => {
     const result = validateRegisterForm(
       'username123',
@@ -91,6 +116,12 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toContain('6 characters');
   });
 
+  /**
+   * Test: Reject mismatched passwords
+   * 
+   * Verifies that password and password confirmation fields must match.
+   * Prevents accidental password typos during registration.
+   */
   it('should reject mismatched passwords', () => {
     const result = validateRegisterForm(
       'username123',
@@ -102,6 +133,12 @@ describe('RegisterPage - Registration Validation', () => {
     expect(result.error).toBeDefined();
   });
 
+  /**
+   * Test: Validate with minimal input
+   * 
+   * Verifies that valid input passes all validation checks
+   * even with minimal allowed values (username: 3 chars, password: 6 chars).
+   */
   it('should validate with minimal whitespace', () => {
     const result = validateRegisterForm(
       'username123',
