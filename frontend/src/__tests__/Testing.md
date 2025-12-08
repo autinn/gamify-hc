@@ -43,6 +43,245 @@ npm test -- [file]    # Run specific test file
 
 **Total: 21 test files, 146 tests, all passing ✅**
 
+## Detailed Test Breakdown
+
+### Services (7 test files, 59 tests)
+Unit tests for API communication and data transformation.
+
+- **authService.test.js (19 tests)** - Email/password/form validation
+  - Email format and Minerva domain enforcement
+  - Password strength validation
+  - Username requirements
+  - Complete form validation
+
+- **quizService.test.js (18 tests)** - Quiz utilities
+  - Answer shuffling and randomization
+  - Quiz path navigation logic
+  - Array handling edge cases
+
+- **progressService.test.js (12 tests)** - Progress metrics
+  - Global progress fetching
+  - Course-level progress
+  - Unit-level progress
+  - Success rate calculations
+
+- **dataMappers.test.js (5 tests)** - Data transformation
+  - Course data mapping
+  - Unit and concept mapping
+  - Quiz card mapping
+
+- **courseService, unitService, conceptService (1 test each)** - Service existence verification
+
+### Hooks (9 test files, 70 tests)
+Integration tests for hook state management and API integration.
+
+- **useAuth.test.js (9 tests)** - Authentication
+  - Login validation and API calls
+  - Registration validation
+  - Loading/error states
+
+- **useQuiz.test.js (13 tests)** - Quiz state and interaction
+  - Quiz card fetching
+  - Answer submission and scoring
+  - First correct answer tracking
+  - Question navigation
+
+- **useProgress.test.js (10 tests)** - Progress tracking
+  - Global, course, unit, and concept level progress
+  - Progress refresh functionality
+  - Error handling
+
+- **useHeaderNavigation.test.js (12 tests)** - Navigation structure
+  - Course and unit fetching
+  - Navigation data mapping
+  - Error scenarios
+
+- **useCourses.test.js (3 tests)**, **useCourse.test.js (3 tests)**, **useUnit.test.js (3 tests)**, **useConcept.test.js (3 tests)** - Data fetching hooks
+  - Initial state
+  - Loading states
+  - Error handling
+
+- **useCurrentUser.test.js (4 tests)** - User information
+  - Current user fetching
+  - Token handling
+  - Missing token scenarios
+
+### Pages (5 test files, 29 tests)
+Integration tests verifying data flow from API to UI.
+
+- **LoginPage.test.js (7 tests)** - Login validation
+  - Email format validation
+  - Minerva domain enforcement
+  - Password requirements
+  - Case-insensitive email handling
+
+- **RegisterPage.test.js (7 tests)** - Registration form
+  - Complete registration validation
+  - Email domain restriction
+  - Username requirements
+  - Password strength and confirmation
+
+- **MainPage.test.js (5 tests)** - Dashboard
+  - Course fetching on mount
+  - Global progress loading
+  - Empty course lists
+  - Error handling
+
+- **CoursePage.test.js (5 tests)** - Course content
+  - Course with units fetching
+  - Course progress metrics
+  - Empty course handling
+  - Progress updates
+
+- **UnitPage.test.js (5 tests)** - Unit content
+  - Unit data fetching
+  - Concept fetching
+  - Composite data handling
+
+## Testing Strategy
+
+### Service Tests
+Service tests mock the API layer and verify data transformation.
+
+**Pattern:**
+```javascript
+vi.mock('../../services/api');
+api.getCourses.mockResolvedValue([...]); // Mock API response
+const result = await courseService.fetchAllCourses();
+expect(result[0].course_id).toBe(1); // Verify transformation
+```
+
+**Focus Areas:**
+- API request correctness
+- Data transformation accuracy
+- Error handling
+- Edge cases (empty arrays, null values)
+
+### Hook Tests
+Hook tests mock services and verify state updates and side effects.
+
+**Pattern:**
+```javascript
+vi.mock('../../services/courseService');
+const { result } = renderHook(() => useCourses());
+await waitFor(() => expect(result.current.loading).toBe(false));
+expect(result.current.courses.length).toBe(2);
+```
+
+**Focus Areas:**
+- State initialization
+- Loading states during async operations
+- Error state management
+- Data updates after API calls
+- User action handlers
+
+### Page Tests
+Page tests mock services and verify data integration in the UI.
+
+**Pattern:**
+```javascript
+courseService.fetchAllCourses.mockResolvedValue([...]);
+render(<MainPage />);
+await waitFor(() => {
+  expect(screen.getByText('Habits of Mind')).toBeInTheDocument();
+});
+```
+
+**Focus Areas:**
+- Data flow from hook to component
+- Error message display
+- Empty state handling
+- User interactions
+- Navigation
+
+## Testing Setup
+
+### Global Mocks (setup.js)
+```javascript
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+global.localStorage = localStorageMock;
+
+// Mock fetch
+global.fetch = vi.fn();
+```
+
+### Service Mocking Pattern
+```javascript
+import * as courseService from '../../services/courseService';
+vi.mock('../../services/courseService');
+
+// In tests:
+courseService.fetchAllCourses.mockResolvedValue([...]);
+```
+
+### Custom Render with Providers
+```javascript
+// testUtils.js provides custom render with BrowserRouter
+import { render } from '../testUtils';
+render(<MainPage />); // Automatically wrapped with routing
+```
+
+## Common Test Patterns
+
+### Async Operation Testing
+```javascript
+it('should fetch data on mount', async () => {
+  service.fetch.mockResolvedValue(mockData);
+  const { result } = renderHook(() => useHook());
+  
+  await waitFor(() => {
+    expect(result.current.loading).toBe(false);
+  });
+  
+  expect(result.current.data).toEqual(mockData);
+});
+```
+
+### Error Handling Testing
+```javascript
+it('should handle API errors', async () => {
+  const error = new Error('API failed');
+  service.fetch.mockRejectedValue(error);
+  
+  const { result } = renderHook(() => useHook());
+  
+  await waitFor(() => {
+    expect(result.current.error).toBeDefined();
+  });
+});
+```
+
+### Form Validation Testing
+```javascript
+it('should validate required fields', () => {
+  const result = validateForm('', 'password');
+  expect(result.valid).toBe(false);
+  expect(result.error).toContain('required');
+});
+```
+
+## Coverage
+
+Run coverage reports with:
+```bash
+npm run test:coverage
+```
+
+Coverage is configured to exclude:
+- `node_modules/`
+- `src/__tests__/` (test files themselves)
+- `src/setupTests.js`
+- `src/reportWebVitals.js`
+- `src/index.js`
+
+View the HTML report in `coverage/index.html`
+
 ## Writing Tests
 
 ### Unit Test Example (Service)

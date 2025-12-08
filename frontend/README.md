@@ -49,6 +49,297 @@ src/
 └── index.js            # Entry point
 ```
 
+## Architecture Overview
+
+The Gamify-HC frontend uses a **layered architecture** with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Pages (Route Components)              │
+│  MainPage │ LoginPage │ CoursePage │ UnitPage │ QuizPage │
+└────────────────────────┬────────────────────────────────┘
+                         │ Use
+┌────────────────────────▼────────────────────────────────┐
+│              Custom React Hooks (State Logic)            │
+│  useCourses │ useAuth │ useUnit │ useQuiz │ useProgress │
+└────────────────────────┬────────────────────────────────┘
+                         │ Call
+┌────────────────────────▼────────────────────────────────┐
+│            Services (API Communication)                  │
+│  courseService │ authService │ quizService │ api.js     │
+└────────────────────────┬────────────────────────────────┘
+                         │ HTTP Requests
+┌────────────────────────▼────────────────────────────────┐
+│         Backend API (Flask - Port 5001)                  │
+│  /api/auth │ /api/courses │ /api/units │ /api/quiz      │
+└─────────────────────────────────────────────────────────┘
+```
+
+### How Data Flows Through the Architecture
+
+#### 1. **Pages** - The UI Layer
+Pages are route-based components that render the user interface. They compose custom hooks to manage state and display data.
+
+**Key Pages:**
+- `MainPage.js` - Dashboard showing all courses and global progress
+- `LoginPage.js` / `RegisterPage.js` - Authentication
+- `CoursePage.js` - Lists units in a course
+- `UnitPage.js` - Shows concepts in a unit
+- `QuizPage.js` - Quiz interface for answering questions
+
+**Example Flow:**
+```javascript
+// MainPage.js
+export default function MainPage() {
+  const { courses, loading, error } = useCourses();
+  const { globalProgress } = useProgress('global');
+  
+  return (
+    <div>
+      <h1>My Courses</h1>
+      {courses.map(course => <CourseCard key={course.course_id} course={course} />)}
+    </div>
+  );
+}
+```
+
+#### 2. **Custom Hooks** - The Business Logic Layer
+Hooks encapsulate all state management, API communication, and data processing logic. This keeps pages clean and reusable.
+
+**Hook Responsibilities:**
+- Fetch data from services on mount
+- Manage loading/error states
+- Transform API responses into component-ready formats
+- Handle user actions (submit, select, navigate)
+- Provide state setters for UI interactions
+
+**Key Hooks:**
+
+| Hook | Purpose | Returns |
+|------|---------|---------|
+| `useCourses()` | Fetch all courses | `{ courses, loading, error }` |
+| `useCourse(courseId)` | Fetch single course with units | `{ course, units, loading }` |
+| `useUnit(courseId, unitId)` | Fetch unit with concepts | `{ unit, concepts, loading }` |
+| `useConcept(courseId, unitId, conceptId)` | Fetch concept details | `{ concept, loading }` |
+| `useQuiz(conceptId, unitId, courseId)` | Quiz state & handlers | `{ cards, score, handleNext, handleSelect }` |
+| `useProgress(level)` | User progress metrics | `{ chartData, loading, refresh }` |
+| `useAuth()` | Login/register logic | `{ login, register, loading, error }` |
+| `useCurrentUser()` | Current user info | `{ user, loading, token }` |
+| `useHeaderNavigation()` | Navigation structure | `{ courses, units, error }` |
+| `useGameification()` | Gamification state | `{ badges, points, level }` |
+
+**Example Hook:**
+```javascript
+// useQuiz.js
+export function useQuiz(conceptId, unitId, courseId) {
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [score, setScore] = useState(0);
+  
+  useEffect(() => {
+    // Fetch quiz cards from API via quizService
+    quizService.getQuizCards(conceptId).then(data => {
+      setCards(quizService.shuffleAnswerOptions(data));
+      setLoading(false);
+    });
+  }, [conceptId]);
+  
+  const handleSelect = (answer) => {
+    // Submit answer via API, update score
+    api.submitQuizAnswer({ answer_id: answer.id, ... });
+    setScore(score + 1);
+  };
+  
+  return { cards, loading, score, handleSelect };
+}
+```
+
+#### 3. **Services** - The API Layer
+Services handle all HTTP communication with the backend. They:
+- Make API requests using Axios (via `api.js`)
+- Transform API responses into frontend data structures
+- Handle authentication tokens
+- Manage error states
+
+**Service Files:**
+
+| Service | Endpoints | Purpose |
+|---------|-----------|---------|
+| `authService.js` | `/api/auth/login`, `/api/auth/register` | User authentication & validation |
+| `courseService.js` | `/api/courses`, `/api/courses/{id}` | Course data fetching |
+| `unitService.js` | `/api/units`, `/api/units/{id}` | Unit and concept data |
+| `quizService.js` | `/api/quiz` | Quiz card fetching & shuffling |
+| `progressService.js` | `/api/progress` | User progress metrics |
+| `conceptService.js` | `/api/concepts` | Concept details |
+| `dataMappers.js` | (No API) | Data transformation utilities |
+
+**Example Service:**
+```javascript
+// courseService.js
+export async function fetchAllCourses() {
+  const response = await api.getCourses(); // HTTP GET /api/courses
+  return mapCoursesArray(response); // Transform to component format
+}
+
+export async function fetchCourseWithUnits(courseId) {
+  const course = await api.getCourse(courseId);
+  const units = await api.getCourseUnits(courseId);
+  return { ...course, units }; // Combine related data
+}
+```
+
+#### 4. **API Module** - The HTTP Client
+`api.js` is a wrapper around Axios that handles:
+- Setting authentication headers (JWT token from localStorage)
+- Base URL configuration
+- Error handling
+- Response interceptors
+
+**Example API Call:**
+```javascript
+// api.js
+export async function getCourses() {
+  const response = await axios.get('/api/courses', {
+    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  });
+  return response.data;
+}
+```
+
+#### 5. **Data Transformation** - dataMappers.js
+Services use data mappers to transform backend responses into component-expected formats:
+
+```javascript
+// dataMappers.js
+export function mapCourseData(apiCourse) {
+  return {
+    course_id: apiCourse.id,           // Rename field
+    title: apiCourse.name,              // Standardize format
+    units: apiCourse.units || []        // Provide defaults
+  };
+}
+```
+
+## Complete Data Flow Example
+
+**Scenario: User loads the MainPage dashboard**
+
+```
+1. LOAD MAINPAGE
+   ↓
+2. mainPage component mounts
+   ↓
+3. Calls two hooks:
+   - useCourses()
+   - useProgress('global')
+   ↓
+4. useCourses hook:
+   - Sets loading = true
+   - Calls courseService.fetchAllCourses()
+   ↓
+5. courseService:
+   - Calls api.getCourses()
+   - Makes HTTP GET /api/courses
+   ↓
+6. Backend API (Flask):
+   - Queries database for user's courses
+   - Returns: [{ id: 1, name: 'EA50', ... }, ...]
+   ↓
+7. courseService receives response:
+   - Calls mapCoursesArray() to transform data
+   - Returns: [{ course_id: 1, title: 'EA50', ... }, ...]
+   ↓
+8. Hook receives transformed data:
+   - setLoading(false)
+   - setCourses(transformedData)
+   ↓
+9. Component re-renders:
+   - Displays courses in UI
+   - Shows loading spinner gone
+   - User sees dashboard
+```
+
+## Component Communication
+
+**Props Flow (Down):**
+```
+MainPage
+  ↓ passes course object
+  ↓
+CourseCard (component)
+  ↓ passes course_id on click
+  ↓
+Navigation → CoursePage
+```
+
+**Data Flow (Up through Hooks):**
+```
+User clicks "Start Quiz"
+  ↓
+QuizPage mounts with conceptId
+  ↓
+useQuiz(conceptId) hook initializes
+  ↓
+Fetches quiz cards from API
+  ↓
+Returns { cards, score, handleSelect }
+  ↓
+QuizPage renders questions
+```
+
+## State Management Pattern
+
+Gamify-HC uses **React Hooks for state** (no Redux/Context):
+
+```javascript
+// Local component state via hooks
+const { courses, loading, error } = useCourses();
+const { progress } = useProgress(courseId);
+const { user } = useCurrentUser();
+```
+
+**Advantages:**
+- Simpler, less boilerplate than Redux
+- Direct API calls from hooks
+- Co-located state and logic
+- Easy to test (mock the services)
+
+## Authentication Flow
+
+```
+1. User enters email/password on LoginPage
+2. useAuth hook validates input
+3. Calls authService.validateLoginForm()
+4. Service calls api.login(email, password)
+5. Backend verifies credentials
+6. Returns JWT token
+7. localStorage.setItem('token', response.access_token)
+8. All future API calls include Authorization header
+9. useCurrentUser() fetches user profile with token
+10. Redirect to MainPage
+```
+
+## Error Handling
+
+All services handle errors gracefully:
+
+```javascript
+// In useQuiz hook
+useEffect(() => {
+  quizService.getQuizCards(conceptId)
+    .catch(error => {
+      setError(`Failed to load quiz: ${error.message}`);
+      setLoading(false);
+    });
+}, [conceptId]);
+```
+
+**Common Error Scenarios:**
+- 401 Unauthorized → Redirect to login
+- 404 Not Found → Show "Resource not found"
+- 500 Server Error → Show "Server error, try again"
+- Network timeout → Show "Connection lost"
+
 ## Technology Stack
 
 - **React 19** - UI framework
@@ -59,13 +350,18 @@ src/
 
 ## Testing
 
-See [Testing.md](src/__tests__/Testing.md) for comprehensive testing documentation.
+The project has comprehensive test coverage across services, hooks, and pages.
 
-**Test Structure:**
-- Services (7): authService, courseService, unitService, conceptService, quizService, progressService, dataMappers
-- Hooks (9): useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser, useProgress, useHeaderNavigation, useGameification
-- Pages (2): LoginPage, UnitPage (integration tests)
-- Components: Quiz components
+```bash
+npm test                  # Run all tests with watch mode
+npm test -- --run         # Run once (CI mode)
+npm run test:ui           # Interactive test dashboard
+npm run test:coverage     # Generate coverage report
+```
+
+**Test Status: 146 tests passing (21 test files) ✅**
+
+See [Testing.md](src/__tests__/Testing.md) for detailed testing architecture, patterns, and strategies.
 
 ## Backend Integration
 
