@@ -1,70 +1,87 @@
-# Getting Started with Create React App
+# Gamify-HC Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A gamified learning platform for Habits of Mind and Foundational Concepts, built with React and Vitest.
+
+## Quick Start
+
+### With Docker (Recommended)
+
+```bash
+docker compose up
+```
+
+Frontend runs at: http://localhost:3000
+Backend API at: http://localhost:5001
+
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+Opens at http://localhost:3000
 
 ## Available Scripts
 
-In the project directory, you can run:
+```bash
+npm start              # Development server on port 3000
+npm run build          # Production build to `build/` folder
+npm test               # Run all tests with Vitest
+npm run test:ui        # Interactive test dashboard
+npm run test:coverage  # Generate test coverage report
+npm test -- --watch    # Watch mode for development
+```
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+src/
+├── pages/              # 7 page components (Main, Login, Register, Course, Unit, Concept, Quiz)
+├── components/         # Reusable UI components (common, course, unit, quiz, concept)
+├── hooks/              # 10 custom React hooks for state & logic
+├── services/           # 7 API services (auth, course, unit, concept, quiz, progress, dataMappers)
+├── __tests__/          # Test suite with Vitest setup
+├── App.js              # Root component
+└── index.js            # Entry point
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Technology Stack
 
-### `npm test`
+- **React 19** - UI framework
+- **React Router 7** - Client-side routing
+- **Vitest** - Unit & integration test runner
+- **React Testing Library** - Component testing utilities
+- **Axios** - HTTP client (via api.js)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Testing
 
-### `npm run build`
+See [Testing.md](src/__tests__/Testing.md) for comprehensive testing documentation.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Test Structure:**
+- Services (7): authService, courseService, unitService, conceptService, quizService, progressService, dataMappers
+- Hooks (9): useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser, useProgress, useHeaderNavigation, useGameification
+- Pages (2): LoginPage, UnitPage (integration tests)
+- Components: Quiz components
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Backend Integration
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The frontend communicates with the backend API at `/api`:
+- Authentication: `/api/auth`
+- Courses: `/api/courses`
+- Units: `/api/units`
+- Concepts: `/api/concepts`
+- Quiz: `/api/quiz`
+- Users: `/api/users`
 
-### `npm run eject`
+See [Backend README](../backend/README.md) for API documentation.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Development Tips
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Use `npm test -- --watch` for Test-Driven Development
+- Mock API responses in tests with Vitest's `vi.mock()`
+- Custom render function in `src/__tests__/testUtils.js` includes routing providers
+- localStorage is mocked globally in `src/__tests__/setup.js`
