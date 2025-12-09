@@ -2,6 +2,13 @@
 
 This directory contains pytest tests for the backend API.
 
+## Prerequisites
+
+- Docker must be installed and running (testcontainers uses Docker)
+- Python dependencies installed: `pip install -r requirements.txt`
+
+No manual database setup required - tests automatically spin up a PostgreSQL container using testcontainers.
+
 ## Running Tests
 
 Run all tests:
@@ -42,7 +49,8 @@ pytest backend/tests/test_health.py::TestHealthEndpoint::test_health_check
 
 The test suite uses pytest fixtures defined in `conftest.py`:
 
-- `test_database_url` - In-memory SQLite database URL
+- `postgres_container` - Testcontainers PostgreSQL container (session-scoped)
+- `test_database_url` - Connection URL from the container
 - `test_engine` - Shared test database engine
 - `test_session_factory` - Session factory for creating test sessions
 - `db_session` - Database session for tests
@@ -68,15 +76,29 @@ Test data is populated using the `populated_test_data` fixture in `conftest.py`.
 - 4 quiz answers
 - 1 test user
 
+## How Testcontainers Works
+
+When you run `pytest`:
+1. Testcontainers starts a fresh PostgreSQL 16 container
+2. Tests run against this isolated database
+3. Container is automatically destroyed after tests complete
+
+This ensures:
+- Tests are isolated from development data
+- Same PostgreSQL version as production
+- No manual setup required
+
 ## Dependencies
 
 Tests require:
 - pytest
 - pytest-flask
 - requests
+- psycopg2-binary
+- testcontainers[postgresql]
+- Docker (running)
 
-Install with:
+Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-

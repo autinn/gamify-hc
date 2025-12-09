@@ -1,10 +1,15 @@
 """
 Pytest configuration and fixtures for backend tests
+
+Uses testcontainers to automatically spin up a PostgreSQL container for testing.
+No manual database setup required - just run pytest.
 """
 
 import pytest
 import sys
 from pathlib import Path
+
+from testcontainers.postgres import PostgresContainer
 
 # Add project root to Python path
 project_root = Path(__file__).resolve().parent.parent.parent
@@ -13,20 +18,25 @@ if str(project_root) not in sys.path:
 
 from backend.app import create_app
 from backend.database.setup import create_database
-from backend.database.models import Course, Unit, Concept, QuizCard, QuizAnswer, User
+from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer, User
 
 
 @pytest.fixture(scope='session')
-def test_database_url():
-    """Create a temporary test database URL"""
-    # Use in-memory SQLite for faster tests
-    # Note: Using check_same_thread=False allows sharing across threads
-    return "sqlite:///:memory:?check_same_thread=False"
+def postgres_container():
+    """Spin up a PostgreSQL container for the test session."""
+    with PostgresContainer("postgres:16-alpine") as postgres:
+        yield postgres
+
+
+@pytest.fixture(scope='session')
+def test_database_url(postgres_container):
+    """Get connection URL from the container."""
+    return postgres_container.get_connection_url()
 
 
 @pytest.fixture(scope='session')
 def test_engine(test_database_url):
-    """Create a shared test database engine"""
+    """Create a shared test database engine."""
     engine, _ = create_database(
         database_url=test_database_url,
         echo=False,
@@ -38,14 +48,14 @@ def test_engine(test_database_url):
 
 @pytest.fixture(scope='session')
 def test_session_factory(test_engine):
-    """Create a session factory from the shared test engine"""
+    """Create a session factory from the shared test engine."""
     from sqlalchemy.orm import sessionmaker
     return sessionmaker(bind=test_engine)
 
 
 @pytest.fixture(scope='function')
 def db_session(test_session_factory):
-    """Create a test database session"""
+    """Create a test database session."""
     session = test_session_factory()
     yield session
     session.close()
@@ -53,7 +63,7 @@ def db_session(test_session_factory):
 
 @pytest.fixture(scope='function')
 def clean_db(db_session):
-    """Clean database before each test"""
+    """Clean database before each test."""
     from backend.database.models import UserCard
     # Rollback any pending transactions
     db_session.rollback()
@@ -81,7 +91,7 @@ def clean_db(db_session):
 
 @pytest.fixture
 def test_client(test_engine, test_session_factory, test_database_url):
-    """Create a test Flask client with shared database engine"""
+    """Create a test Flask client with shared database engine."""
     from backend.utils.database_manager import DatabaseManager
     
     # Create DatabaseManager with shared engine
@@ -90,8 +100,8 @@ def test_client(test_engine, test_session_factory, test_database_url):
         SessionLocal=test_session_factory
     )
     
-    # Create app with test database URL, but override db_session
-    app = create_app(database_url=test_database_url)
+    # Create app with test database URL, disable auto_seed for tests
+    app = create_app(database_url=test_database_url, auto_seed=False)
     # Replace the app's db_session with our shared one to ensure
     # all sessions use the same engine
     app.db_session = db_manager.get_session
@@ -99,7 +109,6 @@ def test_client(test_engine, test_session_factory, test_database_url):
     app.config['DEBUG'] = False
     
     # Ensure database tables exist
-    from backend.database.models import Base
     Base.metadata.create_all(bind=test_engine)
     
     with app.test_client() as client:
@@ -108,7 +117,7 @@ def test_client(test_engine, test_session_factory, test_database_url):
 
 @pytest.fixture
 def sample_course(clean_db):
-    """Create a sample course for testing"""
+    """Create a sample course for testing."""
     course = Course(
         title="EA50 - Empirical Analyses",
         description="Empirical analysis and data-driven reasoning"
@@ -121,7 +130,7 @@ def sample_course(clean_db):
 
 @pytest.fixture
 def sample_unit(clean_db, sample_course):
-    """Create a sample unit for testing"""
+    """Create a sample unit for testing."""
     unit = Unit(
         course_id=sample_course.course_id,
         title="Data Visualization",
@@ -136,7 +145,7 @@ def sample_unit(clean_db, sample_course):
 
 @pytest.fixture
 def sample_concept(clean_db, sample_unit):
-    """Create a sample concept for testing"""
+    """Create a sample concept for testing."""
     concept = Concept(
         unit_id=sample_unit.unit_id,
         title="#dataviz",
@@ -150,7 +159,7 @@ def sample_concept(clean_db, sample_unit):
 
 @pytest.fixture
 def sample_quiz_card(clean_db, sample_concept, sample_unit, sample_course):
-    """Create a sample quiz card for testing"""
+    """Create a sample quiz card for testing."""
     quiz_card = QuizCard(
         concept_id=sample_concept.concept_id,
         unit_id=sample_unit.unit_id,
@@ -165,7 +174,7 @@ def sample_quiz_card(clean_db, sample_concept, sample_unit, sample_course):
 
 @pytest.fixture
 def sample_quiz_answers(clean_db, sample_quiz_card):
-    """Create sample quiz answers for testing"""
+    """Create sample quiz answers for testing."""
     answers = [
         QuizAnswer(
             quiz_card_id=sample_quiz_card.quiz_card_id,
@@ -187,7 +196,7 @@ def sample_quiz_answers(clean_db, sample_quiz_card):
 
 @pytest.fixture
 def sample_user(clean_db):
-    """Create a sample user for testing"""
+    """Create a sample user for testing."""
     from werkzeug.security import generate_password_hash
     user = User(
         username="test_user",
@@ -202,7 +211,7 @@ def sample_user(clean_db):
 
 @pytest.fixture
 def populated_test_data(clean_db):
-    """Populate database with comprehensive test data"""
+    """Populate database with comprehensive test data."""
     # Create courses
     course1 = Course(
         title="EA50 - Empirical Analyses",
@@ -348,7 +357,7 @@ def populated_test_data(clean_db):
 
 @pytest.fixture
 def auth_token(sample_user):
-    """Create a JWT token for the sample user"""
+    """Create a JWT token for the sample user."""
     import jwt
     from datetime import datetime, timedelta
     
@@ -365,7 +374,7 @@ def auth_token(sample_user):
 
 
 def create_auth_token(user_id):
-    """Helper function to create a JWT token for a user"""
+    """Helper function to create a JWT token for a user."""
     import jwt
     from datetime import datetime, timedelta
     
@@ -379,4 +388,3 @@ def create_auth_token(user_id):
         'dev-secret-key-change-in-production',
         algorithm='HS256'
     )
-

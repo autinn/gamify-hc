@@ -31,10 +31,9 @@ class TestIndexExistence:
         """Verify all expected indices are created in the database."""
         for table_name, index_name in expected_indices:
             query = text("""
-                SELECT name FROM sqlite_master
-                WHERE type = 'index'
-                AND tbl_name = :table_name
-                AND name = :index_name
+                SELECT indexname FROM pg_indexes
+                WHERE tablename = :table_name
+                AND indexname = :index_name
             """)
             result = db_session.execute(
                 query,
@@ -95,7 +94,7 @@ class TestIndexUsage:
         """Verify each query uses its expected index."""
         for test_case in test_queries:
             explain_query = text(
-                f"EXPLAIN QUERY PLAN {test_case['query']}"
+                f"EXPLAIN {test_case['query']}"
             )
             result = db_session.execute(explain_query)
 
