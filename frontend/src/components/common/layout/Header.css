@@ -101,6 +101,31 @@
   background-color: #f5f5f5;
 }
 
+.header__help-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.header__help-button:hover {
+  background-color: #e0e0e0;
+}
+
+.header__help-button .material-symbols-outlined {
+  font-size: 24px;
+  color: #333;
+}
+
 .header__logout-button {
   display: flex;
   align-items: center;

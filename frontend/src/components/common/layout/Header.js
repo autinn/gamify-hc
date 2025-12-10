@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useHeaderNavigation } from '../../../hooks/useHeaderNavigation';
+import { useOnboardingContext } from '../../../contexts/OnboardingContext';
 import * as api from '../../../services/api';
 import './Header.css';
 
@@ -45,6 +46,9 @@ const Header = () => {
   
   // Navigation data from hook
   const { courses, courseUnits } = useHeaderNavigation();
+  
+  // Onboarding context for help button
+  const { startGuide } = useOnboardingContext();
 
   const handleMouseEnter = (courseId) => {
     setOpenDropdown(courseId);
@@ -95,9 +99,19 @@ const Header = () => {
         ))}
       </nav>
       {isAuthenticated() && (
-        <button className="header__logout-button" onClick={handleLogout}>
-          <span className="material-symbols-outlined">logout</span>
-        </button>
+        <>
+          <button 
+            className="header__help-button" 
+            onClick={startGuide}
+            title="Show onboarding guide"
+            aria-label="Help"
+          >
+            <span className="material-symbols-outlined">help</span>
+          </button>
+          <button className="header__logout-button" onClick={handleLogout}>
+            <span className="material-symbols-outlined">logout</span>
+          </button>
+        </>
       )}
     </header>
   );
