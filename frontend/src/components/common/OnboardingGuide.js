@@ -24,7 +24,7 @@
  * Used by: MainPage, App (or PageLayout)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Joyride from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 import './OnboardingGuide.css';
@@ -180,13 +180,16 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
     }
   }, [steps.length, location.pathname]);
 
+  // Track previous pathname to detect actual navigation changes
+  const prevPathnameRef = useRef(location.pathname);
+
   /**
    * Starts/stops the guide based on isActive prop.
    * When starting, increments resetKey to force react-joyride to remount and start from step 0.
    * Uses a brief delay to ensure clean reset before starting.
    */
   useEffect(() => {
-    console.log('[OnboardingGuide] Effect triggered - isActive:', isActive, 'steps.length:', steps.length);
+    console.log('[OnboardingGuide] Start effect - isActive:', isActive, 'steps.length:', steps.length, 'run:', run);
     if (isActive && steps.length > 0) {
       console.log('[OnboardingGuide] ✅ Starting guide! Resetting and will run in 100ms');
       // Increment resetKey to force react-joyride to remount and start from step 0
@@ -205,18 +208,23 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
       if (isActive && steps.length === 0) {
         console.warn('[OnboardingGuide] ❌ Cannot start: isActive=true but steps.length=0');
       } else if (!isActive) {
-        console.log('[OnboardingGuide] ❌ Not starting: isActive=false');
+        console.log('[OnboardingGuide] ❌ Not starting: isActive=false, setting run=false');
       }
       setRun(false);
     }
-  }, [isActive, steps.length, location.pathname]);
+  }, [isActive, steps.length]); // Removed location.pathname - only start when isActive changes
 
   /**
    * Resets the tour when location changes (user navigates to different page).
-   * Increments resetKey to force react-joyride to reset to the first step with new steps.
+   * Only resets if tour is already running to avoid interfering with initial start.
    */
   useEffect(() => {
-    if (run && steps.length > 0) {
+    const pathnameChanged = prevPathnameRef.current !== location.pathname;
+    prevPathnameRef.current = location.pathname;
+    
+    // Only reset if pathname actually changed AND tour is already running
+    if (pathnameChanged && run && isActive && steps.length > 0) {
+      console.log('[OnboardingGuide] Location changed while tour running, resetting tour');
       setResetKey(prev => prev + 1);
       setRun(false);
       const timer = setTimeout(() => {
@@ -224,7 +232,7 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, run, steps.length]);
+  }, [location.pathname]); // Only depend on pathname, not run/isActive to avoid conflicts
 
   /**
    * Handles react-joyride callback events.
@@ -233,12 +241,34 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
    * @param {Object} data - Callback data from react-joyride
    * @param {string} data.action - Action type (e.g., 'close')
    * @param {string} data.status - Status (e.g., 'finished', 'skipped')
+   * @param {string} data.type - Event type (e.g., 'tour:start', 'step:before')
+   * @param {number} data.index - Current step index
    */
   const handleJoyrideCallback = (data) => {
-    const { action, status } = data;
+    const { action, status, type, index } = data;
+    
+    // DEBUG: Log all callback events to diagnose issues
+    console.log('[OnboardingGuide] Joyride callback:', { action, status, type, index });
+
+    // Handle tour start - this confirms react-joyride is actually running
+    if (type === 'tour:start') {
+      console.log('[OnboardingGuide] ✅✅✅ Tour STARTED! Step index:', index);
+    }
+
+    // Handle step changes
+    if (type === 'step:before' || type === 'step:after') {
+      console.log('[OnboardingGuide] Step', type === 'step:before' ? 'BEFORE' : 'AFTER', 'index:', index);
+    }
+
+    // Handle errors - this is critical for debugging
+    if (status === 'error' || type === 'error') {
+      console.error('[OnboardingGuide] ❌❌❌ Joyride ERROR:', data);
+      // Don't stop the tour on error, let it continue
+    }
 
     // Handle close button (X button)
     if (action === 'close') {
+      console.log('[OnboardingGuide] User closed tour');
       setRun(false);
       setIsActive(false);
       if (onSkip) {
@@ -249,6 +279,7 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
 
     // Handle completion or skip
     if (status === 'finished' || status === 'skipped') {
+      console.log('[OnboardingGuide] Tour', status === 'finished' ? 'FINISHED' : 'SKIPPED');
       setRun(false);
       setIsActive(false);
       
@@ -260,6 +291,11 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
       return;
     }
   };
+
+  // DEBUG: Log render state
+  useEffect(() => {
+    console.log('[OnboardingGuide] Render state - run:', run, 'resetKey:', resetKey, 'isActive:', isActive);
+  }, [run, resetKey, isActive]);
 
   // Don't render if no steps available for current page
   if (steps.length === 0) {
