@@ -256,8 +256,12 @@ def register():
         db.commit()
         db.refresh(new_user)
 
-        # Return user data (without password_hash)
+        # Generate JWT token for the new user (auto-login after registration)
+        token = create_token(new_user.user_id)
+
+        # Return user data with access token (same format as login)
         return jsonify({
+            'access_token': token,
             'user_id': new_user.user_id,
             'username': new_user.username,
             'email': new_user.email,
@@ -401,7 +405,8 @@ def get_current_user():
             'created_at': (
                 user.created_at.isoformat()
                 if user.created_at else None
-            )
+            ),
+            'has_completed_onboarding': user.has_completed_onboarding
         }), 200
 
     finally:
