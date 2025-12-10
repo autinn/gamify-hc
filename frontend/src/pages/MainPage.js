@@ -59,51 +59,83 @@ const MainPage = () => {
   const { chartData } = useProgress('global');
   const { isFirstTime, startGuide, loading: onboardingLoading, refreshStatus } = useOnboardingContext();
 
-  // Force refresh onboarding status when MainPage mounts (e.g., after registration/login)
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      console.log('[MainPage] Mounted with token, refreshing onboarding status...');
-      refreshStatus();
-    }
-  }, [refreshStatus]);
-
   // Get user name from API response or localStorage fallback for display
   // This ensures the greeting works even if user fetch fails
   const userName = user?.username || localStorage.getItem('user_username') || 'Guest';
 
-  // Auto-trigger onboarding for first-time users
-  // Use a ref to track if we've already triggered to avoid multiple triggers
+  /**
+   * Auto-triggers onboarding guide for first-time users.
+   * 
+   * Uses refs to prevent multiple triggers:
+   * - hasTriggeredRef: Prevents duplicate triggers in same component mount
+   * - timerRef: Stores timer ID to prevent premature cleanup when effect re-runs
+   * 
+   * The database flag (has_completed_onboarding) is the single source of truth
+   * for whether a user should see onboarding.
+   */
   const hasTriggeredRef = useRef(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    // Use user_id directly (primitive) instead of entire user object to avoid unnecessary re-renders
+    const userId = user?.user_id || localStorage.getItem('user_id');
+
+    // DEBUG: Log current state for debugging
     console.log('[MainPage] Onboarding check:', {
       isFirstTime,
       onboardingLoading,
       userLoading,
       hasToken: !!token,
-      hasTriggered: hasTriggeredRef.current
+      userId,
+      hasTriggered: hasTriggeredRef.current,
+      hasCompletedOnboarding: user?.has_completed_onboarding
     });
 
-    // Only trigger if:
-    // 1. We have a token
-    // 2. Loading is complete
-    // 3. User is first-time
-    // 4. We haven't already triggered
-    if (token && !onboardingLoading && !userLoading && isFirstTime && !hasTriggeredRef.current) {
+    // Trigger conditions (all must be true):
+    // 1. Token exists
+    // 2. Onboarding status check complete
+    // 3. User data loaded
+    // 4. User is first-time (has_completed_onboarding = false)
+    // 5. Not already triggered in this mount
+    // 6. Valid user_id exists
+    if (token && !onboardingLoading && !userLoading && isFirstTime && !hasTriggeredRef.current && userId) {
       console.log('[MainPage] ✅ Conditions met! Auto-triggering onboarding guide for first-time user');
       hasTriggeredRef.current = true;
       
-      // Delay to ensure page is fully rendered and all elements are available
-      const timer = setTimeout(() => {
-        console.log('[MainPage] Calling startGuide()...');
+      // Clear any existing timer before setting new one
+      if (timerRef.current) {
+        console.log('[MainPage] Clearing existing timer before setting new one');
+        clearTimeout(timerRef.current);
+      }
+      
+      console.log('[MainPage] ⚡ About to call startGuide() in 1200ms...');
+      
+      // Delay to ensure page is fully rendered and all DOM elements are available
+      timerRef.current = setTimeout(() => {
+        console.log('[MainPage] ⚡ Calling startGuide() NOW');
+        timerRef.current = null; // Clear ref when timer fires
         startGuide();
       }, 1200);
-      return () => clearTimeout(timer);
+      
+      return () => {
+        // Only clear timer if it hasn't fired yet
+        if (timerRef.current) {
+          console.log('[MainPage] Cleanup: clearing startGuide timer (timer not yet fired)');
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        } else {
+          console.log('[MainPage] Cleanup: timer already fired, no cleanup needed');
+        }
+      };
     } else if (!isFirstTime) {
       // Reset trigger flag if user is not first-time (e.g., after completing onboarding)
       hasTriggeredRef.current = false;
+      // Clear any pending timer
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     }
   }, [isFirstTime, onboardingLoading, userLoading, startGuide]);
 

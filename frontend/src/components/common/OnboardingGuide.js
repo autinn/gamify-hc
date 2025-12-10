@@ -34,7 +34,18 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
   const [run, setRun] = useState(false);
   const [resetKey, setResetKey] = useState(0);
 
-  // Get steps based on current page
+  // DEBUG: Log when isActive prop changes
+  useEffect(() => {
+    console.log('[OnboardingGuide] 🔔 isActive prop changed to:', isActive);
+  }, [isActive]);
+
+  /**
+   * Generates tour steps based on the current page path.
+   * Each page type (main, course, unit, concept) has its own set of steps.
+   * The welcome step is shown first on the main page.
+   * 
+   * @returns {Array} Array of step objects for react-joyride
+   */
   const getSteps = () => {
     const path = location.pathname;
     
@@ -160,28 +171,52 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
   };
 
   const steps = getSteps();
-
-  // Start/stop guide based on isActive prop
-  // Always reset to step 0 when starting by changing the key
+  
+  // DEBUG: Log steps for current page
   useEffect(() => {
+    console.log('[OnboardingGuide] Steps for current page:', steps.length, 'path:', location.pathname);
+    if (steps.length === 0) {
+      console.warn('[OnboardingGuide] ⚠️ No steps available for path:', location.pathname);
+    }
+  }, [steps.length, location.pathname]);
+
+  /**
+   * Starts/stops the guide based on isActive prop.
+   * When starting, increments resetKey to force react-joyride to remount and start from step 0.
+   * Uses a brief delay to ensure clean reset before starting.
+   */
+  useEffect(() => {
+    console.log('[OnboardingGuide] Effect triggered - isActive:', isActive, 'steps.length:', steps.length);
     if (isActive && steps.length > 0) {
+      console.log('[OnboardingGuide] ✅ Starting guide! Resetting and will run in 100ms');
       // Increment resetKey to force react-joyride to remount and start from step 0
       setResetKey(prev => prev + 1);
       setRun(false);
       // Restart after a brief delay to ensure clean reset
       const timer = setTimeout(() => {
+        console.log('[OnboardingGuide] ⚡ Setting run=true NOW');
         setRun(true);
       }, 100);
-      return () => clearTimeout(timer);
+      return () => {
+        console.log('[OnboardingGuide] Cleanup: clearing start timer');
+        clearTimeout(timer);
+      };
     } else {
+      if (isActive && steps.length === 0) {
+        console.warn('[OnboardingGuide] ❌ Cannot start: isActive=true but steps.length=0');
+      } else if (!isActive) {
+        console.log('[OnboardingGuide] ❌ Not starting: isActive=false');
+      }
       setRun(false);
     }
-  }, [isActive, steps.length]);
+  }, [isActive, steps.length, location.pathname]);
 
-  // Reset tour when location changes (user navigates to different page)
+  /**
+   * Resets the tour when location changes (user navigates to different page).
+   * Increments resetKey to force react-joyride to reset to the first step with new steps.
+   */
   useEffect(() => {
     if (run && steps.length > 0) {
-      // Increment resetKey to force reset to first step with new steps
       setResetKey(prev => prev + 1);
       setRun(false);
       const timer = setTimeout(() => {
@@ -189,11 +224,18 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [location.pathname]);
+  }, [location.pathname, run, steps.length]);
 
-  // Handle step changes
+  /**
+   * Handles react-joyride callback events.
+   * Manages guide state when user closes, completes, or skips the tour.
+   * 
+   * @param {Object} data - Callback data from react-joyride
+   * @param {string} data.action - Action type (e.g., 'close')
+   * @param {string} data.status - Status (e.g., 'finished', 'skipped')
+   */
   const handleJoyrideCallback = (data) => {
-    const { action, index, status, type } = data;
+    const { action, status } = data;
 
     // Handle close button (X button)
     if (action === 'close') {
@@ -217,12 +259,9 @@ const OnboardingGuide = ({ isActive, onComplete, onSkip, setIsActive }) => {
       }
       return;
     }
-
-    // Don't control stepIndex during navigation - let react-joyride handle it
-    // We only set it to 0 when starting the tour
   };
 
-  // Don't render if no steps for current page
+  // Don't render if no steps available for current page
   if (steps.length === 0) {
     return null;
   }

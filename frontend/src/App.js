@@ -184,7 +184,7 @@ function App() {
  * OnboardingGuideWrapper - Wrapper component to access onboarding context
  * 
  * Renders OnboardingGuide with access to the onboarding context.
- * Must be inside Router to use useLocation hook.
+ * Must be inside Router to use useLocation hook in OnboardingGuide.
  */
 function OnboardingGuideWrapper() {
   const { isActive, setIsActive, completeOnboarding, skipOnboarding } = useOnboardingContext();

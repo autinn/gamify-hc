@@ -30,7 +30,12 @@ export function useOnboarding() {
   const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Simple check: get user data from /auth/me which includes has_completed_onboarding
+  /**
+   * Checks onboarding status by fetching user data from /auth/me endpoint.
+   * The user object includes has_completed_onboarding flag which determines if user is first-time.
+   * 
+   * @returns {Promise<void>}
+   */
   const checkOnboardingStatus = useCallback(async () => {
     try {
       setLoading(true);
@@ -49,26 +54,36 @@ export function useOnboarding() {
       console.log('[Onboarding] Current user data:', currentUser);
       
       if (currentUser && currentUser.has_completed_onboarding !== undefined) {
+        // User is first-time if they haven't completed onboarding
         const isFirst = !currentUser.has_completed_onboarding;
         console.log('[Onboarding] has_completed_onboarding:', currentUser.has_completed_onboarding);
         console.log('[Onboarding] Setting isFirstTime to:', isFirst);
         setIsFirstTime(isFirst);
+        setLoading(false);
+        console.log('[Onboarding] Status check complete. isFirstTime:', isFirst, 'loading: false');
+        return;
       } else {
+        // Missing field - assume not first-time for safety
         console.warn('[Onboarding] User data missing has_completed_onboarding field. Assuming not first-time.');
         setIsFirstTime(false);
+        setLoading(false);
+        return;
       }
     } catch (error) {
       console.error('[Onboarding] Error checking onboarding status:', error);
-      console.error('[Onboarding] Error details:', error.message, error.stack);
       setIsFirstTime(false);
-    } finally {
       setLoading(false);
-      console.log('[Onboarding] Status check complete. Final state - loading: false, isFirstTime:', isFirstTime);
     }
   }, []);
 
-  // Check status on mount and whenever token becomes available
-  // This handles both initial load and after login/registration
+  /**
+   * Checks onboarding status on mount and when token becomes available.
+   * Uses multiple strategies to catch token storage after login/registration:
+   * - Immediate check on mount
+   * - Polling at 500ms, 1000ms, 2000ms intervals
+   * - Listening for localStorage storage events (cross-tab)
+   * - Listening for custom 'token-stored' event (same-tab)
+   */
   useEffect(() => {
     let mounted = true;
     
@@ -91,15 +106,14 @@ export function useOnboarding() {
     // Check immediately
     performCheck();
 
-    // Also check after delays to catch async token storage (important after login)
+    // Poll at intervals to catch async token storage (important after login)
     const timers = [
       setTimeout(() => mounted && performCheck(), 500),
       setTimeout(() => mounted && performCheck(), 1000),
       setTimeout(() => mounted && performCheck(), 2000),
     ];
 
-    // Listen for localStorage changes (when token is set)
-    // Note: storage event only fires for OTHER tabs, so we also poll
+    // Listen for localStorage changes (cross-tab only - storage event doesn't fire in same tab)
     const handleStorageChange = (e) => {
       if (e.key === 'token' && e.newValue && mounted) {
         console.log('[Onboarding] Token detected via storage event, checking status...');
@@ -108,7 +122,7 @@ export function useOnboarding() {
     };
     window.addEventListener('storage', handleStorageChange);
 
-    // Also listen for custom event we can trigger after login
+    // Listen for custom event triggered after login/registration (same-tab)
     const handleTokenSet = () => {
       if (mounted) {
         console.log('[Onboarding] Token set event received, checking status...');
@@ -125,7 +139,13 @@ export function useOnboarding() {
     };
   }, [checkOnboardingStatus]);
 
-  // Mark onboarding as completed in database
+  /**
+   * Marks onboarding as completed in the database.
+   * Updates the has_completed_onboarding flag to true, which persists globally across devices.
+   * Also updates local state and refreshes status to confirm the update.
+   * 
+   * @returns {Promise<void>}
+   */
   const completeOnboarding = useCallback(async () => {
     try {
       const token = getStoredToken();
@@ -134,7 +154,6 @@ export function useOnboarding() {
         return;
       }
 
-      // Get user_id from current user
       const currentUser = await getCurrentUser();
       if (!currentUser || !currentUser.user_id) {
         console.warn('[Onboarding] Cannot complete: no user_id');
@@ -142,24 +161,39 @@ export function useOnboarding() {
       }
 
       const userId = currentUser.user_id;
-      console.log('[Onboarding] Marking onboarding as completed for user:', userId);
+      
+      // Update database: set has_completed_onboarding = true (global, persistent)
       await updateOnboardingStatus(userId, true);
       
+      // Update local state immediately for responsive UI
       setIsFirstTime(false);
       setIsActive(false);
-      console.log('[Onboarding] Onboarding marked as completed');
+      
+      // Refresh status from database to confirm update
+      await checkOnboardingStatus();
     } catch (error) {
       console.error('[Onboarding] Error updating onboarding status:', error);
     }
-  }, []);
+  }, [checkOnboardingStatus]);
 
-  // Skip onboarding (same as complete)
+  /**
+   * Skips onboarding (same as completing it).
+   * Marks onboarding as completed in the database.
+   * 
+   * @returns {Promise<void>}
+   */
   const skipOnboarding = useCallback(async () => {
     await completeOnboarding();
   }, [completeOnboarding]);
 
-  // Start guide manually (works regardless of first-time status)
+  /**
+   * Starts the onboarding guide manually.
+   * Works regardless of first-time status (can be triggered via help button).
+   * 
+   * @returns {void}
+   */
   const startGuide = useCallback(() => {
+    console.log('[Onboarding] 🚀 startGuide() called - setting isActive to true');
     setIsActive(true);
   }, []);
 
