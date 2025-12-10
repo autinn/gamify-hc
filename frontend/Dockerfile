@@ -10,7 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+# Use --legacy-peer-deps for react-joyride compatibility with React 18
+RUN npm ci --legacy-peer-deps
 
 # Copy frontend source
 COPY . ./
