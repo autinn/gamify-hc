@@ -1,0 +1,24 @@
+/* OnboardingGuide - Styles for react-joyride tour overlay */
+
+/* Ensure guide overlay appears above all content */
+.react-joyride__overlay {
+  z-index: 9999 !important;
+}
+
+/* Custom styling for tooltip */
+.react-joyride__tooltip {
+  max-width: 400px;
+  font-family: inherit;
+}
+
+/* Ensure buttons are properly styled */
+.react-joyride__tooltip button {
+  font-family: inherit;
+  font-weight: 500;
+}
+
+/* Spotlight effect for highlighted elements */
+.react-joyride__spotlight {
+  border-radius: 8px;
+}
+
