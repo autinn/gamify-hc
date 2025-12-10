@@ -189,6 +189,14 @@ function App() {
 function OnboardingGuideWrapper() {
   const { isActive, setIsActive, completeOnboarding, skipOnboarding } = useOnboardingContext();
   
+  // DEBUG: Log when isActive changes in context
+  React.useEffect(() => {
+    console.log('[OnboardingGuideWrapper] 🔔 isActive in context changed to:', isActive);
+    if (isActive) {
+      console.log('[OnboardingGuideWrapper] ✅ isActive is TRUE - guide should start!');
+    }
+  }, [isActive]);
+  
   return (
     <OnboardingGuide
       isActive={isActive}
