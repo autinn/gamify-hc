@@ -58,7 +58,7 @@ export function validateEmail(email) {
  * @returns {string|null} result.error - Error message if validation failed, null on success
  */
 export function validatePassword(password) {
-  const MIN_LENGTH = 6;
+  const MIN_LENGTH = 8;
 
   if (!password) {
     return { valid: false, error: 'Password is required' };
@@ -66,7 +66,7 @@ export function validatePassword(password) {
 
   // Enforce minimum password length for basic security
   if (password.length < MIN_LENGTH) {
-    return { valid: false, error: `Password must be at least ${MIN_LENGTH} characters` };
+    return { valid: false, error: `Password must be at least ${MIN_LENGTH} characters long` };
   }
 
   return { valid: true, error: null };

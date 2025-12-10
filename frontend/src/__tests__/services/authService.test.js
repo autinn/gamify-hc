@@ -50,7 +50,7 @@ describe('authService - Validation Functions', () => {
     it('should reject password below minimum length', () => {
       const result = validatePassword('pass');
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('at least 6 characters');
+      expect(result.error).toContain('at least 8 characters');
     });
 
     it('should reject empty password', () => {
