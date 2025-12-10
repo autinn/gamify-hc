@@ -9,11 +9,23 @@ vi.mock('../../services/api', () => ({
   register: vi.fn()
 }));
 
-vi.mock('../../services/authService', () => ({
-  validateLoginForm: vi.fn(),
-  validateRegisterForm: vi.fn(),
-  storeAuthData: vi.fn()
-}));
+vi.mock('../../services/authService', async () => {
+  const actual = await vi.importActual('../../services/authService');
+  // Create real mocks for validators but keep storeAuthData real
+  const validateLoginForm = vi.fn();
+  const validateRegisterForm = vi.fn();
+  // Use the actual implementations for these
+  return {
+    validateLoginForm,
+    validateRegisterForm,
+    storeAuthData: actual.storeAuthData,
+    validateEmail: actual.validateEmail,
+    validatePassword: actual.validatePassword,
+    validateUsername: actual.validateUsername,
+    validatePasswordMatch: actual.validatePasswordMatch,
+    getStoredToken: actual.getStoredToken
+  };
+});
 
 vi.mock('react-router-dom', () => ({
   useNavigate: vi.fn(() => vi.fn())
@@ -68,7 +80,6 @@ describe('useAuth Hook', () => {
 
       authService.validateLoginForm.mockReturnValue({ valid: true });
       api.login.mockResolvedValue(mockResponse);
-      authService.storeAuthData.mockImplementation(() => {});
 
       const { result } = renderHook(() => useAuth());
 
@@ -77,7 +88,7 @@ describe('useAuth Hook', () => {
       });
 
       expect(api.login).toHaveBeenCalledWith('user@minerva.edu', 'password123');
-      expect(authService.storeAuthData).toHaveBeenCalledWith(mockResponse);
+      expect(localStorage.getItem('token')).toBe('test-token-123');
     });
 
     it('should display error on API failure', async () => {
@@ -138,7 +149,6 @@ describe('useAuth Hook', () => {
 
       authService.validateRegisterForm.mockReturnValue({ valid: true });
       api.register.mockResolvedValue(mockResponse);
-      authService.storeAuthData.mockImplementation(() => {});
 
       const { result } = renderHook(() => useAuth());
 
@@ -147,7 +157,8 @@ describe('useAuth Hook', () => {
       });
 
       expect(api.register).toHaveBeenCalledWith('newuser', 'newuser@minerva.edu', 'password123');
-      expect(authService.storeAuthData).toHaveBeenCalledWith(mockResponse);
+      // Register navigates to login without storing token (for onboarding flow)
+      expect(localStorage.getItem('token')).toBeNull();
     });
   });
 
@@ -161,7 +172,7 @@ describe('useAuth Hook', () => {
       };
 
       api.login.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockResponse), 100)));
-      authService.storeAuthData.mockImplementation(() => {});
+      authService.validateLoginForm.mockReturnValue({ valid: true });
 
       const { result } = renderHook(() => useAuth());
 
