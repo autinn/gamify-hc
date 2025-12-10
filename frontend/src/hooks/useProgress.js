@@ -1,33 +1,35 @@
 /**
- * useProgress Hook
- * 
- * Manages progress data fetching at different levels (global, course, unit, concept).
- * Returns standardized chart data with labels and values.
- * Handles loading and error states with graceful fallbacks.
- * 
- * @component
- * @param {string} levelType - Level type: 'global' | 'course' | 'unit' | 'concept'
- * @param {number} [levelId] - ID for the specific level (not needed for 'global')
- * @param {number} [parentId] - Parent ID (courseId for unit, unitId for concept)
- * @returns {Object} Progress data object
- * @returns {Object} returns.chartData - Chart data {labels, values, metadata}
- * @returns {boolean} returns.loading - True while data is being fetched
+ * useProgress Hook - User progress chart data management
+ *
+ * Fetches user progress data at different hierarchical levels:
+ * - Global: Across all courses
+ * - Course: Across all units in a course
+ * - Unit: Across all concepts in a unit
+ * - Concept: For individual quiz cards (expansion-ready)
+ *
+ * Returns standardized chart data format suitable for PerformanceChart components.
+ * Includes manual refresh capability and graceful error handling.
+ *
+ * @hook
+ * @param {string} levelType - Progress aggregation level: 'global' | 'course' | 'unit' | 'concept'
+ * @param {number} [levelId] - ID for the specific level (required for non-global levels)
+ * @param {number} [parentId] - Parent ID for nested levels (courseId for unit, unitId for concept)
+ * @returns {Object} Progress data and state
+ * @returns {Object} returns.chartData - Chart data {labels: string[], values: number[], metadata: object}
+ * @returns {boolean} returns.loading - True while fetching
  * @returns {Error|null} returns.error - Error object if fetch failed
- * @returns {Function} returns.refresh - Function to manually refresh progress data
- * 
+ * @returns {Function} returns.refresh - Manual refresh function to re-fetch data
+ *
  * @example
  * // Global progress
  * const { chartData, loading } = useProgress('global');
- * 
+ *
  * // Course progress
  * const { chartData, loading } = useProgress('course', courseId);
- * 
+ *
  * // Unit progress
  * const { chartData, loading } = useProgress('unit', unitId, courseId);
- * 
- * // Concept progress
- * const { chartData, loading } = useProgress('concept', conceptId, unitId);
- * 
+ *
  * Used by: MainPage, CoursePage, UnitPage
  */
 

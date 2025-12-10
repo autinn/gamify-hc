@@ -5,11 +5,22 @@ import './CourseCard.css';
 /**
  * CourseCard - Individual course card component
  *
- * Displays a single course (e.g., EA50, FA50) as a clickable card.
- * Navigates to the CoursePage when clicked.
+ * Displays a single course as a clickable card. When clicked, navigates
+ * to the course detail page showing units and course progress.
  *
- * @param {number} id - Course ID (course_id from DB schema)
- * @param {string} name - Course title/display text (e.g., "EA50")
+ * @component
+ * @param {number} id - Course ID (course_id from DB)
+ * @param {string} name - Course title/code to display (e.g., "EA50", "FA50")
+ * @returns {React.ReactNode} Clickable course card
+ *
+ * CSS Classes:
+ * - course-card: Main card container (clickable, hover effect)
+ * - course-card__name: Course name text element
+ *
+ * @example
+ * <CourseCard id={1} name="EA50" />
+ *
+ * Used by: CourseList component
  */
 const CourseCard = ({ id, name }) => {
   const navigate = useNavigate();

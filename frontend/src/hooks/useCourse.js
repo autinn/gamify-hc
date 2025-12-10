@@ -1,7 +1,22 @@
 /**
- * useCourse Hook
- * 
- * Manages single course fetching with its units.
+ * useCourse Hook - Single course data management
+ *
+ * Fetches a single course by ID along with all its units.
+ * Provides loading and error states with graceful fallbacks.
+ *
+ * @hook
+ * @param {number} courseId - Course ID from URL parameters
+ * @returns {Object} Course data and state
+ * @returns {Object|null} returns.course - Mapped course object {course_id, title, description}
+ * @returns {Array} returns.units - Array of unit objects for the course
+ * @returns {boolean} returns.loading - True while fetching
+ * @returns {Error|null} returns.error - Error object if fetch failed
+ *
+ * @example
+ * const { course, units, loading } = useCourse(courseId);
+ * if (loading) return <Loading />;
+ * return <CoursePage course={course} units={units} />;
+ *
  * Used by: CoursePage
  */
 

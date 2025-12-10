@@ -2,16 +2,29 @@ import { useState, useEffect } from 'react';
 import * as api from '../services/api';
 
 /**
- * useHeaderNavigation - Manages header navigation data
+ * useHeaderNavigation Hook - Header navigation data management
  *
- * Fetches all courses and their units, handles errors gracefully.
- * All business logic for header data is isolated here.
+ * Fetches all courses and units for header navigation dropdown menus.
+ * Organizes units by parent course ID for efficient dropdown filtering.
+ * Handles loading and error states with user-friendly fallbacks.
  *
- * @returns {Object} { courses, courseUnits, loading, error }
- *   - courses: Array of { id, label }
- *   - courseUnits: Map of courseId -> Array of { id, name }
- *   - loading: Boolean indicating fetch state
- *   - error: Error message if fetch fails
+ * @hook
+ * @returns {Object} Navigation data and state
+ * @returns {Array} returns.courses - Array of course objects {id, label}
+ * @returns {Object} returns.courseUnits - Map of courseId -> units {id, name}
+ * @returns {boolean} returns.loading - True while fetching
+ * @returns {string|null} returns.error - Error message if fetch failed
+ *
+ * @example
+ * const { courses, courseUnits, loading } = useHeaderNavigation();
+ * return courses.map(course => (
+ *   <CourseDropdown
+ *     course={course}
+ *     units={courseUnits[course.id]}
+ *   />
+ * ));
+ *
+ * Used by: Header component
  */
 export const useHeaderNavigation = () => {
   const [courses, setCourses] = useState([]);

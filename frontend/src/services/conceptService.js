@@ -1,15 +1,18 @@
 /**
- * Concept Service
- * 
- * Business logic for concept-related data fetching and transformations.
- * Centralizes all concept API orchestration and field mapping.
+ * Concept Service - Concept data fetching and orchestration
+ *
+ * Handles all concept-related API calls and response transformations.
+ * Uses dataMappers to standardize API responses for components.
+ *
+ * @module conceptService
  */
 
 import * as api from './api';
 import { mapCourseData, mapUnitData, mapConceptData, mapQuizCardsArrayForConcept } from './dataMappers';
 
 /**
- * Fetch single concept by ID
+ * Fetch a single concept by ID
+ *
  * @param {number} conceptId - Concept ID
  * @returns {Promise<Object>} Mapped concept object
  */
@@ -19,7 +22,8 @@ export async function fetchConcept(conceptId) {
 }
 
 /**
- * Fetch concept quiz cards
+ * Fetch all quiz cards for a concept
+ *
  * @param {number} conceptId - Concept ID
  * @returns {Promise<Array>} Array of mapped quiz cards in concept format
  */
@@ -29,7 +33,11 @@ export async function fetchConceptQuizCards(conceptId) {
 }
 
 /**
- * Fetch course, unit, concept, and quiz cards together (for ConceptPage)
+ * Fetch complete concept page data (for ConceptPage)
+ *
+ * Orchestrates multiple API calls in parallel to build complete concept page data.
+ * Returns all levels: course, unit, concept, and quiz cards.
+ *
  * @param {number} courseId - Course ID
  * @param {number} unitId - Unit ID
  * @param {number} conceptId - Concept ID

@@ -1,17 +1,36 @@
 /**
  * Unit Service
+ * @module unitService
  * 
- * Business logic for unit-related data fetching and transformations.
- * Centralizes all unit API orchestration and field mapping.
+ * Provides business logic for unit-related data operations including:
+ * - Individual unit fetching and data transformation
+ * - Unit concept retrieval and aggregation
+ * - Combined data fetching for page initialization
+ * 
+ * Centralizes all unit-level API orchestration, enabling efficient parallel
+ * requests and consistent field mapping across the application. Use these
+ * functions when rendering unit pages or loading unit content for users.
  */
 
 import * as api from './api';
 import { mapCourseData, mapUnitData, mapConceptsArray } from './dataMappers';
 
+// ============================================================================
+// Single Unit Operations
+// ============================================================================
+
 /**
- * Fetch single unit by ID
- * @param {number} unitId - Unit ID
- * @returns {Promise<Object>} Mapped unit object
+ * Retrieves a single unit by ID with all fields transformed and mapped.
+ * 
+ * Use this when you need to display or work with a specific unit's metadata,
+ * such as unit title, description, duration, or learning objectives.
+ * Data is automatically transformed via mappers for consistent field names
+ * and structure across the frontend.
+ * 
+ * @async
+ * @param {number} unitId - The unique identifier for the unit to fetch
+ * @returns {Promise<Object>} Mapped unit object with standardized field structure
+ * @throws {Error} If the API request fails or unit ID is invalid
  */
 export async function fetchUnit(unitId) {
   const unit = await api.getUnit(unitId);
@@ -19,19 +38,41 @@ export async function fetchUnit(unitId) {
 }
 
 /**
- * Fetch unit concepts
- * @param {number} unitId - Unit ID
- * @returns {Promise<Array>} Array of mapped concepts
+ * Retrieves all concepts associated with a specific unit.
+ * 
+ * Concepts represent the individual learning topics within a unit. Use this
+ * when you need to display a concept list, populate concept navigation menus,
+ * or check available learning topics under a unit without fetching full
+ * unit metadata.
+ * 
+ * @async
+ * @param {number} unitId - The unique identifier for the parent unit
+ * @returns {Promise<Array>} Array of mapped concept objects with consistent structure
+ * @throws {Error} If the API request fails or unit ID is invalid
  */
 export async function fetchUnitConcepts(unitId) {
   const concepts = await api.getUnitConcepts(unitId);
   return mapConceptsArray(concepts);
 }
 
+// ============================================================================
+// Combined Data Operations
+// ============================================================================
+
 /**
- * Fetch unit with all its concepts
- * @param {number} unitId - Unit ID
- * @returns {Promise<Object>} {unit: {...}, concepts: [...]}
+ * Retrieves unit metadata and all associated concepts using parallel requests.
+ * 
+ * Optimized for unit detail views that need both unit information and concept
+ * listings. Uses Promise.all() to fetch data in parallel, reducing total
+ * network latency compared to sequential requests.
+ * 
+ * Use this when rendering a unit page that displays unit info alongside
+ * its complete concept list for navigation or overview purposes.
+ * 
+ * @async
+ * @param {number} unitId - The unique identifier for the unit
+ * @returns {Promise<Object>} Object with structure: { unit: Object, concepts: Array }
+ * @throws {Error} If any API request fails or unit ID is invalid
  */
 export async function fetchUnitWithConcepts(unitId) {
   const [unitData, conceptsData] = await Promise.all([
@@ -46,10 +87,20 @@ export async function fetchUnitWithConcepts(unitId) {
 }
 
 /**
- * Fetch course, unit, and concepts together (for UnitPage)
- * @param {number} courseId - Course ID
- * @param {number} unitId - Unit ID
- * @returns {Promise<Object>} {course: {...}, unit: {...}, concepts: [...]}
+ * Retrieves complete hierarchical data for a unit page: course, unit, and concepts.
+ * 
+ * Fetches all necessary data for rendering a unit detail page in a single
+ * call using parallel requests. Maintains the content hierarchy context
+ * (course > unit > concepts) needed for navigation and breadcrumbs.
+ * 
+ * Use this for initializing UnitPage components or views that need full
+ * content context and multiple levels of the learning hierarchy.
+ * 
+ * @async
+ * @param {number} courseId - The parent course identifier for context and navigation
+ * @param {number} unitId - The unit identifier for the main content
+ * @returns {Promise<Object>} Object with structure: { course: Object, unit: Object, concepts: Array }
+ * @throws {Error} If any API request fails or IDs are invalid
  */
 export async function fetchCourseUnitWithConcepts(courseId, unitId) {
   const [courseData, unitData, conceptsData] = await Promise.all([

@@ -6,18 +6,52 @@ import PerformanceChart from '../Charts/PerformanceChart';
 import './PageLayout.css';
 
 /**
- * PageLayout - Reusable two-column layout component
+ * PageLayout - Reusable two-column application layout component
  *
- * Provides consistent spacing and structure across MainPage, CoursePage, and UnitPage.
- * Left column contains greeting text, title, Start Quiz button, and chart.
- * Right column contains dynamic content (courses, units, or concepts).
+ * Provides consistent page structure across the application with:
+ * - Header navigation at top
+ * - Optional back button between header and content
+ * - Left column: greeting, title, quiz button, performance chart
+ * - Right column: dynamic content (courses, units, concepts, quiz results)
  *
- * @param {string} greeting - Small greeting text (e.g., "Hello,", "Welcome to")
- * @param {string} title - Main title text (e.g., "NAME", "EA50", "Problem-Solving")
- * @param {boolean} showButton - Whether to display the Start Quiz button
- * @param {object} chartData - Data object for PerformanceChart (label, values, etc.)
- * @param {string} chartLabel - Label/description for the chart (e.g., "EA FA MC CX")
- * @param {React.ReactNode} rightContent - Content for right column (CourseList, UnitList, ConceptList, etc.)
+ * The layout adapts based on props to support different page types:
+ * - MainPage: Shows global progress + course list
+ * - CoursePage: Shows course progress + unit list + back button
+ * - UnitPage: Shows unit progress + concept list + back button
+ * - QuizPage: Uses leftContent to show quiz UI instead of chart
+ *
+ * @component
+ * @param {string} greeting - Greeting text (e.g., "Hello,", "Welcome to")
+ * @param {string} title - Page title (e.g., username, course name, unit name)
+ * @param {boolean} [showButton=true] - Show "Start Quiz" button in left column
+ * @param {Object} [chartData] - Chart data object {labels: [], values: []} for PerformanceChart
+ * @param {string} [chartLabel] - X-axis label for chart (e.g., "Success Rate (%)")
+ * @param {number} [labelOffset=50] - Pixel offset for chart label positioning
+ * @param {React.ReactNode} rightContent - Content for right column (required)
+ * @param {string} [startQuizPath] - Navigation path for quiz button (default: '/quiz')
+ * @param {React.ReactNode} [leftContent] - Custom left-column content instead of chart
+ * @param {boolean} [showBackButton=false] - Show back button (for hierarchical pages)
+ * @param {Function} [onBackClick] - Back button click handler (defaults to navigate(-1))
+ * @returns {React.ReactNode} Full page layout
+ *
+ * CSS Layout:
+ * - page-layout__header-wrapper: Header container
+ * - page-layout__back-button-bar: Back button bar
+ * - page-layout: Main grid container (two columns)
+ * - page-layout__left-column: Left section (greeting, title, button, chart)
+ * - page-layout__right-column: Right section (dynamic content)
+ *
+ * @example
+ * <PageLayout
+ *   greeting="Hello,"
+ *   title={userName}
+ *   showButton={true}
+ *   chartData={progressData}
+ *   chartLabel="Success Rate (%)"
+ *   rightContent={<CourseList courses={courses} />}
+ * />
+ *
+ * Used by: MainPage, CoursePage, UnitPage, QuizPage
  */
 const PageLayout = ({
   greeting,

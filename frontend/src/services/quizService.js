@@ -1,20 +1,39 @@
 /**
  * Quiz Service
+ * @module quizService
  * 
- * Business logic for quiz-related data fetching, transformations, and utilities.
- * Handles quiz level detection, shuffling, and navigation.
+ * Provides centralized business logic for quiz-related operations including:
+ * - Multi-level quiz data fetching (concept, unit, course, or global)
+ * - Question and answer option shuffling using randomization
+ * - Quiz navigation path generation
+ * - Quiz result calculations and scoring
+ * 
+ * The service bridges API calls with presentation logic, ensuring quiz data
+ * is properly transformed and randomized for fair assessment experiences.
  */
 
 import * as api from './api';
 import { mapQuizCardsArray } from './dataMappers';
 
+// ============================================================================
+// Quiz Data Fetching
+// ============================================================================
+
 /**
- * Fetch quiz cards based on level (course, unit, concept, or global)
- * @param {number} courseId - Course ID (optional)
- * @param {number} unitId - Unit ID (optional)
- * @param {number} conceptId - Concept ID (optional)
- * @returns {Promise<Array>} Array of mapped quiz cards
- * Fetches from global pool if no specific level provided
+ * Fetches quiz cards at the appropriate level based on provided context IDs.
+ * 
+ * Uses hierarchical resolution: conceptId > unitId > courseId > global.
+ * When multiple IDs are provided, the most specific level is used.
+ * 
+ * Use this when you need quiz questions tailored to a specific learning context,
+ * or use global quiz for system-wide assessment across all content.
+ * 
+ * @async
+ * @param {number} [courseId] - The course identifier for course-level quiz
+ * @param {number} [unitId] - The unit identifier for unit-level quiz
+ * @param {number} [conceptId] - The concept identifier for concept-level quiz
+ * @returns {Promise<Array>} Array of mapped quiz card objects ready for display
+ * @throws {Error} If API request fails or IDs are invalid
  */
 export async function fetchQuizByLevel(courseId, unitId, conceptId) {
   let quizCards;
@@ -26,49 +45,75 @@ export async function fetchQuizByLevel(courseId, unitId, conceptId) {
   } else if (courseId) {
     quizCards = await api.getCourseQuizCards(parseInt(courseId, 10));
   } else {
-    // Global quiz - fetch random questions from all courses
     quizCards = await api.getGlobalQuizCards();
   }
 
   return mapQuizCardsArray(quizCards);
 }
 
+// ============================================================================
+// Quiz Shuffling & Randomization
+// ============================================================================
+
 /**
- * Shuffle array of items randomly
- * @param {Array} array - Array to shuffle
- * @returns {Array} New shuffled array
+ * Randomly shuffles an array using in-place Fisher-Yates-inspired randomization.
+ * 
+ * Creates a shallow copy before shuffling to preserve the original array.
+ * Use this when order independence or unbiased randomization is important.
+ * 
+ * @param {Array} array - The array to shuffle
+ * @returns {Array} A new shuffled array (original array unchanged)
  */
 export function shuffleArray(array) {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
 /**
- * Shuffle quiz answer options
- * Alias for shuffleArray, used specifically for answer shuffling
- * @param {Array} options - Array of answer options
- * @returns {Array} New shuffled answer options
+ * Randomly shuffles quiz answer options for a single question.
+ * 
+ * Provides semantic clarity when specifically dealing with answer options
+ * to prevent answer position bias during assessment. Ensures no answer
+ * choice is consistently in the same position across multiple attempts.
+ * 
+ * @param {Array} options - Array of answer option objects
+ * @returns {Array} Shuffled answer options in random order
  */
 export function shuffleAnswerOptions(options) {
   return shuffleArray(options);
 }
 
 /**
- * Get shuffled quiz questions limited to 5
- * Shuffles the quiz cards and returns only the first 5
- * @param {Array} quizCards - Array of quiz cards
- * @returns {Array} First 5 shuffled quiz cards
+ * Retrieves a randomized subset of quiz questions (maximum 5 questions).
+ * 
+ * Useful when conducting brief assessments or spot-checks of knowledge.
+ * Questions are both shuffled and limited to create focused quiz sessions
+ * that take approximately 3-5 minutes to complete.
+ * 
+ * @param {Array} quizCards - Array of complete quiz card objects
+ * @returns {Array} Up to 5 randomly selected and shuffled quiz cards
  */
 export function getShuffledQuizQuestions(quizCards) {
   const shuffled = shuffleArray(quizCards);
-  return shuffled.slice(0, 5); // Limit to 5 questions
+  return shuffled.slice(0, 5);
 }
 
+// ============================================================================
+// Quiz Navigation & Results
+// ============================================================================
+
 /**
- * Get back navigation path based on quiz context
- * @param {number} courseId - Course ID
- * @param {number} unitId - Unit ID (optional)
- * @param {number} conceptId - Concept ID (optional)
- * @returns {string} Navigation path
+ * Determines the appropriate back navigation URL based on quiz context hierarchy.
+ * 
+ * Uses hierarchical path construction to return users to the content level
+ * from which they initiated the quiz. Helps maintain navigation context
+ * and provides intuitive "back" behavior throughout the learning experience.
+ * 
+ * Hierarchy: conceptId > unitId > courseId > home
+ * 
+ * @param {number} courseId - The course identifier (always provided)
+ * @param {number} [unitId] - The unit identifier for unit/concept level quizzes
+ * @param {number} [conceptId] - The concept identifier for concept-specific quizzes
+ * @returns {string} Fully qualified URL path for navigation (e.g., '/course/1/unit/2')
  */
 export function getQuizBackPath(courseId, unitId, conceptId) {
   if (conceptId) {
@@ -82,10 +127,15 @@ export function getQuizBackPath(courseId, unitId, conceptId) {
 }
 
 /**
- * Calculate quiz results percentage
- * @param {number} correctCount - Number of correct answers
- * @param {number} totalCount - Total number of questions
- * @returns {number} Percentage (0-100)
+ * Calculates the percentage score achieved on a quiz attempt.
+ * 
+ * Converts raw correct answer count to a percentage score (0-100) for
+ * user feedback, progress tracking, and mastery assessment. Handles
+ * edge case where quiz has no questions (returns 0%).
+ * 
+ * @param {number} correctCount - Number of questions answered correctly
+ * @param {number} totalCount - Total number of questions in the quiz attempt
+ * @returns {number} Rounded percentage score from 0 to 100 inclusive
  */
 export function calculateQuizPercentage(correctCount, totalCount) {
   if (totalCount === 0) return 0;
