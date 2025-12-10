@@ -203,7 +203,7 @@ class QuizAnswer(Base):
     answer_text = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=False)
     # Nullable - not all questions have explanations
-    explanation = Column(Text)
+    explanation = Column(Text, nullable=True)
 
     # Relationships
     quiz_card = relationship('QuizCard', back_populates='answers')
