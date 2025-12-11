@@ -22,6 +22,20 @@ That's it! The application will be available at:
 
 The database will be automatically created and seeded on first run.
 
+### Making Changes and Switching Branches
+Docker caches image layers, so when switching branches or making changes, Docker may use cached images that contain older code. To ensure you're running the latest code:
+
+```bash
+# Stop containers and remove volumes (use -v if you expect DB schema changes between branches)
+docker compose down -v
+
+# Rebuild images without cache to ensure fresh builds
+docker compose build --no-cache
+
+# Start services with rebuilt images
+docker compose up
+```
+
 ### Docker Commands
 
 ```bash
