@@ -50,44 +50,6 @@ def _resolve_echo(echo: Union[bool, str, None]) -> bool:
         return _str_to_bool(echo)
     return DEFAULT_SQLALCHEMY_ECHO
 
-
-# ===============================
-# DATABASE MIGRATIONS
-# ===============================
-
-def _run_migrations(engine):
-    """
-    Run database migrations to add new columns to existing tables.
-    This handles schema updates without requiring a full database recreation.
-    """
-    inspector = inspect(engine)
-    
-    # Check if users table exists
-    if 'users' not in inspector.get_table_names():
-        return  # Table doesn't exist yet, create_all will handle it
-    
-    # Check if has_completed_onboarding column exists
-    users_columns = [col['name'] for col in inspector.get_columns('users')]
-    
-    if 'has_completed_onboarding' not in users_columns:
-        print("Running migration: Adding has_completed_onboarding column to users table...")
-        with engine.begin() as conn:
-            try:
-                # Add the column with default value
-                conn.execute(text("""
-                    ALTER TABLE users 
-                    ADD COLUMN has_completed_onboarding BOOLEAN DEFAULT FALSE NOT NULL;
-                """))
-                print("✓ Migration complete: has_completed_onboarding column added")
-            except Exception as e:
-                # Column might already exist or there's a constraint issue
-                if 'already exists' in str(e).lower() or 'duplicate' in str(e).lower():
-                    print("  (Column already exists, skipping)")
-                else:
-                    print(f"  Warning: Migration failed (non-critical): {e}")
-                    raise  # Re-raise to trigger rollback
-
-
 # ===============================
 # DATABASE SETUP UTILITIES
 # ===============================
@@ -130,9 +92,6 @@ def create_database(
     
     # Create all tables (if they don't exist)
     Base.metadata.create_all(engine)
-    
-    # Run migrations to add new columns to existing tables
-    _run_migrations(engine)
     
     Session = sessionmaker(bind=engine)
 
