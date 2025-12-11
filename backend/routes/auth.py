@@ -256,12 +256,9 @@ def register():
         db.commit()
         db.refresh(new_user)
 
-        # Generate JWT token for the new user (auto-login after registration)
-        token = create_token(new_user.user_id)
 
         # Return user data with access token (same format as login)
         return jsonify({
-            'access_token': token,
             'user_id': new_user.user_id,
             'username': new_user.username,
             'email': new_user.email,
