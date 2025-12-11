@@ -45,7 +45,7 @@ describe('useAuth Hook', () => {
     it('should reject login with short password', async () => {
       authService.validateLoginForm.mockReturnValue({
         valid: false,
-        error: 'Password must be at least 6 characters'
+        error: 'Password must be at least 8 characters long'
       });
 
       const { result } = renderHook(() => useAuth());
@@ -54,7 +54,7 @@ describe('useAuth Hook', () => {
         await result.current.login('user@minerva.edu', 'short');
       });
 
-      expect(result.current.error).toContain('6 characters');
+      expect(result.current.error).toContain('8 characters');
       expect(api.login).not.toHaveBeenCalled();
     });
 
