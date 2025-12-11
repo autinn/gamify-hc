@@ -147,6 +147,7 @@ def get_session(database_url: Optional[str] = None):
 
 
 if __name__ == '__main__':
+    # Runs when script is executed directly (not imported as module)
     # Create the database and tables
     print("Creating database...")
     engine, Session = create_database()
