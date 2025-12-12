@@ -12,6 +12,10 @@ from typing import Optional, List, Dict, Any
 
 from backend.database.models import Concept, QuizCard, QuizAnswer
 from backend.services.base_service import BaseService
+from backend.services.serializers import (
+    serialize_concept,
+    serialize_quiz_card_with_answers
+)
 
 
 class ConceptService(BaseService):
@@ -61,8 +65,8 @@ class ConceptService(BaseService):
         
         if not concept:
             return None
-        
-        return self.serialize_concept(concept)
+
+        return serialize_concept(concept)
     
     def get_concept_quiz_cards(
         self,
@@ -115,80 +119,7 @@ class ConceptService(BaseService):
             ).all()
             
             result.append(
-                self.serialize_quiz_card_with_answers(card, answers)
+                serialize_quiz_card_with_answers(card, answers)
             )
         
         return result
-    
-    @staticmethod
-    def serialize_concept(concept: Concept) -> Dict[str, Any]:
-        """
-        Convert a Concept model instance to a dictionary.
-        
-        Args:
-            concept: The Concept model instance to serialize
-        
-        Returns:
-            Dictionary with concept data:
-            {
-                'id': int,
-                'unit_id': int,
-                'name': str,
-                'tag': str,
-                'definition': str
-            }
-            
-        Note:
-            Currently 'tag' uses the title field as a placeholder.
-        """
-        return {
-            'id': concept.concept_id,
-            'unit_id': concept.unit_id,
-            'name': concept.title,
-            # TODO: Update when tag field is added to Concept model
-            'tag': concept.title,
-            'definition': concept.definition
-        }
-    
-    @staticmethod
-    def serialize_quiz_card_with_answers(
-        quiz_card: QuizCard,
-        answers: List[QuizAnswer]
-    ) -> Dict[str, Any]:
-        """
-        Convert a QuizCard with its answers to a dictionary.
-        
-        Args:
-            quiz_card: The QuizCard model instance
-            answers: List of QuizAnswer model instances for this card
-        
-        Returns:
-            Dictionary with quiz card and answers:
-            {
-                'id': int,
-                'concept_id': int,
-                'question': str,
-                'answers': [
-                    {
-                        'id': int,
-                        'answer_text': str,
-                        'is_correct': bool,
-                        'explanation': str
-                    }, ...
-                ]
-            }
-        """
-        return {
-            'id': quiz_card.quiz_card_id,
-            'concept_id': quiz_card.concept_id,
-            'question': quiz_card.question,
-            'answers': [
-                {
-                    'id': ans.answer_id,
-                    'answer_text': ans.answer_text,
-                    'is_correct': ans.is_correct,
-                    'explanation': ans.explanation
-                }
-                for ans in answers
-            ]
-        }

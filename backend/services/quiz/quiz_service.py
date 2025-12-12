@@ -16,6 +16,7 @@ from backend.database.models import (
     QuizCard, QuizAnswer, UserCard, Concept, Unit
 )
 from backend.services.base_service import BaseService
+from backend.services.serializers import serialize_quiz_card_with_answers
 
 
 class QuizService(BaseService):
@@ -78,8 +79,8 @@ class QuizService(BaseService):
         answers = self.db_session.query(QuizAnswer).filter(
             QuizAnswer.quiz_card_id == quiz_card_id
         ).all()
-        
-        return self.serialize_quiz_card_with_answers(quiz_card, answers)
+
+        return serialize_quiz_card_with_answers(quiz_card, answers)
     
     def get_course_quiz_cards(self, course_id: int) -> List[Dict[str, Any]]:
         """
@@ -164,18 +165,18 @@ class QuizService(BaseService):
             raise ValueError("Database session required")
         
         quiz_cards = self.db_session.query(QuizCard).all()
-        
+
         result = []
         for qc in quiz_cards:
             answers = self.db_session.query(QuizAnswer).filter(
                 QuizAnswer.quiz_card_id == qc.quiz_card_id
             ).all()
             result.append(
-                self.serialize_quiz_card_with_answers(qc, answers)
+                serialize_quiz_card_with_answers(qc, answers)
             )
-        
+
         return result
-    
+
     def submit_answer(
         self,
         user_id: int,
@@ -329,57 +330,14 @@ class QuizService(BaseService):
         quiz_cards = self.db_session.query(QuizCard).filter(
             QuizCard.concept_id.in_(concept_ids)
         ).all()
-        
+
         result = []
         for qc in quiz_cards:
             answers = self.db_session.query(QuizAnswer).filter(
                 QuizAnswer.quiz_card_id == qc.quiz_card_id
             ).all()
             result.append(
-                self.serialize_quiz_card_with_answers(qc, answers)
+                serialize_quiz_card_with_answers(qc, answers)
             )
-        
+
         return result
-    
-    @staticmethod
-    def serialize_quiz_card_with_answers(
-        quiz_card: QuizCard,
-        answers: List[QuizAnswer]
-    ) -> Dict[str, Any]:
-        """
-        Convert a QuizCard with its answers to a dictionary.
-        
-        Args:
-            quiz_card: The QuizCard model instance
-            answers: List of QuizAnswer model instances for this card
-        
-        Returns:
-            Dictionary with quiz card and answers:
-            {
-                'id': int,
-                'concept_id': int,
-                'question': str,
-                'answers': [
-                    {
-                        'id': int,
-                        'answer_text': str,
-                        'is_correct': bool,
-                        'explanation': str
-                    }, ...
-                ]
-            }
-        """
-        return {
-            'id': quiz_card.quiz_card_id,
-            'concept_id': quiz_card.concept_id,
-            'question': quiz_card.question,
-            'answers': [
-                {
-                    'id': ans.answer_id,
-                    'answer_text': ans.answer_text,
-                    'is_correct': ans.is_correct,
-                    'explanation': ans.explanation
-                }
-                for ans in answers
-            ]
-        }

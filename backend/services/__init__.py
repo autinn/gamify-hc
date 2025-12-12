@@ -30,6 +30,15 @@ from backend.services.user import UserService, UserProgressService
 from backend.services.course import CourseService, UnitService, ConceptService
 from backend.services.quiz import QuizService
 
+# Shared serializers
+from backend.services.serializers import (
+    serialize_course,
+    serialize_unit,
+    serialize_concept,
+    serialize_quiz_card_with_answers,
+    serialize_user
+)
+
 __all__ = [
     # Base
     'BaseService',
@@ -44,4 +53,10 @@ __all__ = [
     'ConceptService',
     # Quiz domain
     'QuizService',
+    # Serializers
+    'serialize_course',
+    'serialize_unit',
+    'serialize_concept',
+    'serialize_quiz_card_with_answers',
+    'serialize_user',
 ]

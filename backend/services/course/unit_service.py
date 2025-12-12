@@ -12,6 +12,7 @@ from typing import Optional, List, Dict, Any
 
 from backend.database.models import Unit, Concept
 from backend.services.base_service import BaseService
+from backend.services.serializers import serialize_unit, serialize_concept
 
 
 class UnitService(BaseService):
@@ -61,8 +62,8 @@ class UnitService(BaseService):
         
         if not unit:
             return None
-        
-        return self.serialize_unit(unit)
+
+        return serialize_unit(unit)
     
     def get_unit_concepts(self, unit_id: int) -> List[Dict[str, Any]]:
         """
@@ -92,62 +93,5 @@ class UnitService(BaseService):
         concepts = self.db_session.query(Concept).filter(
             Concept.unit_id == unit_id
         ).all()
-        
-        return [self.serialize_concept(c) for c in concepts]
-    
-    @staticmethod
-    def serialize_unit(unit: Unit) -> Dict[str, Any]:
-        """
-        Convert a Unit model instance to a dictionary.
-        
-        Args:
-            unit: The Unit model instance to serialize
-        
-        Returns:
-            Dictionary with unit data:
-            {
-                'id': int,
-                'course_id': int,
-                'name': str,
-                'description': str,
-                'order_index': int
-            }
-        """
-        return {
-            'id': unit.unit_id,
-            'course_id': unit.course_id,
-            'name': unit.title,
-            'description': unit.description,
-            'order_index': unit.order_index
-        }
-    
-    @staticmethod
-    def serialize_concept(concept: Concept) -> Dict[str, Any]:
-        """
-        Convert a Concept model instance to a dictionary.
-        
-        Args:
-            concept: The Concept model instance to serialize
-        
-        Returns:
-            Dictionary with concept data:
-            {
-                'id': int,
-                'unit_id': int,
-                'name': str,
-                'tag': str,
-                'definition': str
-            }
-            
-        Note:
-            Currently 'tag' uses the title field as a placeholder.
-            This may be updated if a separate tag field is added.
-        """
-        return {
-            'id': concept.concept_id,
-            'unit_id': concept.unit_id,
-            'name': concept.title,
-            # TODO: Update when tag field is added to Concept model
-            'tag': concept.title,
-            'definition': concept.definition
-        }
+
+        return [serialize_concept(c) for c in concepts]

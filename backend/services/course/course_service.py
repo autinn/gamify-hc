@@ -12,6 +12,7 @@ from typing import Optional, List, Dict, Any
 
 from backend.database.models import Course, Unit
 from backend.services.base_service import BaseService
+from backend.services.serializers import serialize_course, serialize_unit
 
 
 class CourseService(BaseService):
@@ -52,7 +53,7 @@ class CourseService(BaseService):
             raise ValueError("Database session required")
         
         courses = self.db_session.query(Course).all()
-        return [self.serialize_course(c) for c in courses]
+        return [serialize_course(c) for c in courses]
     
     def get_course_by_id(self, course_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -84,8 +85,8 @@ class CourseService(BaseService):
         
         if not course:
             return None
-        
-        return self.serialize_course(course)
+
+        return serialize_course(course)
     
     def get_course_units(self, course_id: int) -> List[Dict[str, Any]]:
         """
@@ -118,59 +119,5 @@ class CourseService(BaseService):
         units = self.db_session.query(Unit).filter(
             Unit.course_id == course_id
         ).order_by(Unit.order_index).all()
-        
-        return [self.serialize_unit(u) for u in units]
-    
-    @staticmethod
-    def serialize_course(course: Course) -> Dict[str, Any]:
-        """
-        Convert a Course model instance to a dictionary.
-        
-        Args:
-            course: The Course model instance to serialize
-        
-        Returns:
-            Dictionary with course data:
-            {
-                'id': int,
-                'code': str,
-                'name': str,
-                'description': str
-            }
-            
-        Note:
-            Currently 'code' and 'name' both use the title field.
-            This may be updated if a separate code field is added.
-        """
-        return {
-            'id': course.course_id,
-            'code': course.title,
-            'name': course.title,
-            'description': course.description
-        }
-    
-    @staticmethod
-    def serialize_unit(unit: Unit) -> Dict[str, Any]:
-        """
-        Convert a Unit model instance to a dictionary.
-        
-        Args:
-            unit: The Unit model instance to serialize
-        
-        Returns:
-            Dictionary with unit data:
-            {
-                'id': int,
-                'course_id': int,
-                'name': str,
-                'description': str,
-                'order_index': int
-            }
-        """
-        return {
-            'id': unit.unit_id,
-            'course_id': unit.course_id,
-            'name': unit.title,
-            'description': unit.description,
-            'order_index': unit.order_index
-        }
+
+        return [serialize_unit(u) for u in units]
