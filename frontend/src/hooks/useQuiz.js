@@ -37,6 +37,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchQuizByLevel, getShuffledQuizQuestions } from '../services/quizService';
+import { submitQuizAnswer } from '../services/api';
 
 export function useQuiz(courseId, unitId, conceptId) {
   const [questions, setQuestions] = useState([]);
@@ -113,26 +114,11 @@ export function useQuiz(courseId, unitId, conceptId) {
 
     // Persist answer to backend for progress tracking and user card updates
     try {
-      const token = localStorage.getItem('token');
-
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${apiUrl}/quiz-submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        },
-        body: JSON.stringify({
-          quiz_card_id: currentQuestion.id,
-          answer_id: option.id,
-          is_first_attempt: isFirstAttempt
-        })
+      await submitQuizAnswer({
+        quiz_card_id: currentQuestion.id,
+        answer_id: option.id,
+        is_first_attempt: isFirstAttempt
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Quiz submission error:', errorData);
-      }
     } catch (err) {
       console.error('Error submitting quiz answer:', err);
     }
