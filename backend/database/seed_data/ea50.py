@@ -178,7 +178,7 @@ EA50_DATA = {
                         {
                             'question': 'A team uses "Netflix recommendation algorithms" as an analogy for suggesting personalized learning paths in education. What challenge must they address?',
                             'answers': [
-                                {'text': 'Students and viewers are identical', 'correct': False, 'explanation': 'This is not true; students and viewers have different contexts, needs, and goals.'},
+                                {'text': 'Students and viewers are identical', 'correct': False, 'explanation': 'It might seem true because both groups consume content, but their contexts, needs, and goals differ significantly.'},
                                 {'text': 'Educational goals differ from entertainment engagement; success metrics must be redefined', 'correct': True, 'explanation': 'Correct! The analogy requires adaptation of success metrics to fit the educational context.'},
                                 {'text': 'The analogy is completely invalid', 'correct': False, 'explanation': 'The analogy is not completely invalid; it just needs careful adaptation to the new context.'},
                                 {'text': 'Algorithms cannot be applied to education', 'correct': False, 'explanation': 'This is too broad; while direct application may be flawed, adapted algorithms can be useful.'},
@@ -190,7 +190,7 @@ EA50_DATA = {
                                 {'text': 'Companies and teams both have members', 'correct': False, 'explanation': 'Having members is too vague a similarity; the structures and goals of the entities matter more.'},
                                 {'text': 'Corporate goals are often more ambiguous and long-term than game outcomes', 'correct': True, 'explanation': 'Exactly! This difference in goal clarity and timeframe can limit the analogy\'s applicability.'},
                                 {'text': 'Sports teams never collaborate', 'correct': False, 'explanation': 'This is false; sports teams often collaborate with other teams, coaches, and staff.'},
-                                {'text': 'All organizational analogies are perfect', 'correct': False, 'explanation': 'This is not true; analogies can be helpful but are never perfect due to the uniqueness of each organization.'},
+                                {'text': 'All organizational analogies are perfect', 'correct': False, 'explanation': 'Analogies can seem perfect because they highlight similarities, but they overlook the unique aspects of each organization.'},
                             ],
                         },
                         {
@@ -198,7 +198,7 @@ EA50_DATA = {
                             'answers': [
                                 {'text': 'Cars and data are both physical objects', 'correct': False, 'explanation': 'This is too superficial; the validity of an analogy depends on deeper structural similarities.'},
                                 {'text': 'Both systems exhibit congestion, bottlenecks, and throughput optimization challenges', 'correct': True, 'explanation': 'Exactly! These shared characteristics validate the use of traffic flow models as an analogy for data packet routing.'},
-                                {'text': 'Traffic and networks are unrelated', 'correct': False, 'explanation': 'This is not true; there are relevant similarities that make the analogy valid.'},
+                                {'text': 'Traffic and networks are unrelated', 'correct': False, 'explanation': 'This might seem valid because they operate in different domains, but both share congestion and optimization challenges.'},
                                 {'text': 'All analogies between transport and computing work', 'correct': False, 'explanation': 'This is too broad; each analogy must be evaluated on its own merits and relevance.'},
                             ],
                         },
@@ -231,16 +231,16 @@ EA50_DATA = {
                             'answers': [
                                 {'text': 'Keep it a constraint', 'correct': False, 'explanation': 'If it can be repaired, it should not be classified as a constraint which is typically fixed.'},
                                 {'text': 'Reframe as an obstacle and plan remediation', 'correct': True, 'explanation': 'Correct! This allows for addressing the issue directly rather than treating it as an unchangeable constraint.'},
-                                {'text': 'Remove it entirely', 'correct': False, 'explanation': 'This is not feasible if the equipment is essential and the failure is reparable.'},
+                                {'text': 'Remove it entirely', 'correct': False, 'explanation': 'It might seem feasible, but if the equipment is essential and reparable, it cannot be removed.'},
                                 {'text': 'Treat it as a success metric', 'correct': False, 'explanation': 'This is incorrect; it does not measure success but rather indicates a problem that needs fixing.'},
                             ],
                         },
                         {
                             'question': 'A team must schedule a conference with 5 constraints: venue availability, speaker schedules, budget limits, accessibility requirements, and catering lead times. What approach applies #constraints?',
                             'answers': [
-                                {'text': 'Pick one constraint and ignore the rest', 'correct': False, 'explanation': 'This is not feasible as multiple constraints must be satisfied simultaneously.'},
+                                {'text': 'Pick one constraint and ignore the rest', 'correct': False, 'explanation': 'This might seem practical, but multiple constraints must be satisfied simultaneously.'},
                                 {'text': 'Find a solution that simultaneously satisfies all 5 constraints', 'correct': True, 'explanation': 'Yes, this is the correct approach to satisfy all constraints.'},
-                                {'text': 'Remove constraints until the problem is easy', 'correct': False, 'explanation': 'This is not a valid approach as it may lead to overlooking important factors.'},
+                                {'text': 'Remove constraints until the problem is easy', 'correct': False, 'explanation': 'Simplifying the problem by removing constraints might overlook critical factors.'},
                                 {'text': 'Prioritize constraints and violate lower-priority ones', 'correct': False, 'explanation': 'This could lead to significant issues if lower-priority constraints are violated.'},
                             ],
                         },
@@ -250,51 +250,51 @@ EA50_DATA = {
                                 {'text': 'Obstacle, because construction can be rescheduled or phased differently', 'correct': True, 'explanation': 'Correct! Construction is an obstacle that can be managed, not a fixed constraint.'},
                                 {'text': 'Constraint, because construction is happening', 'correct': False, 'explanation': 'This is incorrect; construction is an obstacle that affects traffic flow.'},
                                 {'text': 'Neither, because it\'s temporary', 'correct': False, 'explanation': 'The temporary nature does not change the fact that it is an obstacle.'},
-                                {'text': 'Both equally', 'correct': False, 'explanation': 'This is not accurate; it is primarily an obstacle.'},
+                                {'text': 'Both equally', 'correct': False, 'explanation': 'While both may seem important, one is primarily an obstacle.'},
                             ],
                         },
                         {
                             'question': 'A software project has hard constraints (regulatory compliance, system compatibility) and soft preferences (user interface aesthetics). How should they be treated?',
                             'answers': [
-                                {'text': 'Treat preferences as constraints to simplify', 'correct': False, 'explanation': 'This is incorrect; preferences are not constraints and should not be treated as such.'},
+                                {'text': 'Treat preferences as constraints to simplify', 'correct': False, 'explanation': 'Preferences are not constraints and should be considered separately.'},
                                 {'text': 'Satisfy hard constraints first; optimize preferences within feasible solutions', 'correct': True, 'explanation': 'Correct! This ensures that essential requirements are met while still considering preferences.'},
-                                {'text': 'Ignore hard constraints if they conflict with preferences', 'correct': False, 'explanation': 'This is not feasible as hard constraints are non-negotiable requirements.'},
-                                {'text': 'All constraints are equally negotiable', 'correct': False, 'explanation': 'This is not true; some constraints are fixed while others are flexible.'},
+                                {'text': 'Ignore hard constraints if they conflict with preferences', 'correct': False, 'explanation': 'Hard constraints are non-negotiable and must be addressed.'},
+                                {'text': 'All constraints are equally negotiable', 'correct': False, 'explanation': 'Some constraints are fixed, while others can be adjusted.'},
                             ],
                         },
                         {
                             'question': 'A meal planner must satisfy: dietary restrictions (vegan, nut-free), budget ($50), prep time (under 2 hours), and ingredient availability. Two menus meet all constraints. What should guide the final choice?',
                             'answers': [
                                 {'text': 'Additional preferences like taste or nutrition balance', 'correct': True, 'explanation': 'Yes! Additional preferences should guide the final choice between equally viable options.'},
-                                {'text': 'Randomly select one', 'correct': False, 'explanation': 'This is not a good idea as it does not consider the best option available.'},
-                                {'text': 'Add more constraints until only one remains', 'correct': False, 'explanation': 'This is not practical or necessary; the goal is to find a satisfactory solution, not to eliminate options.'},
-                                {'text': 'Violate one constraint to simplify', 'correct': False, 'explanation': 'This is not advisable as it could lead to an unsatisfactory or unviable solution.'},
+                                {'text': 'Randomly select one', 'correct': False, 'explanation': 'Random selection ignores the importance of evaluating the best option.'},
+                                {'text': 'Add more constraints until only one remains', 'correct': False, 'explanation': 'Adding constraints unnecessarily complicates the problem.'},
+                                {'text': 'Violate one constraint to simplify', 'correct': False, 'explanation': 'Violating constraints can lead to unsatisfactory solutions.'},
                             ],
                         },
                         {
                             'question': 'A warehouse layout must accommodate: fire safety codes (constraint), forklift turning radii (constraint), and "easy access to popular items" (preference). What distinguishes the constraint from the preference?',
                             'answers': [
                                 {'text': 'Constraints are legally mandated or physically necessary; preferences are desirable but negotiable', 'correct': True, 'explanation': 'Exactly! Constraints are mandatory requirements, while preferences are additional desirable factors.'},
-                                {'text': 'Preferences are always more important', 'correct': False, 'explanation': 'This is not true; preferences are not more important than constraints.'},
+                                {'text': 'Preferences are always more important', 'correct': False, 'explanation': 'Preferences are secondary to constraints, which are mandatory.'},
                                 {'text': 'Constraints can be violated with enough creativity', 'correct': False, 'explanation': 'This is incorrect; constraints are fixed and cannot be violated.'},
-                                {'text': 'There is no distinction', 'correct': False, 'explanation': 'This is not accurate; there is a clear distinction between constraints and preferences.'},
+                                {'text': 'There is no distinction', 'correct': False, 'explanation': 'Constraints are mandatory, while preferences are negotiable.'},
                             ],
                         },
                         {
                             'question': 'A project faces "insufficient expertise in the team" and "a non-negotiable December deadline." Which is the constraint?',
                             'answers': [
-                                {'text': 'The expertise gap, because it limits capability', 'correct': False, 'explanation': 'This is not a constraint; it is a gap that needs to be addressed.'},
+                                {'text': 'The expertise gap, because it limits capability', 'correct': False, 'explanation': 'The expertise gap is a challenge, not a fixed constraint.'},
                                 {'text': 'The December deadline, because it cannot be changed', 'correct': True, 'explanation': 'Correct! The December deadline is a fixed constraint that must be met.'},
-                                {'text': 'Both are constraints', 'correct': False, 'explanation': 'This is not accurate; only the December deadline is a constraint.'},
-                                {'text': 'Neither—both are just challenges', 'correct': False, 'explanation': 'This is incorrect; the December deadline is a clear constraint.'},
+                                {'text': 'Both are constraints', 'correct': False, 'explanation': 'Insufficient expertise might feel like a constraint because it is hard to change, but new talent can be hired and staff can be trained.'},
+                                {'text': 'Neither—both are just challenges', 'correct': False, 'explanation': 'The December deadline is a clear constraint that must be met.'},
                             ],
                         },
                         {
                             'question': 'A school must assign 30 teachers to 30 classrooms, ensuring each teacher\'s subject matches room equipment, schedule fits personal constraints, and no room is double-booked. This is an example of:',
                             'answers': [
-                                {'text': 'A heuristic problem', 'correct': False, 'explanation': 'This is not a heuristic problem; it is a complex problem with multiple constraints.'},
+                                {'text': 'A heuristic problem', 'correct': False, 'explanation': 'This problem involves multiple constraints, not just heuristics.'},
                                 {'text': 'A constraint satisfaction problem', 'correct': True, 'explanation': 'Exactly! This problem requires satisfying multiple constraints simultaneously.'},
-                                {'text': 'An unconstrained optimization', 'correct': False, 'explanation': 'This is not an unconstrained optimization problem; there are clear constraints that must be met.'},
+                                {'text': 'An unconstrained optimization', 'correct': False, 'explanation': 'This problem has clear constraints that must be met.'},
                                 {'text': 'A purely creative task', 'correct': False, 'explanation': 'This task is not purely creative; it requires careful consideration of constraints.'},
                             ],
                         },
@@ -336,28 +336,28 @@ EA50_DATA = {
                         {
                             'question': 'A doctor quickly diagnoses a patient based on the most common symptoms matching typical cases. This uses which heuristic?',
                             'answers': [
-                                {'text': 'Anchoring', 'correct': False, 'explanation': 'This is not anchoring; it\'s using representative symptoms to make a quick diagnosis.'},
+                                {'text': 'Anchoring', 'correct': False, 'explanation': 'Anchouring involves people relying too heavily on the first piece of information, we don'\t see a first piece of information that is relevant here.'},
                                 {'text': 'Representativeness', 'correct': True, 'explanation': 'Correct! This is an example of the representativeness heuristic in action.'},
-                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This is not means-ends analysis; it\'s a quick, heuristic-based diagnosis.'},
-                                {'text': 'Constraint satisfaction', 'correct': False, 'explanation': 'This is not about satisfying constraints; it\'s about matching symptoms to diagnoses.'},
+                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This diagnosis uses heuristics to act quickly, not lengthy means-ends analysis.'},
+                                {'text': 'Constraint satisfaction', 'correct': False, 'explanation': 'This diagnosis matches symptoms to cases, not constraints.'},
                             ],
                         },
                         {
                             'question': 'A manager sets project timelines by starting with an initial estimate (30 days) and adjusting slightly upward (35 days). What heuristic bias might occur?',
                             'answers': [
                                 {'text': 'Anchoring—the initial 30 days overly influences the final estimate', 'correct': True, 'explanation': 'Exactly! This is a classic case of anchoring bias in decision making.'},
-                                {'text': 'Availability', 'correct': False, 'explanation': 'This is not related to the availability heuristic; it\'s about anchoring to an initial value.'},
-                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This is not means-ends analysis; it\'s a biased adjustment of an initial estimate.'},
-                                {'text': 'Representativeness', 'correct': False, 'explanation': 'This is not representativeness; it\'s a cognitive bias affecting the estimate.'},
+                                {'text': 'Availability', 'correct': False, 'explanation': 'This heuristic involves anchoring to an initial value, not availability.'},
+                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This heuristic involves adjusting estimates, not means-ends analysis.'},
+                                {'text': 'Representativeness', 'correct': False, 'explanation': 'This heuristic involves anchoring, not representativeness.'},
                             ],
                         },
                         {
                             'question': 'A team uses means-ends analysis to plan a product launch: identify launch date (goal), determine current readiness (initial state), then define subgoals (complete testing, finalize marketing). What makes this effective?',
                             'answers': [
-                                {'text': 'It relies on random exploration', 'correct': False, 'explanation': 'This is not random; it\'s a systematic approach to problem-solving.'},
+                                {'text': 'It relies on random exploration', 'correct': False, 'explanation': 'Means-ends analysis is systematic, not random.'},
                                 {'text': 'It systematically decomposes the gap into manageable subgoals', 'correct': True, 'explanation': 'Exactly! This systematic decomposition is key to effective means-ends analysis.'},
-                                {'text': 'It ignores constraints', 'correct': False, 'explanation': 'This is not true; effective means-ends analysis considers relevant constraints.'},
-                                {'text': 'It avoids planning altogether', 'correct': False, 'explanation': 'This is incorrect; means-ends analysis is a form of planning.'},
+                                {'text': 'It ignores constraints', 'correct': False, 'explanation': 'Effective means-ends analysis considers relevant constraints.'},
+                                {'text': 'It avoids planning altogether', 'correct': False, 'explanation': 'Means-ends analysis is a form of planning, involving careful consideration of steps to reach the goal.'},
                             ],
                         },
                         {
@@ -425,9 +425,9 @@ EA50_DATA = {
                         {
                             'question': 'Which pairing matches Kosslyn\'s Maxims?',
                             'answers': [
-                                {'text': 'Think it Through → retrieval cues; Make and Use Associations → deep processing', 'correct': False, 'explanation': 'This is not the correct pairing according to Kosslyn\'s Maxims.'},
+                                {'text': 'Think it Through → retrieval cues; Make and Use Associations → deep processing', 'correct': False, 'explanation': 'This pairing does not align with Kosslyn’s Maxims.'},
                                 {'text': 'Think it Through → deep processing; Make and Use Associations → rich retrieval cues', 'correct': True, 'explanation': 'Correct! This pairing aligns with Kosslyn\'s Maxims for effective learning.'},
-                                {'text': 'Think it Through → dual codes only; Make and Use Associations → spacing only', 'correct': False, 'explanation': 'This is not accurate; the maxims involve broader principles than just dual codes and spacing.'},
+                                {'text': 'Think it Through → dual codes only; Make and Use Associations → spacing only', 'correct': False, 'explanation': 'This pairing oversimplifies Kosslyn’s Maxims.'},
                                 {'text': 'Both maxims → massed practice', 'correct': False, 'explanation': 'This is incorrect; massed practice is not aligned with the principles of spaced practice and retrieval practice.'},
                             ],
                         },
@@ -660,7 +660,7 @@ EA50_DATA = {
                                 {'text': 'Always choose the most complete solution', 'correct': False, 'explanation': 'This is not always the best approach; the most complete solution may not be the most cost-effective.'},
                                 {'text': 'Weigh trade-offs between fit, cost, and customization; 80% may suffice', 'correct': True, 'explanation': 'Exactly! This is a practical approach that considers multiple factors in the decision.'},
                                 {'text': 'Build entirely from scratch', 'correct': False, 'explanation': 'This is not efficient; building from scratch is time-consuming and costly.'},
-                                {'text': 'Choose randomly', 'correct': False, 'explanation': 'This is not a sensible approach; the decision should be based on careful analysis, not random choice.'},
+                                {'text': 'Choose randomly', 'correct': False, 'explanation': 'Random choice does not lead to a sensible or effective decision.'},
                             ],
                         },
                         {

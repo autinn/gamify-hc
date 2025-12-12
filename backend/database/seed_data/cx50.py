@@ -20,9 +20,9 @@ CX50_DATA = {
                             'question': 'A polar region experiences accelerating ice melt: as sea ice disappears, darker ocean water absorbs more heat, further speeding melting. Which best describes this interaction?',
                             'answers': [
                                 {'text': 'Linear causation', 'correct': False, 'explanation': 'Linear causation assumes a direct, proportional relationship, which does not apply here.'},
-                                {'text': 'Random correlation', 'correct': False, 'explanation': 'This is not random; the interaction is systematic and feedback-driven.'},
+                                {'text': 'Random correlation', 'correct': False, 'explanation': 'The interaction is systematic and feedback-driven, emphasizing the role of feedback.'},
                                 {'text': 'Reinforcing feedback loop', 'correct': True, 'explanation': 'Correct! The process accelerates itself through positive feedback.'},
-                                {'text': 'Isolated cause–effect chain', 'correct': False, 'explanation': 'This is not isolated; it involves interconnected feedback loops.'},
+                                {'text': 'Isolated cause–effect chain', 'correct': False, 'explanation': 'This is an interconnected, complex the system.'},
                             ],
                         },
                         {
@@ -30,16 +30,16 @@ CX50_DATA = {
                             'answers': [
                                 {'text': 'A single sufficient cause', 'correct': False, 'explanation': 'Obesity is not caused by a single factor; it involves multiple interacting causes.'},
                                 {'text': 'Interacting causal factors that offset each other', 'correct': True, 'explanation': 'Correct! Multiple causes interact, neutralizing the intended effect of the intervention.'},
-                                {'text': 'A non-causal coincidence', 'correct': False, 'explanation': 'This is not coincidental; the outcome is due to interacting causes.'},
+                                {'text': 'A non-causal coincidence', 'correct': False, 'explanation': 'The outcome is due to interacting causes, showcasing systematic interactions.'},
                                 {'text': 'Random variance', 'correct': False, 'explanation': 'The outcome is not random; it is driven by systematic interactions.'},
                             ],
                         },
                         {
-                            'question': 'After adding a new bus line, traffic worsens because fewer people carpool and more use feeder roads. Which HC concept explains this?',
+                            'question': 'After adding a new bus line, traffic worsens because fewer people carpool and more use feeder roads. Which HC concept explains the wosened traffic?',
                             'answers': [
                                 {'text': 'Emergent property', 'correct': False, 'explanation': 'Emergent properties describe system-level outcomes, but this is about causal interactions.'},
                                 {'text': 'Complex causality', 'correct': True, 'explanation': 'Correct! The unintended outcome arises from interdependent variables.'},
-                                {'text': 'Network hub effect', 'correct': False, 'explanation': 'This is not about hubs; it is about causal interactions.'},
+                                {'text': 'Network hub effect', 'correct': False, 'explanation': 'The buses might be considered network hubs in some analysis, but that doesn'\t explain the traffic.'},
                                 {'text': 'System mapping', 'correct': False, 'explanation': 'System mapping is a tool, not the concept explaining this outcome.'},
                             ],
                         },
@@ -55,10 +55,10 @@ CX50_DATA = {
                         {
                             'question': 'A country subsidizes solar panels to cut emissions, but coal use rises as cheap electricity enables energy-intensive manufacturing. What causal dynamic occurred?',
                             'answers': [
-                                {'text': 'Direct linear reduction', 'correct': False, 'explanation': 'This is not a linear reduction; the outcome involves unintended interactions.'},
+                                {'text': 'Direct linear reduction', 'correct': False, 'explanation': 'The outcome involves unintended interactions, demonstrating the complexity of the system.'},
                                 {'text': 'Unintended rebound effect via interacting variables', 'correct': True, 'explanation': 'Correct! The rebound effect arises from interconnected causal pathways.'},
                                 {'text': 'Solar panels caused pollution', 'correct': False, 'explanation': 'Solar panels did not directly cause pollution; the rebound effect did.'},
-                                {'text': 'Pure coincidence', 'correct': False, 'explanation': 'This is not coincidental; it is a result of interacting variables.'},
+                                {'text': 'Pure coincidence', 'correct': False, 'explanation': 'It might seem coincidental because of the complexity, but it results from interacting variables.'},
                             ],
                         },
                         {
@@ -73,7 +73,7 @@ CX50_DATA = {
                         {
                             'question': 'A drought prompts farmers to pump groundwater, lowering water tables, increasing costs, forcing farm closures, reducing food supply, and raising prices that incentivize distant farms to expand production. Which dynamic is most evident?',
                             'answers': [
-                                {'text': 'A simple chain reaction', 'correct': False, 'explanation': 'This is not a simple chain reaction; it involves multiple, interacting feedback loops.'},
+                                {'text': 'A simple chain reaction', 'correct': False, 'explanation': 'This might seem like a simple chain reaction, but it involves multiple, interacting feedback loops.'},
                                 {'text': 'Reinforcing loops across multiple causal pathways', 'correct': True, 'explanation': 'Correct! Each step in the process creates conditions that reinforce the next.'},
                                 {'text': 'Random environmental variation', 'correct': False, 'explanation': 'The changes are not random; they result from specific causal interactions.'},
                                 {'text': 'A single root cause', 'correct': False, 'explanation': 'There is no single root cause; multiple factors are interconnected.'},
