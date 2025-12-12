@@ -66,9 +66,9 @@ class AuthService:
 
     def __del__(self):
         """Close session if we own it."""
-        if hasattr(self, '_owns_session') and self._owns_session:
-            if hasattr(self, 'user_repo'):
-                self.user_repo.close()
+        if (hasattr(self, '_owns_session') and self._owns_session and 
+            hasattr(self, 'user_repo')):
+            self.user_repo.close()
 
     def register_user(
         self,
