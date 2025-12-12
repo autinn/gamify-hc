@@ -90,25 +90,20 @@ def clean_db(db_session):
 
 
 @pytest.fixture
-def test_client(test_engine, test_session_factory, test_database_url, monkeypatch):
+def test_client(test_engine, test_session_factory, test_database_url,
+                monkeypatch):
     """Create a test Flask client with shared database engine."""
-    from backend.utils.database_manager import DatabaseManager
-    
     # Set DATABASE_URL environment variable for Settings to work
     monkeypatch.setenv("DATABASE_URL", test_database_url)
     monkeypatch.setenv("FLASK_ENV", "testing")
     
-    # Create DatabaseManager with shared engine
-    db_manager = DatabaseManager(
+    # Create app with shared engine to avoid connection leaks
+    app = create_app(
+        database_url=test_database_url,
+        auto_seed=False,
         engine=test_engine,
-        SessionLocal=test_session_factory
+        session_factory=test_session_factory
     )
-    
-    # Create app with test database URL, disable auto_seed for tests
-    app = create_app(database_url=test_database_url, auto_seed=False)
-    # Replace the app's db_session with our shared one to ensure
-    # all sessions use the same engine
-    app.db_session = db_manager.get_session
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
     

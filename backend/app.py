@@ -28,7 +28,8 @@ from backend.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def create_app(database_url=None, auto_seed=True):
+def create_app(database_url=None, auto_seed=True, engine=None,
+               session_factory=None):
     """
     Create and configure Flask app with clean architecture.
     
@@ -37,6 +38,8 @@ def create_app(database_url=None, auto_seed=True):
             (uses settings if None)
         auto_seed: If True, seed database with initial data if empty.
             Default True. Set to False for testing.
+        engine: Optional SQLAlchemy engine (for testing with shared engine)
+        session_factory: Optional session factory (for testing)
             
     Returns:
         Flask application instance
@@ -55,7 +58,14 @@ def create_app(database_url=None, auto_seed=True):
     logger.info(f'Creating Flask app in {flask_env} mode')
     
     # Setup database manager
-    db_manager = DatabaseManager(db_url, auto_seed=auto_seed)
+    # Use provided engine/session_factory if available (testing)
+    if engine and session_factory:
+        db_manager = DatabaseManager(
+            engine=engine,
+            SessionLocal=session_factory
+        )
+    else:
+        db_manager = DatabaseManager(db_url, auto_seed=auto_seed)
     
     # Make db session available to blueprints via app context
     app.db_session = db_manager.get_session
