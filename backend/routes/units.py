@@ -11,8 +11,10 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify
-from backend.database.models import Unit, Concept
+
 from backend.utils.database_manager import get_db
+from backend.services.course import UnitService
+from backend.decorators import handle_errors
 
 # Create blueprint for unit-related routes
 # All routes in this blueprint will be prefixed with '/api'
@@ -20,6 +22,7 @@ units_bp = Blueprint('units', __name__, url_prefix='/api')
 
 
 @units_bp.route('/units/<int:unit_id>', methods=['GET'])
+@handle_errors
 def get_unit(unit_id):
     """
     Retrieve a specific unit by its ID.
@@ -51,25 +54,19 @@ def get_unit(unit_id):
     """
     db = get_db()
     try:
-        unit = db.query(Unit).filter(
-            Unit.unit_id == unit_id
-        ).first()
+        unit_service = UnitService(db_session=db)
+        unit = unit_service.get_unit_by_id(unit_id)
 
         if not unit:
             return jsonify({'error': 'Unit not found'}), 404
 
-        return jsonify({
-            'id': unit.unit_id,
-            'course_id': unit.course_id,
-            'name': unit.title,
-            'description': unit.description,
-            'order_index': unit.order_index
-        })
+        return jsonify(unit)
     finally:
         db.close()
 
 
 @units_bp.route('/units/<int:unit_id>/concepts', methods=['GET'])
+@handle_errors
 def get_unit_concepts(unit_id):
     """
     Retrieve all concepts associated with a specific unit.
@@ -106,17 +103,8 @@ def get_unit_concepts(unit_id):
     """
     db = get_db()
     try:
-        concepts = db.query(Concept).filter(
-            Concept.unit_id == unit_id
-        ).all()
-
-        return jsonify([{
-            'id': concept.concept_id,
-            'unit_id': concept.unit_id,
-            'name': concept.title,
-            # TODO: Update when tag field is added to Concept model
-            'tag': concept.title,
-            'definition': concept.definition
-        } for concept in concepts])
+        unit_service = UnitService(db_session=db)
+        concepts = unit_service.get_unit_concepts(unit_id)
+        return jsonify(concepts)
     finally:
         db.close()
