@@ -16,6 +16,7 @@ import jwt
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from backend.services.base_service import BaseService
+from backend.database.models import User
 
 
 class AuthService(BaseService):
@@ -296,5 +297,57 @@ class AuthService(BaseService):
         valid, error = self.validate_password(password)
         if not valid:
             return valid, error
-        
+
         return True, None
+
+    def authenticate_user(
+        self,
+        username_or_email: str,
+        password: str,
+        db_session
+    ) -> Optional[User]:
+        """
+        Authenticate a user with username/email and password.
+
+        This method combines user lookup and password verification into
+        a single authentication operation.
+
+        Args:
+            username_or_email: The username or email address to authenticate
+            password: The plain text password to verify
+            db_session: Database session for user lookup
+
+        Returns:
+            User object if authentication succeeds, None otherwise
+
+        Example:
+            user = auth_service.authenticate_user(
+                username_or_email='john',
+                password='mypassword',
+                db_session=db
+            )
+            if user:
+                token = auth_service.create_token(user.user_id)
+                return jsonify({'token': token})
+            else:
+                return jsonify({'error': 'Invalid credentials'}), 401
+        """
+        # Look up user by username
+        user = db_session.query(User).filter(
+            User.username == username_or_email
+        ).first()
+
+        # If not found by username, try email
+        if not user:
+            user = db_session.query(User).filter(
+                User.email == username_or_email.lower()
+            ).first()
+
+        if not user:
+            return None
+
+        # Verify password
+        if not self.verify_password(user.password_hash, password):
+            return None
+
+        return user
