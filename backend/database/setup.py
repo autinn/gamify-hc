@@ -147,6 +147,7 @@ def get_session(database_url: Optional[str] = None):
 
 
 if __name__ == '__main__':
+    # Runs when script is executed directly (not imported as module)
     # Create the database and tables
     print("Creating database...")
     engine, Session = create_database()
@@ -197,6 +198,15 @@ if __name__ == '__main__':
                         # Display answers
                         for answer in quiz_card.answers:
                             correct_marker = "✓" if answer.is_correct else " "
+                            print(f"        [{correct_marker}] {answer.answer_text}")
+
+                            if answer.explanation:
+                                print(f"            Explanation: {answer.explanation}")
+                            else:
+                                print(f"            Explanation: (none provided)")
+                        '''
+                        for answer in quiz_card.answers:
+                            correct_marker = "✓" if answer.is_correct else " "
                             print(
                                 f"        [{correct_marker}] "
                                 f"{answer.answer_text}"
@@ -209,6 +219,7 @@ if __name__ == '__main__':
                                 print("      Explanation: (none provided)")
                         else:
                             print("      Explanation: N/A")
+                        '''
 
         print(f"\n{'=' * 80}")
         print("END OF DATABASE CONTENT")
