@@ -9,7 +9,6 @@ Classes:
 """
 
 from typing import Optional
-from sqlalchemy.exc import IntegrityError
 
 from backend.database.models import User
 from backend.services.base_service import BaseService
@@ -68,7 +67,7 @@ class UserService(BaseService):
             
         Example:
             # With plain password (will be hashed)
-            from backend.services.auth_service import AuthService
+            from backend.services.auth import AuthService
             auth_service = AuthService(...)
             
             user = user_service.create_user(
