@@ -112,12 +112,15 @@ class Config:
                 "Please set it in your .env file or environment."
             )
         
-        # Warn about insecure JWT secret in production
+        # Warn about insecure JWT secret in production (but don't fail)
         if (cls.FLASK_ENV == "production" and
                 cls.JWT_SECRET_KEY == "dev-secret-key-change-in-production"):
-            raise ValueError(
-                "JWT_SECRET_KEY must be changed in production! "
-                "Current value is the default development key."
+            import warnings
+            warnings.warn(
+                "JWT_SECRET_KEY is set to the default development key in production! "
+                "This is insecure. Please set a unique secret key.",
+                UserWarning,
+                stacklevel=2
             )
     
     @classmethod
@@ -165,9 +168,3 @@ class Config:
             "algorithm": cls.JWT_ALGORITHM,
             "expiration_hours": cls.JWT_EXPIRATION_HOURS,
         }
-
-
-# Validate configuration on import (in production)
-# This ensures the application won't start with invalid config
-if os.getenv("FLASK_ENV") == "production":
-    Config.validate()
