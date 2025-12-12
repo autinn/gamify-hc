@@ -347,7 +347,9 @@ class ProgressService:
                     if total_repetitions > 0 else 0.0
                 )
                 
-                labels.append(unit.title)
+                # Format labels as "Unit 1", "Unit 2", etc. based on order_index
+                label = f"Unit {unit.order_index + 1}" if unit.order_index is not None else unit.title
+                labels.append(label)
                 values.append(success_rate)
             
             return {
