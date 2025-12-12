@@ -8,12 +8,9 @@ This directory contains tests for the Gamify-HC frontend using **Vitest** and **
 src/__tests__/
 ├── setup.js              # Global test configuration
 ├── testUtils.js          # Shared test utilities and mocks
-├── services/             # Service unit tests (6 files)
-├── hooks/                # Hook unit tests (7 files)
-├── pages/                # Page integration tests (6 files)
-├── components/           # Component tests
-├── integration/          # Additional integration tests
-└── utils/                # Utility tests
+├── services/             # Service unit tests (7 files)
+├── hooks/                # Hook unit tests (8 files)
+└── pages/                # Page integration tests (5 files)
 ```
 
 ## Running Tests
@@ -25,13 +22,19 @@ npm run test:coverage # Generate coverage report
 npm test -- --watch   # Watch mode
 ```
 
+## Test Coverage
+
+**Frontend unit & component tests** provide fast feedback during development and catch regressions early.
+
+**Full end-to-end integration tests** are handled in the CI/CD pipeline via Docker Compose, which starts both frontend and backend services and validates the complete system workflow. See `.github/workflows/ci.yaml` for details.
+
 ## Test Files
 
-**Services (6)**: authService, dataMappers, courseService, unitService, conceptService, quizService
+**Services (7)**: authService, dataMappers, courseService, unitService, conceptService, progressService, quizService
 
-**Hooks (7)**: useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser
+**Hooks (8)**: useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser, useProgress
 
-**Pages (6)**: MainPage, LoginPage, RegisterPage, CoursePage, UnitPage, ConceptPage, QuizPage
+**Pages (5)**: LoginPage, RegisterPage, CoursePage, UnitPage, MainPage
 
 ## Writing Tests
 
