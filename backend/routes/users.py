@@ -18,8 +18,7 @@ from flask import Blueprint, jsonify, request
 
 from backend.utils.database_manager import get_db
 from backend.routes.auth import jwt_required
-from backend.services.user_service import UserService
-from backend.services.user_progress_service import UserProgressService
+from backend.services.user import UserService, UserProgressService
 from backend.decorators import handle_errors, validate_json
 
 # Create blueprint for user-related routes

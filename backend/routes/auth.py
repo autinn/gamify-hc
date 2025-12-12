@@ -22,8 +22,8 @@ from backend.decorators import (
     validate_json,
     handle_errors
 )
-from backend.services.auth_service import AuthService
-from backend.services.user_service import UserService
+from backend.services.auth import AuthService
+from backend.services.user import UserService
 from backend.utils.database_manager import get_db
 
 # Create blueprint for authentication-related routes

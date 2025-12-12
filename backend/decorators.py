@@ -15,7 +15,7 @@ from typing import Callable, List, Any
 
 from flask import request, jsonify
 
-from backend.services.auth_service import AuthService
+from backend.services.auth import AuthService
 
 
 def jwt_required(auth_service: AuthService) -> Callable:
