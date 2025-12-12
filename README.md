@@ -60,12 +60,53 @@ docker compose down -v
 
 ### Environment Variables
 
-You can customize the application with environment variables:
+The application can be customized using environment variables. A template file `.env.example` is provided with all available options.
 
-```bash
-# Set JWT secret for production
-JWT_SECRET_KEY=your-secure-secret docker compose up
-```
+#### Setup for Development
+
+1. **Copy the example file**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` file** with your values (optional - defaults work for development):
+   ```bash
+   # Database Configuration
+   DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc
+   
+   # Flask Configuration
+   FLASK_DEBUG=True
+   FLASK_HOST=0.0.0.0
+   FLASK_PORT=5001
+   
+   # JWT Configuration (CHANGE IN PRODUCTION!)
+   JWT_SECRET_KEY=dev-secret-key-change-in-production
+   ```
+
+3. **For Docker**: Pass variables to docker-compose:
+   ```bash
+   # Set JWT secret for production
+   JWT_SECRET_KEY=your-secure-secret docker compose up
+   ```
+
+#### Available Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://gamify:gamify_secret@localhost:5432/gamify_hc` |
+| `FLASK_DEBUG` | Enable Flask debug mode | `True` |
+| `FLASK_HOST` | Server host address | `0.0.0.0` |
+| `FLASK_PORT` | Server port number | `5001` |
+| `FLASK_ENV` | Flask environment | `development` |
+| `JWT_SECRET_KEY` | Secret key for JWT tokens (**MUST change in production**) | `dev-secret-key-change-in-production` |
+| `JWT_ALGORITHM` | JWT encoding algorithm | `HS256` |
+| `JWT_EXPIRATION_HOURS` | JWT token expiration time | `24` |
+| `SQLALCHEMY_ECHO` | Enable SQL query logging | `False` |
+| `AUTO_SEED_DATABASE` | Auto-seed database if empty | `True` |
+
+For a complete list with detailed descriptions, see `.env.example`.
+
+**⚠️ Security Warning**: Never commit your `.env` file to version control. The `.env` file is already in `.gitignore`.
 
 ---
 
@@ -83,6 +124,12 @@ For development, you may want to run the services directly on your machine inste
    ```
    This starts only the PostgreSQL container. The backend and frontend will run directly on your machine.
 
+2. **Set up environment variables** (optional):
+   ```bash
+   cp .env.example .env
+   # Edit .env if you need to customize any values
+   ```
+
 ### 1. Install Python Dependencies
 ```bash
 python3 -m venv venv
@@ -91,9 +138,20 @@ pip install -r requirements.txt
 ```
 
 ### 2. Start Backend API
+
+**Using the .env file (recommended)**:
+```bash
+# Copy and edit .env file
+cp .env.example .env
+# The backend automatically loads .env via python-dotenv
+python run.py
+```
+
+**Or set environment variables explicitly**:
 ```bash
 DATABASE_URL="postgresql://gamify:gamify_secret@localhost:5432/gamify_hc" python run.py
 ```
+
 ✅ API runs at: **http://localhost:5001**
 
 The database will be automatically created and seeded on first run.

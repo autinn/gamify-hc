@@ -10,20 +10,11 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer
 
+# Remove the try/except fallback - just import Config directly
+from backend.config import Config
 
-def _str_to_bool(value: Optional[str], default: bool = False) -> bool:
-    """Convert common string representations to boolean values."""
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "t", "yes", "y"}
-
-
-# PostgreSQL is required - no SQLite fallback
-DEFAULT_DATABASE_URL = os.getenv("DATABASE_URL")
-DEFAULT_SQLALCHEMY_ECHO = _str_to_bool(
-    os.getenv("SQLALCHEMY_ECHO"),
-    default=False,
-)
+DEFAULT_DATABASE_URL = Config.DATABASE_URL
+DEFAULT_SQLALCHEMY_ECHO = Config.SQLALCHEMY_ECHO
 
 
 def _resolve_database_url(database_url: Optional[str]) -> str:
@@ -37,7 +28,8 @@ def _resolve_database_url(database_url: Optional[str]) -> str:
         raise ValueError(
             "DATABASE_URL environment variable is required. "
             "Start PostgreSQL with: docker compose up postgres -d\n"
-            "Then set: DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc"
+            "Then set DATABASE_URL in your .env file or environment. "
+            "See .env.example for the format."
         )
     return url
 
@@ -79,15 +71,15 @@ def create_database(
     """
     database_url = _resolve_database_url(database_url)
     echo_flag = _resolve_echo(echo)
-    
+
     # PostgreSQL connection pool configuration
     engine = create_engine(
         database_url,
         echo=echo_flag,
-        pool_size=10,
-        max_overflow=20,
-        pool_pre_ping=True,
-        pool_recycle=300,  # Recycle connections after 5 min
+        pool_size=Config.SQLALCHEMY_POOL_SIZE,
+        max_overflow=Config.SQLALCHEMY_MAX_OVERFLOW,
+        pool_pre_ping=Config.SQLALCHEMY_POOL_PRE_PING,
+        pool_recycle=Config.SQLALCHEMY_POOL_RECYCLE,
     )
     
     # Create all tables (if they don't exist)

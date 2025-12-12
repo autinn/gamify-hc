@@ -11,7 +11,6 @@ Endpoints:
     GET /api/auth/me: Get current user info (requires authentication)
 """
 
-import os
 import re
 from datetime import datetime, timedelta
 from functools import wraps
@@ -21,6 +20,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from backend.config import Config
 from backend.database.models import User
 from backend.utils.database_manager import get_db
 
@@ -28,12 +28,11 @@ from backend.utils.database_manager import get_db
 # All routes in this blueprint will be prefixed with '/api'
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
-# JWT configuration
-JWT_SECRET_KEY = os.getenv(
-    'JWT_SECRET_KEY', 'dev-secret-key-change-in-production'
-)
-JWT_ALGORITHM = 'HS256'
-JWT_EXPIRATION_HOURS = 24
+# Load JWT configuration from centralized config
+jwt_config = Config.get_jwt_config()
+JWT_SECRET_KEY = jwt_config['secret_key']
+JWT_ALGORITHM = jwt_config['algorithm']
+JWT_EXPIRATION_HOURS = jwt_config['expiration_hours']
 
 
 def create_token(user_id):
