@@ -279,14 +279,13 @@ class ProgressService:
                     user_id, course.course_id
                 )
                 
-                # Calculate success rate
+                # Calculate success rate using repetitions (total attempts)
                 total_success = sum(p.success_count for p in progress)
-                total_failure = sum(p.failure_count for p in progress)
-                total_attempts = total_success + total_failure
+                total_repetitions = sum(p.repetitions for p in progress)
                 
                 success_rate = (
-                    total_success / total_attempts
-                    if total_attempts > 0 else 0.0
+                    total_success / total_repetitions
+                    if total_repetitions > 0 else 0.0
                 )
                 
                 labels.append(course.title)
@@ -328,7 +327,7 @@ class ProgressService:
                 CourseRepository
             )
             course_repo = CourseRepository(self.progress_repo.session)
-            units = course_repo.get_course_units(course_id)
+            units = course_repo.get_units_by_course(course_id)
             
             labels = []
             values = []
@@ -339,14 +338,13 @@ class ProgressService:
                     user_id, unit.unit_id
                 )
                 
-                # Calculate success rate
+                # Calculate success rate using repetitions (total attempts)
                 total_success = sum(p.success_count for p in progress)
-                total_failure = sum(p.failure_count for p in progress)
-                total_attempts = total_success + total_failure
+                total_repetitions = sum(p.repetitions for p in progress)
                 
                 success_rate = (
-                    total_success / total_attempts
-                    if total_attempts > 0 else 0.0
+                    total_success / total_repetitions
+                    if total_repetitions > 0 else 0.0
                 )
                 
                 labels.append(unit.title)
@@ -390,7 +388,7 @@ class ProgressService:
                 CourseRepository
             )
             course_repo = CourseRepository(self.progress_repo.session)
-            concepts = course_repo.get_unit_concepts(unit_id)
+            concepts = course_repo.get_concepts_by_unit(unit_id)
             
             labels = []
             values = []
@@ -401,14 +399,13 @@ class ProgressService:
                     user_id, concept.concept_id
                 )
                 
-                # Calculate success rate
+                # Calculate success rate using repetitions (total attempts)
                 total_success = sum(p.success_count for p in progress)
-                total_failure = sum(p.failure_count for p in progress)
-                total_attempts = total_success + total_failure
+                total_repetitions = sum(p.repetitions for p in progress)
                 
                 success_rate = (
-                    total_success / total_attempts
-                    if total_attempts > 0 else 0.0
+                    total_success / total_repetitions
+                    if total_repetitions > 0 else 0.0
                 )
                 
                 labels.append(concept.title)

@@ -28,13 +28,12 @@ class UserProgressResponse:
         Returns:
             UserProgressResponse instance
         """
-        total_attempts = (
-            user_card.success_count + user_card.failure_count
-        )
+        # Use repetitions for times_seen (tracks all attempts + retries)
+        times_seen = user_card.repetitions
         
         return cls(
             quiz_card_id=user_card.quiz_card_id,
-            times_seen=total_attempts,
+            times_seen=times_seen,
             times_correct=user_card.success_count,
             last_seen=(
                 user_card.last_reviewed.isoformat()

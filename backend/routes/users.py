@@ -57,10 +57,10 @@ def get_user_progress(user_id):
             }), 403
         
         progress_service = get_progress_service()
-        progress = progress_service.get_user_progress_summary(user_id)
+        progress_records = progress_service.get_user_progress_all(user_id)
         progress_data = [
-            UserProgressResponse.from_dict(p).to_dict()
-            for p in progress
+            UserProgressResponse.from_user_card(card).to_dict()
+            for card in progress_records
         ]
         return jsonify(progress_data), 200
         

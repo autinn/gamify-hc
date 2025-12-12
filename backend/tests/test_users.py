@@ -200,6 +200,7 @@ class TestGetUserProgress:
             quiz_card_id=sample_quiz_card.quiz_card_id,
             success_count=5,
             failure_count=2,
+            repetitions=7,  # Total attempts (success + failure)
             last_reviewed=datetime.utcnow()
         )
         clean_db.add(user_card)
@@ -577,10 +578,13 @@ class TestGetProgressByLevel:
         assert data['labels'] == []
         assert data['values'] == []
 
-    def test_progress_success_rate_calculation(self, test_client, db_session, sample_user, 
-                                              sample_course, sample_unit, sample_concept, sample_quiz_card):
+    def test_progress_success_rate_calculation(
+        self, test_client, db_session, sample_user,
+        sample_course, sample_unit, sample_concept, sample_quiz_card
+    ):
         """
-        Test that success rates are correctly calculated as success_count / repetitions.
+        Test that success rates are correctly calculated as
+        success_count / repetitions.
 
         Verifies:
         - User with 3 successes out of 5 repetitions returns 0.6
@@ -595,7 +599,16 @@ class TestGetProgressByLevel:
         if user_card:
             user_card.success_count = 3
             user_card.repetitions = 5
-            db_session.commit()
+        else:
+            # Create new user card if it doesn't exist
+            user_card = UserCard(
+                user_id=sample_user.user_id,
+                quiz_card_id=sample_quiz_card.quiz_card_id,
+                success_count=3,
+                repetitions=5
+            )
+            db_session.add(user_card)
+        db_session.commit()
 
         token = create_auth_token(sample_user.user_id)
         response = test_client.get(
@@ -608,4 +621,10 @@ class TestGetProgressByLevel:
 
         # Verify success rate calculation (3/5 = 0.6)
         if data['values']:
-            assert data['values'][0] == 0.6
+            # Find the index of the course we care about
+            course_index = (
+                data['labels'].index(sample_course.title)
+                if sample_course.title in data['labels']
+                else 0
+            )
+            assert data['values'][course_index] == 0.6
