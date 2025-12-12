@@ -11,6 +11,10 @@ environment. See .env.example for available configuration options.
 
 import os
 from typing import Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
 
 
 def _str_to_bool(value: Optional[str], default: bool = False) -> bool:

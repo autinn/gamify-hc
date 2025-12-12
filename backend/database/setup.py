@@ -86,28 +86,14 @@ def create_database(
     database_url = _resolve_database_url(database_url)
     echo_flag = _resolve_echo(echo)
 
-    # Load pool configuration from Config if available
-    try:
-        from backend.config import Config
-        pool_size = Config.SQLALCHEMY_POOL_SIZE
-        max_overflow = Config.SQLALCHEMY_MAX_OVERFLOW
-        pool_pre_ping = Config.SQLALCHEMY_POOL_PRE_PING
-        pool_recycle = Config.SQLALCHEMY_POOL_RECYCLE
-    except ImportError:
-        # Fallback defaults
-        pool_size = 10
-        max_overflow = 20
-        pool_pre_ping = True
-        pool_recycle = 300
-
     # PostgreSQL connection pool configuration
     engine = create_engine(
         database_url,
         echo=echo_flag,
-        pool_size=pool_size,
-        max_overflow=max_overflow,
-        pool_pre_ping=pool_pre_ping,
-        pool_recycle=pool_recycle,
+        pool_size=Config.SQLALCHEMY_POOL_SIZE,
+        max_overflow=Config.SQLALCHEMY_MAX_OVERFLOW,
+        pool_pre_ping=Config.SQLALCHEMY_POOL_PRE_PING,
+        pool_recycle=Config.SQLALCHEMY_POOL_RECYCLE,
     )
     
     # Create all tables (if they don't exist)

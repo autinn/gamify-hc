@@ -47,7 +47,7 @@
    # ... etc
    ```
 
-3. **Run the app** - it will automatically load from `.env`:
+3. **Run the app** - `.env` file is automatically loaded by python-dotenv:
    ```bash
    python run.py
    ```

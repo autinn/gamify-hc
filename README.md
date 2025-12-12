@@ -139,13 +139,15 @@ pip install -r requirements.txt
 
 ### 2. Start Backend API
 
-**Option 1: Using environment variables from .env file**
+**Using the .env file (recommended)**:
 ```bash
-# Load .env and run (if you have python-dotenv installed)
+# Copy and edit .env file
+cp .env.example .env
+# The backend automatically loads .env via python-dotenv
 python run.py
 ```
 
-**Option 2: Explicit environment variable**
+**Or set environment variables explicitly**:
 ```bash
 DATABASE_URL="postgresql://gamify:gamify_secret@localhost:5432/gamify_hc" python run.py
 ```
