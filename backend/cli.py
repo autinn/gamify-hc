@@ -148,7 +148,6 @@ def create_user(username, email, password):
     Useful for creating test accounts or admin users.
     """
     try:
-        settings = get_settings()
         logger.info("Creating new user...")
         
         engine, Session = create_database(auto_seed=False)
