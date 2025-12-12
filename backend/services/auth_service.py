@@ -109,8 +109,8 @@ class AuthService:
             logger.warning(f"Registration failed: email '{email}' exists")
             raise ValueError('Email already exists')
         
-        # Hash password
-        password_hash = generate_password_hash(password)
+        # Hash password using pbkdf2:sha256 (compatible with all Python versions)
+        password_hash = generate_password_hash(password, method='pbkdf2:sha256')
         
         # Create user
         user = self.user_repo.create_user(username, email, password_hash)
@@ -309,7 +309,9 @@ class AuthService:
             raise ValueError('Invalid old password')
         
         # Hash and set new password
-        new_hash = generate_password_hash(new_password)
+        new_hash = generate_password_hash(
+            new_password, method='pbkdf2:sha256'
+        )
         user.password_hash = new_hash
         self.user_repo.commit()
         

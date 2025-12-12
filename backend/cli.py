@@ -183,7 +183,9 @@ def create_user(username, email, password):
             new_user = User(
                 username=username,
                 email=email,
-                password_hash=generate_password_hash(password)
+                password_hash=generate_password_hash(
+                    password, method='pbkdf2:sha256'
+                )
             )
             
             session.add(new_user)

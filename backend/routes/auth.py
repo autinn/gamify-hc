@@ -210,8 +210,7 @@ def login():
         )
 
         # 3. Serialize response
-        user_response = UserResponse.from_model(user)
-        token_response = TokenResponse(token=token, user=user_response)
+        token_response = TokenResponse.from_user_and_token(user, token)
 
         logger.info(f'User logged in successfully: {user.username}')
         return jsonify(token_response.to_dict()), 200

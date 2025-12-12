@@ -96,6 +96,25 @@ class QuizRepository(BaseRepository[QuizCard]):
             .all()
         )
 
+    def get_answer_by_id(self, answer_id: int) -> Optional[QuizAnswer]:
+        """
+        Get an answer by its ID.
+        
+        Args:
+            answer_id: Answer unique identifier
+            
+        Returns:
+            QuizAnswer instance or None if not found
+            
+        Example:
+            >>> answer = quiz_repo.get_answer_by_id(105)
+        """
+        return (
+            self.session.query(QuizAnswer)
+            .filter(QuizAnswer.answer_id == answer_id)
+            .first()
+        )
+
     def get_quiz_cards_by_course(self, course_id: int) -> List[QuizCard]:
         """
         Get all quiz cards for a specific course.

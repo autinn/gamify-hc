@@ -86,17 +86,12 @@ class CourseService:
             course_id: Course unique identifier
             
         Returns:
-            List of Unit instances ordered by order_index
-            
-        Raises:
-            ValueError: If course not found
+            List of Unit instances ordered by order_index.
+            Returns empty list if course doesn't exist.
             
         Example:
             >>> units = course_service.get_course_units(1)
         """
-        # Verify course exists
-        self.get_course_by_id(course_id)
-        
         logger.debug(f"Fetching units for course: {course_id}")
         units = self.course_repo.get_units_by_course(course_id)
         logger.info(f"Retrieved {len(units)} units for course {course_id}")
@@ -136,17 +131,12 @@ class CourseService:
             unit_id: Unit unique identifier
             
         Returns:
-            List of Concept instances
-            
-        Raises:
-            ValueError: If unit not found
+            List of Concept instances.
+            Returns empty list if unit doesn't exist.
             
         Example:
             >>> concepts = course_service.get_unit_concepts(5)
         """
-        # Verify unit exists
-        self.get_unit_by_id(unit_id)
-        
         logger.debug(f"Fetching concepts for unit: {unit_id}")
         concepts = self.course_repo.get_concepts_by_unit(unit_id)
         logger.info(f"Retrieved {len(concepts)} concepts for unit {unit_id}")

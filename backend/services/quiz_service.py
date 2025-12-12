@@ -150,7 +150,8 @@ class QuizService:
         self,
         user_id: int,
         quiz_card_id: int,
-        is_correct: bool
+        is_correct: bool,
+        is_first_attempt: bool = True
     ) -> UserCard:
         """
         Submit a quiz answer and update user progress.
@@ -162,12 +163,16 @@ class QuizService:
             user_id: User unique identifier
             quiz_card_id: Quiz card unique identifier
             is_correct: Whether answer was correct
+            is_first_attempt: Whether this is the first attempt (default True)
+                             If False and is_correct=True, won't count as success
             
         Returns:
             Updated UserCard instance
             
         Example:
-            >>> user_card = quiz_service.submit_quiz_answer(42, 10, True)
+            >>> user_card = quiz_service.submit_quiz_answer(
+            ...     42, 10, True, is_first_attempt=True
+            ... )
             >>> print(f"Next review: {user_card.due_date}")
         """
         logger.debug(
@@ -186,11 +191,14 @@ class QuizService:
             user_card = self._create_new_user_card(
                 user_id,
                 quiz_card_id,
-                is_correct
+                is_correct,
+                is_first_attempt
             )
         else:
             # Update existing card
-            user_card = self._update_user_card(user_card, is_correct)
+            user_card = self._update_user_card(
+                user_card, is_correct, is_first_attempt
+            )
         
         self.progress_repo.commit()
         
@@ -206,12 +214,16 @@ class QuizService:
         self,
         user_id: int,
         quiz_card_id: int,
-        is_correct: bool
+        is_correct: bool,
+        is_first_attempt: bool = True
     ) -> UserCard:
         """Create a new UserCard for first-time quiz attempt."""
         now = datetime.utcnow()
         
-        if is_correct:
+        # Only count as success if correct AND first attempt
+        counts_as_success = is_correct and is_first_attempt
+        
+        if counts_as_success:
             # First success: review in 1 day
             interval_days = 1
             ease_factor = 2.5
@@ -219,12 +231,14 @@ class QuizService:
             failure_count = 0
             repetitions = 1
         else:
-            # First failure: review immediately
+            # First failure or retry: review immediately
             interval_days = 0
             ease_factor = 2.5
             success_count = 0
-            failure_count = 1
-            repetitions = 0
+            # Only count as failure if it's a first attempt
+            failure_count = 1 if is_first_attempt else 0
+            # Always count as seen (repetitions = 1)
+            repetitions = 1
         
         due_date = now + timedelta(days=interval_days)
         
@@ -243,18 +257,25 @@ class QuizService:
     def _update_user_card(
         self,
         user_card: UserCard,
-        is_correct: bool
+        is_correct: bool,
+        is_first_attempt: bool = True
     ) -> UserCard:
         """Update existing UserCard using spaced repetition algorithm."""
         now = datetime.utcnow()
         
+        # Always increment repetitions to track times seen
+        user_card.repetitions += 1
+        
+        # Only count as success if correct AND first attempt
+        counts_as_success = is_correct and is_first_attempt
+        
         # Update success/failure counts
-        if is_correct:
+        if counts_as_success:
             user_card.success_count += 1
-            user_card.repetitions += 1
-        else:
+        elif not is_correct and is_first_attempt:
+            # Only count as failure if it's a first attempt
             user_card.failure_count += 1
-            user_card.repetitions = 0  # Reset repetitions on failure
+        # If not first attempt, don't update success/failure counts
         
         # Calculate new ease factor and interval
         user_card.ease_factor, user_card.interval_days = (
@@ -262,7 +283,7 @@ class QuizService:
                 user_card.ease_factor,
                 user_card.interval_days,
                 user_card.repetitions,
-                is_correct
+                counts_as_success
             )
         )
         
@@ -336,3 +357,39 @@ class QuizService:
             f"User {user_id} has {len(due_cards)} cards due"
         )
         return due_cards
+
+    def check_answer_correctness(self, answer_id: int) -> bool:
+        """
+        Check if a quiz answer is correct.
+        
+        Args:
+            answer_id: Answer unique identifier
+            
+        Returns:
+            True if answer is correct, False otherwise
+            
+        Raises:
+            ValueError: If answer not found
+        """
+        answer = self.quiz_repo.get_answer_by_id(answer_id)
+        if not answer:
+            raise ValueError(f'Answer {answer_id} not found')
+        return answer.is_correct
+
+    def get_answer_explanation(self, answer_id: int) -> Optional[str]:
+        """
+        Get explanation for an answer.
+        
+        Args:
+            answer_id: Answer unique identifier
+            
+        Returns:
+            Explanation string or None
+            
+        Raises:
+            ValueError: If answer not found
+        """
+        answer = self.quiz_repo.get_answer_by_id(answer_id)
+        if not answer:
+            raise ValueError(f'Answer {answer_id} not found')
+        return answer.explanation

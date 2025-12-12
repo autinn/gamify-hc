@@ -137,7 +137,9 @@ class TestGetUser:
         user = User(
             username='timestampuser',
             email='timestampuser@minerva.edu',
-            password_hash=generate_password_hash('password'),
+            password_hash=generate_password_hash(
+                'password', method='pbkdf2:sha256'
+            ),
             created_at=datetime.utcnow()
         )
         clean_db.add(user)

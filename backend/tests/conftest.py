@@ -90,9 +90,13 @@ def clean_db(db_session):
 
 
 @pytest.fixture
-def test_client(test_engine, test_session_factory, test_database_url):
+def test_client(test_engine, test_session_factory, test_database_url, monkeypatch):
     """Create a test Flask client with shared database engine."""
     from backend.utils.database_manager import DatabaseManager
+    
+    # Set DATABASE_URL environment variable for Settings to work
+    monkeypatch.setenv("DATABASE_URL", test_database_url)
+    monkeypatch.setenv("FLASK_ENV", "testing")
     
     # Create DatabaseManager with shared engine
     db_manager = DatabaseManager(
@@ -201,7 +205,9 @@ def sample_user(clean_db):
     user = User(
         username="test_user",
         email="test@minerva.edu",
-        password_hash=generate_password_hash("test_password")
+        password_hash=generate_password_hash(
+            "test_password", method='pbkdf2:sha256'
+        )
     )
     clean_db.add(user)
     clean_db.commit()
@@ -339,7 +345,9 @@ def populated_test_data(clean_db):
     user = User(
         username="populated_user",
         email="populated@minerva.edu",
-        password_hash=generate_password_hash("test_password")
+        password_hash=generate_password_hash(
+            "test_password", method='pbkdf2:sha256'
+        )
     )
     clean_db.add(user)
     clean_db.commit()

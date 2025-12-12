@@ -12,8 +12,8 @@ def validate_quiz_submission(data: dict) -> None:
     
     Rules:
     - quiz_card_id is required and must be an integer
-    - selected_answer_id is required and must be an integer
-    - is_correct is required and must be a boolean
+    - answer_id is required and must be an integer
+    - is_first_attempt is optional and must be a boolean
     
     Args:
         data: Quiz submission data dictionary
@@ -24,8 +24,8 @@ def validate_quiz_submission(data: dict) -> None:
     Example:
         >>> data = {
         ...     'quiz_card_id': 42,
-        ...     'selected_answer_id': 105,
-        ...     'is_correct': True
+        ...     'answer_id': 105,
+        ...     'is_first_attempt': True
         ... }
         >>> validate_quiz_submission(data)  # OK
     """
@@ -34,7 +34,7 @@ def validate_quiz_submission(data: dict) -> None:
     
     # Validate quiz_card_id
     if 'quiz_card_id' not in data:
-        raise ValidationError('quiz_card_id is required')
+        raise ValidationError('Missing required field: quiz_card_id')
     
     if not isinstance(data['quiz_card_id'], int):
         raise ValidationError('quiz_card_id must be an integer')
@@ -42,22 +42,20 @@ def validate_quiz_submission(data: dict) -> None:
     if data['quiz_card_id'] <= 0:
         raise ValidationError('quiz_card_id must be positive')
     
-    # Validate selected_answer_id
-    if 'selected_answer_id' not in data:
-        raise ValidationError('selected_answer_id is required')
+    # Validate answer_id
+    if 'answer_id' not in data:
+        raise ValidationError('Missing required field: answer_id')
     
-    if not isinstance(data['selected_answer_id'], int):
-        raise ValidationError('selected_answer_id must be an integer')
+    if not isinstance(data['answer_id'], int):
+        raise ValidationError('answer_id must be an integer')
     
-    if data['selected_answer_id'] <= 0:
-        raise ValidationError('selected_answer_id must be positive')
+    if data['answer_id'] <= 0:
+        raise ValidationError('answer_id must be positive')
     
-    # Validate is_correct
-    if 'is_correct' not in data:
-        raise ValidationError('is_correct is required')
-    
-    if not isinstance(data['is_correct'], bool):
-        raise ValidationError('is_correct must be a boolean')
+    # Validate is_first_attempt (optional)
+    if 'is_first_attempt' in data:
+        if not isinstance(data['is_first_attempt'], bool):
+            raise ValidationError('is_first_attempt must be a boolean')
 
 
 def validate_positive_id(id_value: int, field_name: str = 'id') -> None:

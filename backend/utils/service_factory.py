@@ -71,4 +71,5 @@ def get_progress_service() -> ProgressService:
     """
     session = get_db()
     progress_repo = ProgressRepository(session)
-    return ProgressService(progress_repo)
+    quiz_repo = QuizRepository(session)
+    return ProgressService(progress_repo, quiz_repo)

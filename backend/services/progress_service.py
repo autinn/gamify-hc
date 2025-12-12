@@ -245,6 +245,189 @@ class ProgressService:
         )
         return []
 
+    def get_courses_progress_chart_data(self, user_id: int) -> Dict:
+        """
+        Get chart-formatted progress data for all courses.
+        
+        Returns data in format suitable for frontend charts:
+        {labels: ['Course 1', 'Course 2'], values: [0.75, 0.82]}
+        
+        Args:
+            user_id: User unique identifier
+            
+        Returns:
+            Dictionary with labels and values arrays
+        """
+        logger.debug(
+            f"Fetching chart data for all courses: user={user_id}"
+        )
+        
+        try:
+            # Get all courses with quiz cards
+            from backend.repositories.course_repository import (
+                CourseRepository
+            )
+            course_repo = CourseRepository(self.progress_repo.session)
+            all_courses = course_repo.get_all_courses()
+            
+            labels = []
+            values = []
+            
+            for course in all_courses:
+                # Get progress for this course
+                progress = self.progress_repo.get_user_progress_by_course(
+                    user_id, course.course_id
+                )
+                
+                # Calculate success rate
+                total_success = sum(p.success_count for p in progress)
+                total_failure = sum(p.failure_count for p in progress)
+                total_attempts = total_success + total_failure
+                
+                success_rate = (
+                    total_success / total_attempts
+                    if total_attempts > 0 else 0.0
+                )
+                
+                labels.append(course.title)
+                values.append(success_rate)
+            
+            return {
+                'labels': labels,
+                'values': values,
+                'metadata': {
+                    'type': 'courses',
+                    'user_id': user_id
+                }
+            }
+        except Exception as e:
+            logger.error(f"Error fetching courses chart data: {str(e)}")
+            return {'labels': [], 'values': [], 'metadata': {}}
+
+    def get_units_progress_chart_data(
+        self, user_id: int, course_id: int
+    ) -> Dict:
+        """
+        Get chart-formatted progress data for all units in a course.
+        
+        Args:
+            user_id: User unique identifier
+            course_id: Course unique identifier
+            
+        Returns:
+            Dictionary with labels and values arrays
+        """
+        logger.debug(
+            f"Fetching chart data for course units: "
+            f"user={user_id}, course={course_id}"
+        )
+        
+        try:
+            # Get all units in the course
+            from backend.repositories.course_repository import (
+                CourseRepository
+            )
+            course_repo = CourseRepository(self.progress_repo.session)
+            units = course_repo.get_course_units(course_id)
+            
+            labels = []
+            values = []
+            
+            for unit in units:
+                # Get progress for this unit
+                progress = self.progress_repo.get_user_progress_by_unit(
+                    user_id, unit.unit_id
+                )
+                
+                # Calculate success rate
+                total_success = sum(p.success_count for p in progress)
+                total_failure = sum(p.failure_count for p in progress)
+                total_attempts = total_success + total_failure
+                
+                success_rate = (
+                    total_success / total_attempts
+                    if total_attempts > 0 else 0.0
+                )
+                
+                labels.append(unit.title)
+                values.append(success_rate)
+            
+            return {
+                'labels': labels,
+                'values': values,
+                'metadata': {
+                    'type': 'units',
+                    'user_id': user_id,
+                    'course_id': course_id
+                }
+            }
+        except Exception as e:
+            logger.error(f"Error fetching units chart data: {str(e)}")
+            return {'labels': [], 'values': [], 'metadata': {}}
+
+    def get_concepts_progress_chart_data(
+        self, user_id: int, course_id: int, unit_id: int
+    ) -> Dict:
+        """
+        Get chart-formatted progress data for all concepts in a unit.
+        
+        Args:
+            user_id: User unique identifier
+            course_id: Course unique identifier (for context)
+            unit_id: Unit unique identifier
+            
+        Returns:
+            Dictionary with labels and values arrays
+        """
+        logger.debug(
+            f"Fetching chart data for unit concepts: "
+            f"user={user_id}, unit={unit_id}"
+        )
+        
+        try:
+            # Get all concepts in the unit
+            from backend.repositories.course_repository import (
+                CourseRepository
+            )
+            course_repo = CourseRepository(self.progress_repo.session)
+            concepts = course_repo.get_unit_concepts(unit_id)
+            
+            labels = []
+            values = []
+            
+            for concept in concepts:
+                # Get progress for this concept
+                progress = self.progress_repo.get_user_progress_by_concept(
+                    user_id, concept.concept_id
+                )
+                
+                # Calculate success rate
+                total_success = sum(p.success_count for p in progress)
+                total_failure = sum(p.failure_count for p in progress)
+                total_attempts = total_success + total_failure
+                
+                success_rate = (
+                    total_success / total_attempts
+                    if total_attempts > 0 else 0.0
+                )
+                
+                labels.append(concept.title)
+                values.append(success_rate)
+            
+            return {
+                'labels': labels,
+                'values': values,
+                'metadata': {
+                    'type': 'concepts',
+                    'user_id': user_id,
+                    'course_id': course_id,
+                    'unit_id': unit_id
+                }
+            }
+        except Exception as e:
+            logger.error(f"Error fetching concepts chart data: {str(e)}")
+            return {'labels': [], 'values': [], 'metadata': {}}
+
     def _calculate_stats(
         self,
         progress: List[UserCard],

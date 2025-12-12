@@ -95,7 +95,7 @@ def submit_quiz_answer():
     """Submit a quiz answer and update progress."""
     try:
         data = request.get_json()
-        if not data:
+        if data is None:
             return jsonify({'error': 'Request body is required'}), 400
         
         user_id = request.user_id
@@ -106,23 +106,36 @@ def submit_quiz_answer():
             logger.info(f'Quiz validation failed: {str(e)}')
             return jsonify({'error': str(e)}), 400
         
-        submit_req = QuizSubmitRequest(
-            quiz_card_id=data['quiz_card_id'],
-            selected_answer_id=data['selected_answer_id'],
-            is_correct=data['is_correct']
+        quiz_card_id = data['quiz_card_id']
+        answer_id = data['answer_id']
+        is_first_attempt = data.get('is_first_attempt', True)
+        
+        # Get quiz service to check if answer is correct
+        quiz_service = get_quiz_service()
+        
+        # Check if the answer is correct
+        is_correct = quiz_service.check_answer_correctness(
+            answer_id
         )
         
-        quiz_service = get_quiz_service()
+        # Submit the answer with correctness and first attempt flag
         user_card = quiz_service.submit_quiz_answer(
             user_id=user_id,
-            quiz_card_id=submit_req.quiz_card_id,
-            is_correct=submit_req.is_correct
+            quiz_card_id=quiz_card_id,
+            is_correct=is_correct,
+            is_first_attempt=is_first_attempt
         )
         
-        response = QuizSubmitResponse.from_model(user_card)
+        # Get the explanation for the correct answer
+        explanation = quiz_service.get_answer_explanation(answer_id)
+        
+        response = QuizSubmitResponse.from_model_with_explanation(
+            user_card, is_correct, explanation
+        )
         logger.info(
             f'Quiz submitted: user={user_id}, '
-            f'card={submit_req.quiz_card_id}'
+            f'card={quiz_card_id}, correct={is_correct}, '
+            f'first_attempt={is_first_attempt}'
         )
         return jsonify(response.to_dict()), 200
         

@@ -274,7 +274,9 @@ class TestAuthLogin:
         user = User(
             username='loginuser',
             email='loginuser@minerva.edu',
-            password_hash=generate_password_hash('password123')
+            password_hash=generate_password_hash(
+                'password123', method='pbkdf2:sha256'
+            )
         )
         clean_db.add(user)
         clean_db.commit()
@@ -318,7 +320,9 @@ class TestAuthLogin:
         user = User(
             username='emaillogin',
             email='emaillogin@minerva.edu',
-            password_hash=generate_password_hash('password123')
+            password_hash=generate_password_hash(
+                'password123', method='pbkdf2:sha256'
+            )
         )
         clean_db.add(user)
         clean_db.commit()
@@ -369,7 +373,9 @@ class TestAuthLogin:
         user = User(
             username='wrongpass',
             email='wrongpass@minerva.edu',
-            password_hash=generate_password_hash('correctpassword')
+            password_hash=generate_password_hash(
+                'correctpassword', method='pbkdf2:sha256'
+            )
         )
         clean_db.add(user)
         clean_db.commit()
@@ -438,7 +444,9 @@ class TestAuthMe:
         user = User(
             username='currentuser',
             email='currentuser@minerva.edu',
-            password_hash=generate_password_hash('password123')
+            password_hash=generate_password_hash(
+                'password123', method='pbkdf2:sha256'
+            )
         )
         clean_db.add(user)
         clean_db.commit()

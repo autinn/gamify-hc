@@ -4,6 +4,7 @@ Data transfer objects for course hierarchy responses
 """
 
 from dataclasses import dataclass
+from typing import Optional
 
 from backend.database.models import Course, Unit, Concept
 
@@ -14,7 +15,7 @@ class CourseResponse:
     id: int
     code: str
     name: str
-    description: str
+    description: Optional[str]
 
     @classmethod
     def from_model(cls, course: Course) -> 'CourseResponse':
@@ -31,7 +32,7 @@ class CourseResponse:
             id=course.course_id,
             code=course.title,
             name=course.title,
-            description=course.description or ''
+            description=course.description
         )
 
     def to_dict(self) -> dict:
@@ -50,8 +51,8 @@ class UnitResponse:
     id: int
     course_id: int
     name: str
-    description: str
-    order_index: int
+    description: Optional[str]
+    order_index: Optional[int]
 
     @classmethod
     def from_model(cls, unit: Unit) -> 'UnitResponse':
@@ -68,8 +69,8 @@ class UnitResponse:
             id=unit.unit_id,
             course_id=unit.course_id,
             name=unit.title,
-            description=unit.description or '',
-            order_index=unit.order_index or 0
+            description=unit.description,
+            order_index=unit.order_index
         )
 
     def to_dict(self) -> dict:
@@ -89,7 +90,8 @@ class ConceptResponse:
     id: int
     unit_id: int
     name: str  # Frontend expects 'name' field
-    definition: str
+    tag: str  # Same as name (title), for backwards compatibility
+    definition: Optional[str]
 
     @classmethod
     def from_model(cls, concept: Concept) -> 'ConceptResponse':
@@ -106,7 +108,8 @@ class ConceptResponse:
             id=concept.concept_id,
             unit_id=concept.unit_id,
             name=concept.title,  # Map title to name for frontend
-            definition=concept.definition or ''
+            tag=concept.title,  # Tag same as title (backwards compatibility)
+            definition=concept.definition
         )
 
     def to_dict(self) -> dict:
@@ -115,5 +118,6 @@ class ConceptResponse:
             'id': self.id,
             'unit_id': self.unit_id,
             'name': self.name,  # Frontend expects 'name' field
+            'tag': self.tag,  # For backwards compatibility
             'definition': self.definition,
         }

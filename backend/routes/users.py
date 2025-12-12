@@ -8,10 +8,7 @@ Business logic is in backend/services/progress_service.py
 from flask import Blueprint, jsonify
 
 from backend.routes.auth import jwt_required
-from backend.schemas.user_schemas import (
-    UserProgressResponse,
-    ProgressStatsResponse,
-)
+from backend.schemas.user_schemas import UserProgressResponse
 from backend.utils.logger import get_logger
 from backend.utils.service_factory import (
     get_progress_service,
@@ -81,12 +78,10 @@ def get_course_progress():
         user_id = request.user_id
         
         progress_service = get_progress_service()
-        course_progress = progress_service.get_course_progress(user_id)
-        progress_data = [
-            ProgressStatsResponse.from_dict(p).to_dict()
-            for p in course_progress
-        ]
-        return jsonify(progress_data), 200
+        chart_data = progress_service.get_courses_progress_chart_data(
+            user_id
+        )
+        return jsonify(chart_data), 200
         
     except Exception as e:
         logger.error(f'Get course progress error: {str(e)}')
@@ -104,14 +99,10 @@ def get_unit_progress(course_id):
         user_id = request.user_id
         
         progress_service = get_progress_service()
-        unit_progress = progress_service.get_unit_progress(
+        chart_data = progress_service.get_units_progress_chart_data(
             user_id, course_id
         )
-        progress_data = [
-            ProgressStatsResponse.from_dict(p).to_dict()
-            for p in unit_progress
-        ]
-        return jsonify(progress_data), 200
+        return jsonify(chart_data), 200
         
     except Exception as e:
         logger.error(f'Get unit progress error: {str(e)}')
@@ -130,14 +121,10 @@ def get_concept_progress(course_id, unit_id):
         user_id = request.user_id
         
         progress_service = get_progress_service()
-        concept_progress = progress_service.get_concept_progress(
-            user_id, unit_id
+        chart_data = progress_service.get_concepts_progress_chart_data(
+            user_id, course_id, unit_id
         )
-        progress_data = [
-            ProgressStatsResponse.from_dict(p).to_dict()
-            for p in concept_progress
-        ]
-        return jsonify(progress_data), 200
+        return jsonify(chart_data), 200
         
     except Exception as e:
         logger.error(f'Get concept progress error: {str(e)}')

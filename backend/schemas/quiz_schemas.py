@@ -97,48 +97,44 @@ class QuizSubmitRequest:
 @dataclass
 class QuizSubmitResponse:
     """Response schema for quiz submission result."""
-    quiz_card_id: int
     is_correct: bool
-    success_count: int
-    failure_count: int
-    ease_factor: float
-    next_review_days: int
+    times_seen: int
+    times_correct: int
+    explanation: Optional[str] = None
 
     @classmethod
-    def from_user_card(cls, user_card: UserCard) -> 'QuizSubmitResponse':
+    def from_model_with_explanation(
+        cls,
+        user_card: UserCard,
+        is_correct: bool,
+        explanation: Optional[str] = None
+    ) -> 'QuizSubmitResponse':
         """
         Create QuizSubmitResponse from UserCard model.
         
         Args:
             user_card: UserCard model instance
+            is_correct: Whether the answer was correct
+            explanation: Explanation for the answer
             
         Returns:
             QuizSubmitResponse instance
         """
-        # Determine if the last answer was correct
-        # by checking if success_count increased
-        is_correct = (
-            user_card.repetitions > 0
-            if hasattr(user_card, 'repetitions')
-            else True
-        )
+        # times_seen = total attempts (tracks all including retries)
+        times_seen = user_card.repetitions
         
         return cls(
-            quiz_card_id=user_card.quiz_card_id,
             is_correct=is_correct,
-            success_count=user_card.success_count,
-            failure_count=user_card.failure_count,
-            ease_factor=user_card.ease_factor,
-            next_review_days=user_card.interval_days
+            times_seen=times_seen,
+            times_correct=user_card.success_count,
+            explanation=explanation
         )
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
-            'quiz_card_id': self.quiz_card_id,
             'is_correct': self.is_correct,
-            'success_count': self.success_count,
-            'failure_count': self.failure_count,
-            'ease_factor': self.ease_factor,
-            'next_review_days': self.next_review_days,
+            'times_seen': self.times_seen,
+            'times_correct': self.times_correct,
+            'explanation': self.explanation,
         }
