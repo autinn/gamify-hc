@@ -18,12 +18,18 @@ def _str_to_bool(value: Optional[str], default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "t", "yes", "y"}
 
 
-# PostgreSQL is required - no SQLite fallback
-DEFAULT_DATABASE_URL = os.getenv("DATABASE_URL")
-DEFAULT_SQLALCHEMY_ECHO = _str_to_bool(
-    os.getenv("SQLALCHEMY_ECHO"),
-    default=False,
-)
+# Import configuration from centralized config module
+try:
+    from backend.config import Config
+    DEFAULT_DATABASE_URL = Config.DATABASE_URL
+    DEFAULT_SQLALCHEMY_ECHO = Config.SQLALCHEMY_ECHO
+except ImportError:
+    # Fallback for cases where config module is not available
+    DEFAULT_DATABASE_URL = os.getenv("DATABASE_URL")
+    DEFAULT_SQLALCHEMY_ECHO = _str_to_bool(
+        os.getenv("SQLALCHEMY_ECHO"),
+        default=False,
+    )
 
 
 def _resolve_database_url(database_url: Optional[str]) -> str:
@@ -79,15 +85,29 @@ def create_database(
     """
     database_url = _resolve_database_url(database_url)
     echo_flag = _resolve_echo(echo)
-    
+
+    # Load pool configuration from Config if available
+    try:
+        from backend.config import Config
+        pool_size = Config.SQLALCHEMY_POOL_SIZE
+        max_overflow = Config.SQLALCHEMY_MAX_OVERFLOW
+        pool_pre_ping = Config.SQLALCHEMY_POOL_PRE_PING
+        pool_recycle = Config.SQLALCHEMY_POOL_RECYCLE
+    except ImportError:
+        # Fallback defaults
+        pool_size = 10
+        max_overflow = 20
+        pool_pre_ping = True
+        pool_recycle = 300
+
     # PostgreSQL connection pool configuration
     engine = create_engine(
         database_url,
         echo=echo_flag,
-        pool_size=10,
-        max_overflow=20,
-        pool_pre_ping=True,
-        pool_recycle=300,  # Recycle connections after 5 min
+        pool_size=pool_size,
+        max_overflow=max_overflow,
+        pool_pre_ping=pool_pre_ping,
+        pool_recycle=pool_recycle,
     )
     
     # Create all tables (if they don't exist)
