@@ -2,14 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useQuiz } from '../../hooks/useQuiz';
 import * as quizService from '../../services/quizService';
+import * as api from '../../services/api';
 
 vi.mock('../../services/quizService', () => ({
   fetchQuizByLevel: vi.fn(),
   getShuffledQuizQuestions: vi.fn()
 }));
 
-// Mock fetch globally
-global.fetch = vi.fn();
+vi.mock('../../services/api', () => ({
+  submitQuizAnswer: vi.fn()
+}));
 
 describe('useQuiz Hook', () => {
   const mockQuestions = [
@@ -23,7 +25,6 @@ describe('useQuiz Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    global.fetch.mockClear();
   });
 
   afterEach(() => {
@@ -183,11 +184,7 @@ describe('useQuiz Hook', () => {
 
   describe('Database Persistence - quiz-submit endpoint', () => {
     it('should submit answer with is_first_attempt flag', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        json: async () => ({})
-      });
-
+      api.submitQuizAnswer.mockResolvedValue({});
       quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
       quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
 
@@ -203,11 +200,11 @@ describe('useQuiz Hook', () => {
       });
 
       await waitFor(() => {
-        const quizSubmitCall = global.fetch.mock.calls.find(call => 
-          call[0] === 'http://localhost:5001/api/quiz-submit'
+        expect(api.submitQuizAnswer).toHaveBeenCalledWith(
+          expect.objectContaining({
+            is_first_attempt: true
+          })
         );
-        const body = JSON.parse(quizSubmitCall[1].body);
-        expect(body.is_first_attempt).toBe(true);
       });
 
       // Second attempt
@@ -216,18 +213,13 @@ describe('useQuiz Hook', () => {
       });
 
       await waitFor(() => {
-        const secondCall = global.fetch.mock.calls[global.fetch.mock.calls.length - 1];
-        const body = JSON.parse(secondCall[1].body);
-        expect(body.is_first_attempt).toBe(false);
+        const lastCall = api.submitQuizAnswer.mock.calls[api.submitQuizAnswer.mock.calls.length - 1];
+        expect(lastCall[0].is_first_attempt).toBe(false);
       });
     });
 
     it('should include quiz_card_id, answer_id in submission', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        json: async () => ({})
-      });
-
+      api.submitQuizAnswer.mockResolvedValue({});
       quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
       quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
 
@@ -242,21 +234,20 @@ describe('useQuiz Hook', () => {
       });
 
       await waitFor(() => {
-        const quizSubmitCall = global.fetch.mock.calls.find(call => 
-          call[0] === 'http://localhost:5001/api/quiz-submit'
+        expect(api.submitQuizAnswer).toHaveBeenCalledWith(
+          expect.objectContaining({
+            quiz_card_id: mockQuestions[0].id,
+            answer_id: 42,
+            is_first_attempt: true
+          })
         );
-        const body = JSON.parse(quizSubmitCall[1].body);
-
-        expect(body.quiz_card_id).toBe(mockQuestions[0].id);
-        expect(body.answer_id).toBe(42);
-        expect(quizSubmitCall[1].headers['Content-Type']).toBe('application/json');
       });
     });
 
     it('should handle submission errors gracefully', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      api.submitQuizAnswer.mockRejectedValueOnce(new Error('Network error'));
 
       quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
       quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
@@ -279,10 +270,7 @@ describe('useQuiz Hook', () => {
     });
 
     it('should track correctCount only on first correct attempt per question', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        json: async () => ({})
-      });
+      api.submitQuizAnswer.mockResolvedValue({});
 
       quizService.fetchQuizByLevel.mockResolvedValue(mockQuestions);
       quizService.getShuffledQuizQuestions.mockReturnValue(mockQuestions.slice(0, 5));
