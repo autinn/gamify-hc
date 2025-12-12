@@ -24,6 +24,7 @@ from backend.decorators import (
 )
 from backend.services.auth import AuthService
 from backend.services.user import UserService
+from backend.services.serializers import serialize_user
 from backend.utils.database_manager import get_db
 
 # Create blueprint for authentication-related routes
@@ -143,7 +144,7 @@ def register():
         )
 
         # Convert user to dict for response
-        user_dict = user_service.to_dict(new_user)
+        user_dict = serialize_user(new_user)
 
         return jsonify(user_dict), 201
 
@@ -194,9 +195,6 @@ def login():
     """
     db = get_db()
     try:
-        # Set database session for user service
-        user_service.db_session = db
-        
         # Parse request body
         data = request.get_json()
         if not data:
@@ -210,13 +208,13 @@ def login():
                 'error': 'Username and password are required'
             }), 400
 
-        # Authenticate user using service
-        user = user_service.authenticate_user(
+        # Authenticate user using auth service
+        user = auth_service.authenticate_user(
             username_or_email,
             password,
-            auth_service
+            db_session=db
         )
-        
+
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
 
@@ -279,7 +277,7 @@ def get_current_user():
             return jsonify({'error': 'User not found'}), 404
 
         # Convert user to dict and add onboarding status
-        user_dict = user_service.to_dict(user)
+        user_dict = serialize_user(user)
         user_dict['has_completed_onboarding'] = user.has_completed_onboarding
 
         return jsonify(user_dict), 200
