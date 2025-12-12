@@ -157,7 +157,7 @@ def populate_database(session):
                             quiz_card_id=quiz_card.quiz_card_id,
                             answer_text=answer_data['text'],
                             is_correct=answer_data['correct'],
-                            explanation=question_data['explanation']
+                            explanation=answer_data['explanation']
                         )
 
     session.commit()

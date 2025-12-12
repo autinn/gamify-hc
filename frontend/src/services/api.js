@@ -281,7 +281,7 @@ export async function getUnitProgress(courseId, unitId) {
  * Register a new user account
  * @param {string} username - Username for the account (min 3 characters)
  * @param {string} email - User's email address (must be @minerva.edu)
- * @param {string} password - User's password (min 6 characters)
+ * @param {string} password - User's password (min 8 characters)
  * @returns {Promise<Object>} Response with JWT token and user data {access_token, user_id, email, username}
  * @throws {Error} If email is already registered or validation fails
  */

@@ -34,7 +34,7 @@ describe('LoginPage - Auth Validation', () => {
   it('should reject login with short password', () => {
     const result = validateLoginForm('user@minerva.edu', 'short');
     expect(result.valid).toBe(false);
-    expect(result.error).toContain('6 characters');
+    expect(result.error).toContain('8 characters');
   });
 
   it('should handle whitespace in email', () => {

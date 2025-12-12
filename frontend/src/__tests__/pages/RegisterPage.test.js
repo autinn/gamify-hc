@@ -33,7 +33,7 @@ describe('RegisterPage - Registration Validation', () => {
    * Valid input criteria:
    * - Username: minimum 3 characters
    * - Email: must be @minerva.edu domain
-   * - Password: minimum 6 characters
+   * - Password: minimum 8 characters
    * - Password confirmation: must match password field
    */
   it('should validate complete register form', () => {
@@ -102,7 +102,7 @@ describe('RegisterPage - Registration Validation', () => {
   /**
    * Test: Reject short password
    * 
-   * Verifies minimum password length requirement (6 characters).
+   * Verifies minimum password length requirement (8 characters).
    * Ensures basic password security standards.
    */
   it('should reject short password', () => {
@@ -113,7 +113,7 @@ describe('RegisterPage - Registration Validation', () => {
       'short'
     );
     expect(result.valid).toBe(false);
-    expect(result.error).toContain('6 characters');
+    expect(result.error).toContain('8 characters');
   });
 
   /**
@@ -137,7 +137,7 @@ describe('RegisterPage - Registration Validation', () => {
    * Test: Validate with minimal input
    * 
    * Verifies that valid input passes all validation checks
-   * even with minimal allowed values (username: 3 chars, password: 6 chars).
+   * even with minimal allowed values (username: 3 chars, password: 8 chars).
    */
   it('should validate with minimal whitespace', () => {
     const result = validateRegisterForm(
