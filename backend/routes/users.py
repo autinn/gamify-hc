@@ -15,10 +15,12 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func, join
-from backend.database.models import User, UserCard, QuizCard, Concept, Unit, Course
+
 from backend.utils.database_manager import get_db
 from backend.routes.auth import jwt_required
+from backend.services.user_service import UserService
+from backend.services.user_progress_service import UserProgressService
+from backend.decorators import handle_errors, validate_json
 
 # Create blueprint for user-related routes
 # All routes in this blueprint will be prefixed with '/api'
@@ -27,6 +29,7 @@ users_bp = Blueprint('users', __name__, url_prefix='/api')
 
 @users_bp.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_user(user_id):
     """
     Retrieve a specific user by their ID.
@@ -67,27 +70,16 @@ def get_user(user_id):
                 'error': 'Forbidden: You can only access your own data'
             }), 403
 
-        # Query the database for the user with the given ID
-        user = db.query(User).filter(
-            User.user_id == user_id
-        ).first()
+        # Get user from service
+        user_service = UserService(db_session=db)
+        user = user_service.get_user_by_id(user_id)
 
         # Return 404 if user doesn't exist
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         # Build and return the user data as JSON
-        # Convert datetime to ISO format string, or None if not set
-        return jsonify({
-            'user_id': user.user_id,
-            'username': user.username,
-            'email': user.email,
-            'created_at': (
-                user.created_at.isoformat()
-                if user.created_at else None
-            ),
-            'has_completed_onboarding': user.has_completed_onboarding
-        })
+        return jsonify(user_service.to_dict(user))
     finally:
         # Always close the database session to prevent connection leaks
         db.close()
@@ -95,6 +87,7 @@ def get_user(user_id):
 
 @users_bp.route('/users/<int:user_id>/progress', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_user_progress(user_id):
     """
     Retrieve a user's quiz card progress.
@@ -141,24 +134,11 @@ def get_user_progress(user_id):
                 'error': 'Forbidden: You can only access your own data'
             }), 403
 
-        # Query all UserCard records for this user
-        # These track the user's progress on each quiz card
-        user_cards = db.query(UserCard).filter(
-            UserCard.user_id == user_id
-        ).all()
+        # Get progress from service
+        progress_service = UserProgressService(db_session=db)
+        progress = progress_service.get_user_quiz_progress(user_id)
 
-        # Build and return progress data for each quiz card
-        return jsonify([{
-            'quiz_card_id': uc.quiz_card_id,
-            # Calculate total times seen from success and failure counts
-            'times_seen': uc.success_count + uc.failure_count,
-            'times_correct': uc.success_count,
-            # Convert datetime to ISO format string, or None if not set
-            'last_seen': (
-                uc.last_reviewed.isoformat()
-                if uc.last_reviewed else None
-            )
-        } for uc in user_cards])
+        return jsonify(progress)
     finally:
         # Always close the database session to prevent connection leaks
         db.close()
@@ -166,6 +146,7 @@ def get_user_progress(user_id):
 
 @users_bp.route('/users/<int:user_id>/onboarding', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_onboarding_status(user_id):
     """
     Get user's onboarding completion status.
@@ -202,25 +183,23 @@ def get_onboarding_status(user_id):
                 'error': 'Forbidden: You can only access your own data'
             }), 403
         
-        # Query the database for the user with the given ID
-        user = db.query(User).filter(
-            User.user_id == user_id
-        ).first()
+        # Get onboarding status from service
+        progress_service = UserProgressService(db_session=db)
+        status = progress_service.get_onboarding_status(user_id)
         
         # Return 404 if user doesn't exist
-        if not user:
+        if not status:
             return jsonify({'error': 'User not found'}), 404
         
-        return jsonify({
-            'user_id': user.user_id,
-            'has_completed_onboarding': user.has_completed_onboarding
-        })
+        return jsonify(status)
     finally:
         db.close()
 
 
 @users_bp.route('/users/<int:user_id>/onboarding', methods=['PUT'])
 @jwt_required
+@handle_errors
+@validate_json(['has_completed_onboarding'])
 def update_onboarding_status(user_id):
     """
     Update user's onboarding completion status.
@@ -266,42 +245,31 @@ def update_onboarding_status(user_id):
         
         # Get request data
         data = request.get_json()
-        if not data:
-            return jsonify({'error': 'Request body is required'}), 400
-        
         has_completed = data.get('has_completed_onboarding')
+        
         if not isinstance(has_completed, bool):
             return jsonify({
                 'error': 'has_completed_onboarding must be a boolean'
             }), 400
         
-        # Query the database for the user with the given ID
-        user = db.query(User).filter(
-            User.user_id == user_id
-        ).first()
+        # Update onboarding status via service
+        progress_service = UserProgressService(db_session=db)
+        result = progress_service.update_onboarding_status(
+            user_id, has_completed
+        )
         
         # Return 404 if user doesn't exist
-        if not user:
+        if not result:
             return jsonify({'error': 'User not found'}), 404
         
-        # Update onboarding status
-        user.has_completed_onboarding = has_completed
-        db.commit()
-        db.refresh(user)
-        
-        return jsonify({
-            'user_id': user.user_id,
-            'has_completed_onboarding': user.has_completed_onboarding
-        })
-    except Exception as e:
-        db.rollback()
-        return jsonify({'error': 'Failed to update onboarding status'}), 500
+        return jsonify(result)
     finally:
         db.close()
 
 
 @users_bp.route('/progress/courses', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_courses_progress():
     """
     Get user's progress aggregated by courses.
@@ -329,48 +297,16 @@ def get_courses_progress():
     try:
         user_id = request.user_id
         
-        # Query: Group by course, sum success and repetitions (total attempts) for each course
-        # Optimized: Direct join from QuizCard.course_id (denormalized field)
-        # This eliminates unnecessary joins through Concept and Unit
-        results = db.query(
-            Course.title,
-            func.sum(UserCard.success_count).label('total_success'),
-            func.sum(UserCard.repetitions).label('total_repetitions')
-        ).join(
-            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
-        ).join(
-            Course, QuizCard.course_id == Course.course_id
-        ).filter(
-            UserCard.user_id == user_id
-        ).group_by(
-            QuizCard.course_id, Course.title
-        ).order_by(
-            QuizCard.course_id
-        ).all()
-        
-        labels = [r[0] for r in results]
-        values = []
-        for r in results:
-            success = r[1] or 0
-            total = r[2] or 0
-            rate = success / total if total > 0 else 0
-            values.append(round(rate, 2))
-        
-        return jsonify({
-            'labels': labels,
-            'values': values,
-            'metadata': {
-                'type': 'courses',
-                'count': len(labels),
-                'timestamp': None
-            }
-        })
+        # Get progress from service
+        progress_service = UserProgressService(db_session=db)
+        return jsonify(progress_service.get_courses_progress(user_id))
     finally:
         db.close()
 
 
 @users_bp.route('/progress/courses/<int:course_id>/units', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_units_progress(course_id):
     """
     Get user's progress aggregated by units in a course.
@@ -401,52 +337,18 @@ def get_units_progress(course_id):
     try:
         user_id = request.user_id
         
-        # Query: Group by unit (within course), sum success and repetitions (total attempts) for each unit
-        # Optimized: Direct join from QuizCard.unit_id (denormalized field)
-        # This eliminates unnecessary join through Concept. Course filter can happen at QuizCard level.
-        results = db.query(
-            Unit.order_index,
-            Unit.title,
-            func.sum(UserCard.success_count).label('total_success'),
-            func.sum(UserCard.repetitions).label('total_repetitions')
-        ).join(
-            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
-        ).join(
-            Unit, QuizCard.unit_id == Unit.unit_id
-        ).filter(
-            UserCard.user_id == user_id,
-            QuizCard.course_id == course_id
-        ).group_by(
-            QuizCard.unit_id, Unit.order_index, Unit.title
-        ).order_by(
-            Unit.order_index
-        ).all()
-        
-        # Format labels as "Unit 1", "Unit 2", etc. based on order_index
-        labels = [f"Unit {r[0] + 1}" if r[0] is not None else r[1] for r in results]
-        values = []
-        for r in results:
-            success = r[2] or 0
-            total = r[3] or 0
-            rate = success / total if total > 0 else 0
-            values.append(round(rate, 2))
-        
-        return jsonify({
-            'labels': labels,
-            'values': values,
-            'metadata': {
-                'type': 'units',
-                'course_id': course_id,
-                'count': len(labels),
-                'timestamp': None
-            }
-        })
+        # Get progress from service
+        progress_service = UserProgressService(db_session=db)
+        return jsonify(
+            progress_service.get_units_progress(user_id, course_id)
+        )
     finally:
         db.close()
 
 
 @users_bp.route('/progress/courses/<int:course_id>/units/<int:unit_id>/concepts', methods=['GET'])
 @jwt_required
+@handle_errors
 def get_concepts_progress(course_id, unit_id):
     """
     Get user's progress aggregated by concepts in a unit.
@@ -478,42 +380,12 @@ def get_concepts_progress(course_id, unit_id):
     try:
         user_id = request.user_id
         
-        # Query: Group by concept (within unit), sum success and repetitions (total attempts) for each concept
-        results = db.query(
-            Concept.title,
-            func.sum(UserCard.success_count).label('total_success'),
-            func.sum(UserCard.repetitions).label('total_repetitions')
-        ).join(
-            QuizCard, UserCard.quiz_card_id == QuizCard.quiz_card_id
-        ).join(
-            Concept, QuizCard.concept_id == Concept.concept_id
-        ).filter(
-            UserCard.user_id == user_id,
-            Concept.unit_id == unit_id
-        ).group_by(
-            Concept.concept_id, Concept.title
-        ).order_by(
-            Concept.concept_id
-        ).all()
-        
-        labels = [r[0] for r in results]
-        values = []
-        for r in results:
-            success = r[1] or 0
-            total = r[2] or 0
-            rate = success / total if total > 0 else 0
-            values.append(round(rate, 2))
-        
-        return jsonify({
-            'labels': labels,
-            'values': values,
-            'metadata': {
-                'type': 'concepts',
-                'course_id': course_id,
-                'unit_id': unit_id,
-                'count': len(labels),
-                'timestamp': None
-            }
-        })
+        # Get progress from service
+        progress_service = UserProgressService(db_session=db)
+        return jsonify(
+            progress_service.get_concepts_progress(
+                user_id, unit_id, course_id
+            )
+        )
     finally:
         db.close()
