@@ -50,9 +50,15 @@ export function useAuth() {
 
       // Call login API - backend accepts email in username field
       const data = await api.login(normalizedEmail, password);
+      console.log('[Auth] Login response:', {
+        hasAccessToken: !!data.access_token,
+        userId: data.user_id,
+        username: data.username
+      });
 
       // Store token and user data
       storeAuthData(data);
+      console.log('[Auth] Token stored in localStorage:', !!localStorage.getItem('token'));
 
       // Navigate to home
       navigate('/');
@@ -81,12 +87,17 @@ export function useAuth() {
 
       // Call register API
       const data = await api.register(username, normalizedEmail, password);
+      console.log('[Auth] Registration response:', {
+        hasAccessToken: !!data.access_token,
+        userId: data.user_id,
+        username: data.username,
+        email: data.email
+      });
 
-      // Store token and user data
-      storeAuthData(data);
-
-      // Navigate to home
-      navigate('/');
+      // Note: We don't store the token here since user needs to manually log in
+      // The backend returns a token, but we'll let user log in manually
+      // Navigate to login page for manual login
+      navigate('/login');
     } catch (err) {
       const errorMessage = err.data?.error || err.message || 'Registration failed. Please try again.';
       setError(errorMessage);

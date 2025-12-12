@@ -85,7 +85,8 @@ def get_user(user_id):
             'created_at': (
                 user.created_at.isoformat()
                 if user.created_at else None
-            )
+            ),
+            'has_completed_onboarding': user.has_completed_onboarding
         })
     finally:
         # Always close the database session to prevent connection leaks
@@ -160,6 +161,142 @@ def get_user_progress(user_id):
         } for uc in user_cards])
     finally:
         # Always close the database session to prevent connection leaks
+        db.close()
+
+
+@users_bp.route('/users/<int:user_id>/onboarding', methods=['GET'])
+@jwt_required
+def get_onboarding_status(user_id):
+    """
+    Get user's onboarding completion status.
+    
+    This endpoint returns whether the user has completed the onboarding guide.
+    Requires authentication and users can only access their own data.
+    
+    Args:
+        user_id (int): The unique identifier of the user
+    
+    Returns:
+        JSON response with the following structure:
+        {
+            'user_id': int,
+            'has_completed_onboarding': bool
+        }
+    
+    HTTP Status Codes:
+        200: Success - Returns onboarding status
+        401: Unauthorized - Invalid or missing token
+        403: Forbidden - User can only access their own data
+        404: Not Found - User with the given ID does not exist
+    
+    Example:
+        GET /api/users/1/onboarding
+        Headers: Authorization: Bearer <jwt_token>
+        Returns: {"user_id": 1, "has_completed_onboarding": false}
+    """
+    db = get_db()
+    try:
+        # Verify user can only access their own data
+        if request.user_id != user_id:
+            return jsonify({
+                'error': 'Forbidden: You can only access your own data'
+            }), 403
+        
+        # Query the database for the user with the given ID
+        user = db.query(User).filter(
+            User.user_id == user_id
+        ).first()
+        
+        # Return 404 if user doesn't exist
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        return jsonify({
+            'user_id': user.user_id,
+            'has_completed_onboarding': user.has_completed_onboarding
+        })
+    finally:
+        db.close()
+
+
+@users_bp.route('/users/<int:user_id>/onboarding', methods=['PUT'])
+@jwt_required
+def update_onboarding_status(user_id):
+    """
+    Update user's onboarding completion status.
+    
+    This endpoint marks the user as having completed the onboarding guide.
+    Requires authentication and users can only update their own data.
+    
+    Args:
+        user_id (int): The unique identifier of the user
+    
+    Request Body:
+        {
+            'has_completed_onboarding': bool  # True to mark as completed
+        }
+    
+    Returns:
+        JSON response with the following structure:
+        {
+            'user_id': int,
+            'has_completed_onboarding': bool
+        }
+    
+    HTTP Status Codes:
+        200: Success - Onboarding status updated
+        400: Bad Request - Invalid request body
+        401: Unauthorized - Invalid or missing token
+        403: Forbidden - User can only update their own data
+        404: Not Found - User with the given ID does not exist
+    
+    Example:
+        PUT /api/users/1/onboarding
+        Headers: Authorization: Bearer <jwt_token>
+        Body: {"has_completed_onboarding": true}
+        Returns: {"user_id": 1, "has_completed_onboarding": true}
+    """
+    db = get_db()
+    try:
+        # Verify user can only access their own data
+        if request.user_id != user_id:
+            return jsonify({
+                'error': 'Forbidden: You can only access your own data'
+            }), 403
+        
+        # Get request data
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        has_completed = data.get('has_completed_onboarding')
+        if not isinstance(has_completed, bool):
+            return jsonify({
+                'error': 'has_completed_onboarding must be a boolean'
+            }), 400
+        
+        # Query the database for the user with the given ID
+        user = db.query(User).filter(
+            User.user_id == user_id
+        ).first()
+        
+        # Return 404 if user doesn't exist
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Update onboarding status
+        user.has_completed_onboarding = has_completed
+        db.commit()
+        db.refresh(user)
+        
+        return jsonify({
+            'user_id': user.user_id,
+            'has_completed_onboarding': user.has_completed_onboarding
+        })
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': 'Failed to update onboarding status'}), 500
+    finally:
         db.close()
 
 

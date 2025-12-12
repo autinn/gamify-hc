@@ -5,7 +5,7 @@ Configuration and database initialization functions with side effects
 
 import os
 from typing import Optional, Union
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
 
 from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer
@@ -50,7 +50,6 @@ def _resolve_echo(echo: Union[bool, str, None]) -> bool:
         return _str_to_bool(echo)
     return DEFAULT_SQLALCHEMY_ECHO
 
-
 # ===============================
 # DATABASE SETUP UTILITIES
 # ===============================
@@ -91,7 +90,9 @@ def create_database(
         pool_recycle=300,  # Recycle connections after 5 min
     )
     
+    # Create all tables (if they don't exist)
     Base.metadata.create_all(engine)
+    
     Session = sessionmaker(bind=engine)
 
     # Auto-seed if database is empty

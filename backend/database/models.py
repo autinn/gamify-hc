@@ -238,6 +238,7 @@ class User(Base):
     email = Column(Text, unique=True, nullable=False)
     password_hash = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    has_completed_onboarding = Column(Boolean, default=False, nullable=False)
 
     # Relationships
     user_cards = relationship(

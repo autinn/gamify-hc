@@ -8,6 +8,8 @@ import QuizPage from './pages/QuizPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import { OnboardingProvider, useOnboardingContext } from './contexts/OnboardingContext';
+import OnboardingGuide from './components/common/OnboardingGuide';
 import { getAuthToken } from './services/api';
 import './App.css';
 
@@ -65,8 +67,9 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <OnboardingProvider>
+      <Router>
+        <Routes>
         {/* ============================================================================ */}
         {/* PUBLIC ROUTES - No authentication required */}
         {/* ============================================================================ */}
@@ -171,7 +174,36 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+      <OnboardingGuideWrapper />
+      </Router>
+    </OnboardingProvider>
+  );
+}
+
+/**
+ * OnboardingGuideWrapper - Wrapper component to access onboarding context
+ * 
+ * Renders OnboardingGuide with access to the onboarding context.
+ * Must be inside Router to use useLocation hook in OnboardingGuide.
+ */
+function OnboardingGuideWrapper() {
+  const { isActive, setIsActive, completeOnboarding, skipOnboarding } = useOnboardingContext();
+  
+  // DEBUG: Log when isActive changes in context
+  React.useEffect(() => {
+    console.log('[OnboardingGuideWrapper] 🔔 isActive in context changed to:', isActive);
+    if (isActive) {
+      console.log('[OnboardingGuideWrapper] ✅ isActive is TRUE - guide should start!');
+    }
+  }, [isActive]);
+  
+  return (
+    <OnboardingGuide
+      isActive={isActive}
+      setIsActive={setIsActive}
+      onComplete={completeOnboarding}
+      onSkip={skipOnboarding}
+    />
   );
 }
 

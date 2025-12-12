@@ -221,6 +221,10 @@ export function storeAuthData(data) {
   localStorage.setItem('user_id', data.user_id);
   localStorage.setItem('user_email', data.email);
   localStorage.setItem('user_username', data.username);
+  
+  // Dispatch custom event to notify that token was stored
+  // This helps onboarding check trigger after login/registration
+  window.dispatchEvent(new Event('token-stored'));
 }
 
 /**

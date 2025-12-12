@@ -225,6 +225,28 @@ export async function getUserProgress(userId) {
 }
 
 /**
+ * Get user's onboarding completion status
+ * @param {number} userId - The user ID
+ * @returns {Promise<Object>} Onboarding status {user_id, has_completed_onboarding}
+ */
+export async function getOnboardingStatus(userId) {
+  return apiRequest(`/users/${userId}/onboarding`);
+}
+
+/**
+ * Update user's onboarding completion status
+ * @param {number} userId - The user ID
+ * @param {boolean} hasCompleted - Whether user has completed onboarding
+ * @returns {Promise<Object>} Updated onboarding status
+ */
+export async function updateOnboardingStatus(userId, hasCompleted) {
+  return apiRequest(`/users/${userId}/onboarding`, {
+    method: 'PUT',
+    body: JSON.stringify({ has_completed_onboarding: hasCompleted }),
+  });
+}
+
+/**
  * Fetch global progress (all courses)
  * @returns {Promise<Object>} Chart data {labels, values, metadata}
  */
