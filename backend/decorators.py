@@ -194,6 +194,44 @@ def validate_json(required_fields: List[str] = None) -> Callable:
     return decorator
 
 
+def authorize_self_only(f: Callable) -> Callable:
+    """
+    Decorator to ensure users can only access their own data.
+    
+    This decorator checks that the user_id from the JWT token (stored in
+    request.user_id) matches the user_id parameter in the route URL.
+    Must be used after @jwt_required decorator.
+    
+    The decorator expects a 'user_id' keyword argument to be passed to
+    the route function (from the URL parameter).
+    
+    Example:
+        @users_bp.route('/users/<int:user_id>')
+        @jwt_required
+        @authorize_self_only
+        def get_user(user_id):
+            # Only reaches here if request.user_id == user_id
+            return jsonify({'user_id': user_id})
+    
+    Error Responses:
+        403: Forbidden - You can only access your own data
+    """
+    @wraps(f)
+    def decorated_function(*args: Any, **kwargs: Any):
+        # Get user_id from URL parameter
+        user_id = kwargs.get('user_id')
+        
+        # Check if authenticated user matches requested user
+        if user_id is not None and request.user_id != user_id:
+            return jsonify({
+                'error': 'Forbidden: You can only access your own data'
+            }), 403
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+
 def validate_request(
     required_fields: List[str] = None,
     auth_service: AuthService = None

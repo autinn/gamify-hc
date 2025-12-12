@@ -19,7 +19,8 @@ from flask import Blueprint, jsonify, request
 from backend.utils.database_manager import get_db
 from backend.routes.auth import jwt_required
 from backend.services.user import UserService, UserProgressService
-from backend.decorators import handle_errors, validate_json
+from backend.services.serializers import serialize_user
+from backend.decorators import handle_errors, validate_json, authorize_self_only
 
 # Create blueprint for user-related routes
 # All routes in this blueprint will be prefixed with '/api'
@@ -28,6 +29,7 @@ users_bp = Blueprint('users', __name__, url_prefix='/api')
 
 @users_bp.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required
+@authorize_self_only
 @handle_errors
 def get_user(user_id):
     """
@@ -63,12 +65,6 @@ def get_user(user_id):
     """
     db = get_db()
     try:
-        # Verify user can only access their own data
-        if request.user_id != user_id:
-            return jsonify({
-                'error': 'Forbidden: You can only access your own data'
-            }), 403
-
         # Get user from service
         user_service = UserService(db_session=db)
         user = user_service.get_user_by_id(user_id)
@@ -78,7 +74,7 @@ def get_user(user_id):
             return jsonify({'error': 'User not found'}), 404
 
         # Build and return the user data as JSON
-        return jsonify(user_service.to_dict(user))
+        return jsonify(serialize_user(user))
     finally:
         # Always close the database session to prevent connection leaks
         db.close()
@@ -86,6 +82,7 @@ def get_user(user_id):
 
 @users_bp.route('/users/<int:user_id>/progress', methods=['GET'])
 @jwt_required
+@authorize_self_only
 @handle_errors
 def get_user_progress(user_id):
     """
@@ -127,12 +124,6 @@ def get_user_progress(user_id):
     """
     db = get_db()
     try:
-        # Verify user can only access their own data
-        if request.user_id != user_id:
-            return jsonify({
-                'error': 'Forbidden: You can only access your own data'
-            }), 403
-
         # Get progress from service
         progress_service = UserProgressService(db_session=db)
         progress = progress_service.get_user_quiz_progress(user_id)
@@ -145,6 +136,7 @@ def get_user_progress(user_id):
 
 @users_bp.route('/users/<int:user_id>/onboarding', methods=['GET'])
 @jwt_required
+@authorize_self_only
 @handle_errors
 def get_onboarding_status(user_id):
     """
@@ -176,12 +168,6 @@ def get_onboarding_status(user_id):
     """
     db = get_db()
     try:
-        # Verify user can only access their own data
-        if request.user_id != user_id:
-            return jsonify({
-                'error': 'Forbidden: You can only access your own data'
-            }), 403
-        
         # Get onboarding status from service
         progress_service = UserProgressService(db_session=db)
         status = progress_service.get_onboarding_status(user_id)
@@ -197,6 +183,7 @@ def get_onboarding_status(user_id):
 
 @users_bp.route('/users/<int:user_id>/onboarding', methods=['PUT'])
 @jwt_required
+@authorize_self_only
 @handle_errors
 @validate_json(['has_completed_onboarding'])
 def update_onboarding_status(user_id):
@@ -236,12 +223,6 @@ def update_onboarding_status(user_id):
     """
     db = get_db()
     try:
-        # Verify user can only access their own data
-        if request.user_id != user_id:
-            return jsonify({
-                'error': 'Forbidden: You can only access your own data'
-            }), 403
-        
         # Get request data
         data = request.get_json()
         has_completed = data.get('has_completed_onboarding')
