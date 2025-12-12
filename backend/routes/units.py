@@ -1,122 +1,107 @@
 """
-Unit routes blueprint.
+Unit routes blueprint - Thin controller layer.
 
-This module handles all unit-related API endpoints for the gamify-hc
-application. It provides endpoints to retrieve unit information and
-associated concepts.
+This module handles HTTP concerns for unit-related endpoints:
+- Parse requests
+- Call service layer
+- Return responses
 
-Endpoints:
-    GET /api/units/<unit_id>: Retrieve a specific unit by ID
-    GET /api/units/<unit_id>/concepts: Retrieve all concepts for a unit
+Business logic is in backend/services/course_service.py
 """
 
 from flask import Blueprint, jsonify
-from backend.database.models import Unit, Concept
-from backend.utils.database_manager import get_db
+
+from backend.schemas.course_schemas import UnitResponse, ConceptResponse
+from backend.utils.logger import get_logger
+from backend.utils.service_factory import get_course_service
 
 # Create blueprint for unit-related routes
-# All routes in this blueprint will be prefixed with '/api'
 units_bp = Blueprint('units', __name__, url_prefix='/api')
+
+# Logger
+logger = get_logger(__name__)
 
 
 @units_bp.route('/units/<int:unit_id>', methods=['GET'])
 def get_unit(unit_id):
     """
-    Retrieve a specific unit by its ID.
-
-    This endpoint fetches unit details including its ID, course
-    association, name, description, and order index. If the unit is not
-    found, returns a 404 error.
+    Retrieve a specific unit by ID - Thin controller.
 
     Args:
-        unit_id (int): The unique identifier of the unit to retrieve
+        unit_id: Unit unique identifier
 
     Returns:
-        JSON response with the following structure:
         {
-            'id': int,           # Unit ID
-            'course_id': int,    # ID of the course this unit belongs to
-            'name': str,         # Unit name/title
-            'description': str, # Unit description
-            'order_index': int  # Display order within the course
+            'id': int,
+            'course_id': int,
+            'name': str,
+            'description': str,
+            'order_index': int
         }
 
     HTTP Status Codes:
-        200: Success - Unit found and returned
-        404: Not Found - Unit with the given ID does not exist
-
-    Example:
-        GET /api/units/1
-        Returns: {"id": 1, "course_id": 1, "name": "...", ...}
+        200: Success
+        404: Unit not found
+        500: Server error
     """
-    db = get_db()
     try:
-        unit = db.query(Unit).filter(
-            Unit.unit_id == unit_id
-        ).first()
+        # 1. Call service layer
+        course_service = get_course_service()
+        unit = course_service.get_unit_by_id(unit_id)
 
         if not unit:
             return jsonify({'error': 'Unit not found'}), 404
 
-        return jsonify({
-            'id': unit.unit_id,
-            'course_id': unit.course_id,
-            'name': unit.title,
-            'description': unit.description,
-            'order_index': unit.order_index
-        })
-    finally:
-        db.close()
+        # 2. Serialize response
+        unit_data = UnitResponse.from_model(unit).to_dict()
+
+        return jsonify(unit_data), 200
+
+    except ValueError as e:
+        logger.info(f'Unit not found: {unit_id}')
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        logger.error(f'Get unit error: {str(e)}')
+        return jsonify({'error': 'Failed to get unit'}), 500
 
 
 @units_bp.route('/units/<int:unit_id>/concepts', methods=['GET'])
 def get_unit_concepts(unit_id):
     """
-    Retrieve all concepts associated with a specific unit.
-
-    This endpoint fetches all concepts for a given unit, including their
-    IDs, names, tags, and definitions.
+    Retrieve all concepts for a unit - Thin controller.
 
     Args:
-        unit_id (int): The unique identifier of the unit whose concepts
-            should be retrieved
+        unit_id: Unit unique identifier
 
     Returns:
-        JSON response containing a list of concepts, each with the
-        following structure:
         [
             {
-                'id': int,           # Concept ID
-                'unit_id': int,      # Associated unit ID
-                'name': str,         # Concept name/title
-                'tag': str,          # Concept tag (currently uses
-                                     # title as placeholder)
-                'definition': str    # Concept definition/description
+                'id': int,
+                'unit_id': int,
+                'name': str,
+                'tag': str,
+                'definition': str
             },
             ...
         ]
 
     HTTP Status Codes:
-        200: Success - Returns list of concepts (may be empty if no
-            concepts exist for the unit)
-
-    Example:
-        GET /api/units/1/concepts
-        Returns: [{"id": 1, "unit_id": 1, "name": "...", ...}, ...]
+        200: Success
+        500: Server error
     """
-    db = get_db()
     try:
-        concepts = db.query(Concept).filter(
-            Concept.unit_id == unit_id
-        ).all()
+        # 1. Call service layer
+        course_service = get_course_service()
+        concepts = course_service.get_unit_concepts(unit_id)
 
-        return jsonify([{
-            'id': concept.concept_id,
-            'unit_id': concept.unit_id,
-            'name': concept.title,
-            # TODO: Update when tag field is added to Concept model
-            'tag': concept.title,
-            'definition': concept.definition
-        } for concept in concepts])
-    finally:
-        db.close()
+        # 2. Serialize response
+        concepts_data = [
+            ConceptResponse.from_model(c).to_dict()
+            for c in concepts
+        ]
+
+        return jsonify(concepts_data), 200
+
+    except Exception as e:
+        logger.error(f'Get unit concepts error: {str(e)}')
+        return jsonify({'error': 'Failed to get concepts'}), 500

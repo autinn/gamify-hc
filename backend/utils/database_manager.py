@@ -37,6 +37,19 @@ class DatabaseManager:
     def get_session(self) -> Session:
         """Create and return a new database session"""
         return self.SessionLocal()
+    
+    def cleanup(self):
+        """
+        Cleanup database resources during shutdown.
+        
+        Closes all active connections and disposes the engine pool.
+        Safe to call multiple times.
+        """
+        try:
+            if hasattr(self, 'engine') and self.engine:
+                self.engine.dispose()
+        except Exception:
+            pass  # Ignore errors during cleanup
 
 
 def get_db():

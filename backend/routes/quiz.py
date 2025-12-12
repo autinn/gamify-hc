@@ -1,484 +1,133 @@
 """
-Quiz routes blueprint.
+Quiz routes blueprint - Thin controller layer.
 
-This module handles all quiz-related API endpoints for the gamify-hc
-application. It provides endpoints to retrieve quiz cards and submit
-quiz answers for tracking user progress.
-
-Endpoints:
-    GET /api/quiz-cards/<quiz_card_id>: Retrieve a specific quiz card
-    GET /api/courses/<course_id>/quiz-cards: Retrieve all quiz cards
-        for a course
-    GET /api/units/<unit_id>/quiz-cards: Retrieve all quiz cards for
-        a unit
-    POST /api/quiz-submit: Submit a quiz answer and update user progress
+This module handles HTTP concerns for quiz-related endpoints.
+Business logic is in backend/services/quiz_service.py
 """
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy.exc import IntegrityError
-from backend.database.models import (
-    QuizCard, QuizAnswer, UserCard, Concept, Unit
-)
-from backend.utils.database_manager import get_db
+
 from backend.routes.auth import jwt_required
-from datetime import datetime
+from backend.schemas.quiz_schemas import (
+    QuizCardResponse,
+    QuizSubmitRequest,
+    QuizSubmitResponse,
+)
+from backend.utils.logger import get_logger
+from backend.utils.service_factory import get_quiz_service
+from backend.validators.quiz_validators import (
+    ValidationError,
+    validate_quiz_submission,
+)
 
-# Create blueprint for quiz-related routes
-# All routes in this blueprint will be prefixed with '/api'
 quiz_bp = Blueprint('quiz', __name__, url_prefix='/api')
-
-
-def _serialize_quiz_card_with_answers(quiz_card, answers):
-    """
-    Serialize a QuizCard model instance with its answers to a dictionary.
-
-    Args:
-        quiz_card (QuizCard): The quiz card model instance
-        answers (list): List of QuizAnswer instances for this quiz card
-
-    Returns:
-        dict: Serialized quiz card data with id, concept_id, question,
-            and answers
-    """
-    return {
-        'id': quiz_card.quiz_card_id,
-        'concept_id': quiz_card.concept_id,
-        'question': quiz_card.question,
-        'answers': [{
-            'id': a.answer_id,
-            'answer_text': a.answer_text,
-            'is_correct': a.is_correct,
-            'explanation': a.explanation
-        } for a in answers]
-    }
-
-
-def _get_quiz_cards_for_concepts(db, concept_ids):
-    """
-    Retrieve and serialize all quiz cards for a list of concept IDs.
-
-    Args:
-        db: Database session
-        concept_ids (list): List of concept IDs to fetch quiz cards for
-
-    Returns:
-        list: List of serialized quiz cards with their answers
-    """
-    if not concept_ids:
-        return []
-
-    quiz_cards = db.query(QuizCard).filter(
-        QuizCard.concept_id.in_(concept_ids)
-    ).all()
-
-    result = []
-    for qc in quiz_cards:
-        answers = db.query(QuizAnswer).filter(
-            QuizAnswer.quiz_card_id == qc.quiz_card_id
-        ).all()
-        result.append(_serialize_quiz_card_with_answers(qc, answers))
-
-    return result
+logger = get_logger(__name__)
 
 
 @quiz_bp.route('/quiz-cards/<int:quiz_card_id>', methods=['GET'])
 def get_quiz_card(quiz_card_id):
-    """
-    Retrieve a specific quiz card by its ID.
-
-    This endpoint fetches a quiz card with all its associated answers,
-    including correctness flags and explanations.
-
-    Args:
-        quiz_card_id (int): The unique identifier of the quiz card to
-            retrieve
-
-    Returns:
-        JSON response with the following structure:
-        {
-            'id': int,                    # Quiz card ID
-            'concept_id': int,             # Associated concept ID
-            'question': str,               # Quiz question text
-            'answers': [                   # List of possible answers
-                {
-                    'id': int,             # Answer ID
-                    'answer_text': str,    # Answer option text
-                    'is_correct': bool,    # Whether this answer is
-                                           # correct
-                    'explanation': str     # Explanation for this answer
-                },
-                ...
-            ]
-        }
-
-    HTTP Status Codes:
-        200: Success - Quiz card found and returned
-        404: Not Found - Quiz card with the given ID does not exist
-
-    Example:
-        GET /api/quiz-cards/1
-        Returns: {"id": 1, "concept_id": 1, "question": "...",
-            "answers": [...]}
-    """
-    db = get_db()
+    """Get a specific quiz card by ID."""
     try:
-        quiz_card = db.query(QuizCard).filter(
-            QuizCard.quiz_card_id == quiz_card_id
-        ).first()
-
+        quiz_service = get_quiz_service()
+        quiz_card = quiz_service.get_quiz_card_by_id(quiz_card_id)
         if not quiz_card:
             return jsonify({'error': 'Quiz card not found'}), 404
-
-        # Get all answers for this quiz card
-        answers = db.query(QuizAnswer).filter(
-            QuizAnswer.quiz_card_id == quiz_card_id
-        ).all()
-
-        return jsonify(
-            _serialize_quiz_card_with_answers(quiz_card, answers)
-        )
-    finally:
-        db.close()
+        card_data = QuizCardResponse.from_model(quiz_card).to_dict()
+        return jsonify(card_data), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        logger.error(f'Get quiz card error: {str(e)}')
+        return jsonify({'error': 'Failed to get quiz card'}), 500
 
 
 @quiz_bp.route('/courses/<int:course_id>/quiz-cards', methods=['GET'])
 def get_course_quiz_cards(course_id):
-    """
-    Retrieve all quiz cards associated with a specific course.
-
-    This endpoint fetches all quiz cards for all units within a given
-    course. It traverses the course -> units -> concepts -> quiz cards
-    hierarchy to collect all relevant quiz cards.
-
-    Args:
-        course_id (int): The unique identifier of the course whose quiz
-            cards should be retrieved
-
-    Returns:
-        JSON response containing a list of quiz cards, each with the
-        following structure:
-        [
-            {
-                'id': int,                    # Quiz card ID
-                'concept_id': int,             # Associated concept ID
-                'question': str,               # Quiz question text
-                'answers': [                   # List of possible answers
-                    {
-                        'id': int,             # Answer ID
-                        'answer_text': str,    # Answer option text
-                        'is_correct': bool,    # Whether this answer is
-                                               # correct
-                        'explanation': str     # Explanation for this
-                                               # answer
-                    },
-                    ...
-                ]
-            },
-            ...
-        ]
-
-    HTTP Status Codes:
-        200: Success - Returns list of quiz cards (may be empty if no
-            cards exist for the course)
-
-    Example:
-        GET /api/courses/1/quiz-cards
-        Returns: [{"id": 1, "concept_id": 1, "question": "...",
-            "answers": [...]}, ...]
-    """
-    db = get_db()
+    """Get all quiz cards for a course."""
     try:
-        # Get all units for this course
-        units = db.query(Unit).filter(
-            Unit.course_id == course_id
-        ).all()
-        unit_ids = [u.unit_id for u in units]
-
-        if not unit_ids:
-            return jsonify([])
-
-        # Get all concepts for these units
-        concepts = db.query(Concept).filter(
-            Concept.unit_id.in_(unit_ids)
-        ).all()
-        concept_ids = [c.concept_id for c in concepts]
-
-        # Get and serialize all quiz cards for these concepts
-        result = _get_quiz_cards_for_concepts(db, concept_ids)
-        return jsonify(result)
-    finally:
-        db.close()
+        quiz_service = get_quiz_service()
+        quiz_cards = quiz_service.get_quiz_cards_by_course(course_id)
+        cards_data = [
+            QuizCardResponse.from_model(card).to_dict()
+            for card in quiz_cards
+        ]
+        return jsonify(cards_data), 200
+    except Exception as e:
+        logger.error(f'Get course quiz cards error: {str(e)}')
+        return jsonify({'error': 'Failed to get quiz cards'}), 500
 
 
 @quiz_bp.route('/units/<int:unit_id>/quiz-cards', methods=['GET'])
 def get_unit_quiz_cards(unit_id):
-    """
-    Retrieve all quiz cards associated with a specific unit.
-
-    This endpoint fetches all quiz cards for all concepts within a given
-    unit. It traverses the unit -> concepts -> quiz cards hierarchy.
-
-    Args:
-        unit_id (int): The unique identifier of the unit whose quiz cards
-            should be retrieved
-
-    Returns:
-        JSON response containing a list of quiz cards, each with the
-        following structure:
-        [
-            {
-                'id': int,                    # Quiz card ID
-                'concept_id': int,             # Associated concept ID
-                'question': str,               # Quiz question text
-                'answers': [                   # List of possible answers
-                    {
-                        'id': int,             # Answer ID
-                        'answer_text': str,    # Answer option text
-                        'is_correct': bool,    # Whether this answer is
-                                               # correct
-                        'explanation': str     # Explanation for this
-                                               # answer
-                    },
-                    ...
-                ]
-            },
-            ...
-        ]
-
-    HTTP Status Codes:
-        200: Success - Returns list of quiz cards (may be empty if no
-            cards exist for the unit)
-
-    Example:
-        GET /api/units/1/quiz-cards
-        Returns: [{"id": 1, "concept_id": 1, "question": "...",
-            "answers": [...]}, ...]
-    """
-    db = get_db()
+    """Get all quiz cards for a unit."""
     try:
-        # Get all concepts for this unit
-        concepts = db.query(Concept).filter(
-            Concept.unit_id == unit_id
-        ).all()
-        concept_ids = [c.concept_id for c in concepts]
-
-        # Get and serialize all quiz cards for these concepts
-        result = _get_quiz_cards_for_concepts(db, concept_ids)
-        return jsonify(result)
-    finally:
-        db.close()
+        quiz_service = get_quiz_service()
+        quiz_cards = quiz_service.get_quiz_cards_by_unit(unit_id)
+        cards_data = [
+            QuizCardResponse.from_model(card).to_dict()
+            for card in quiz_cards
+        ]
+        return jsonify(cards_data), 200
+    except Exception as e:
+        logger.error(f'Get unit quiz cards error: {str(e)}')
+        return jsonify({'error': 'Failed to get quiz cards'}), 500
 
 
 @quiz_bp.route('/quiz-cards/random', methods=['GET'])
 def get_random_quiz_cards():
-    """
-    Retrieve all quiz cards from all courses (for global random quiz).
-
-    This endpoint fetches all quiz cards across all courses, units, and
-    concepts. Used for practice mode where users want random questions
-    from the entire system. The frontend will shuffle these and limit
-    to a specific number.
-
-    Returns:
-        JSON response containing a list of all quiz cards with the
-        following structure:
-        [
-            {
-                'id': int,                    # Quiz card ID
-                'concept_id': int,             # Associated concept ID
-                'question': str,               # Quiz question text
-                'answers': [                   # List of possible answers
-                    {
-                        'id': int,             # Answer ID
-                        'answer_text': str,    # Answer option text
-                        'is_correct': bool,    # Whether this answer is
-                                               # correct
-                        'explanation': str     # Explanation for this
-                                               # answer
-                    },
-                    ...
-                ]
-            },
-            ...
-        ]
-
-    HTTP Status Codes:
-        200: Success - Returns list of all quiz cards
-
-    Example:
-        GET /api/quiz-cards/random
-        Returns: [{"id": 1, "concept_id": 1, "question": "...",
-            "answers": [...]}, ...]
-    """
-    db = get_db()
+    """Get all quiz cards from all courses."""
     try:
-        # Get ALL quiz cards from the database (no filtering)
-        quiz_cards = db.query(QuizCard).all()
-
-        result = []
-        for qc in quiz_cards:
-            answers = db.query(QuizAnswer).filter(
-                QuizAnswer.quiz_card_id == qc.quiz_card_id
-            ).all()
-            result.append(_serialize_quiz_card_with_answers(qc, answers))
-
-        return jsonify(result)
-    finally:
-        db.close()
+        quiz_service = get_quiz_service()
+        quiz_cards = quiz_service.get_all_quiz_cards()
+        cards_data = [
+            QuizCardResponse.from_model(card).to_dict()
+            for card in quiz_cards
+        ]
+        return jsonify(cards_data), 200
+    except Exception as e:
+        logger.error(f'Get random quiz cards error: {str(e)}')
+        return jsonify({'error': 'Failed to get quiz cards'}), 500
 
 
 @quiz_bp.route('/quiz-submit', methods=['POST'])
 @jwt_required
 def submit_quiz_answer():
-    """
-    Submit a quiz answer and update user progress.
-
-    This endpoint processes a quiz answer submission, validates the answer,
-    and updates the user's progress tracking (UserCard). It handles both
-    new submissions and updates to existing progress records. Requires
-    authentication and uses the authenticated user's ID from the JWT token.
-
-    Request Body (JSON):
-        {
-            'quiz_card_id': int,          # ID of the quiz card being answered
-            'answer_id': int,             # ID of the selected answer
-            'is_first_attempt': bool      # True if this was the user's first try
-                                          # at this question (optional, defaults
-                                          # to True for backwards compatibility)
-        }
-
-    Headers:
-        Authorization: Bearer <jwt_token>
-
-    Returns:
-        JSON response with the following structure:
-        {
-            'is_correct': bool,    # Whether the submitted answer is
-                                   # correct
-            'explanation': str,    # Explanation for the answer (may be
-                                   # null)
-            'times_seen': int,     # Total number of submission attempts
-                                   # for this quiz card
-            'times_correct': int   # Number of times user answered correctly
-                                   # on the first attempt
-        }
-
-    HTTP Status Codes:
-        200: Success - Answer processed and progress updated
-        400: Bad Request - Missing required fields or invalid answer_id
-        401: Unauthorized - Invalid or missing token
-        500: Internal Server Error - Database error occurred
-
-    Example:
-        POST /api/quiz-submit
-        Headers: Authorization: Bearer <jwt_token>
-        Body: {"quiz_card_id": 1, "answer_id": 2, "is_first_attempt": true}
-        Returns: {"is_correct": true, "explanation": "...",
-            "times_seen": 3, "times_correct": 2}
-    """
-    db = get_db()
+    """Submit a quiz answer and update progress."""
     try:
         data = request.get_json()
-        # Default to True so existing clients still count first-try correctness
-        is_first_attempt = True if data is None else data.get(
-            'is_first_attempt', True
-        )
-
-        # Use authenticated user_id from JWT token instead of request body
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
         user_id = request.user_id
-        quiz_card_id = data.get('quiz_card_id') if data else None
-        answer_id = data.get('answer_id') if data else None
-
-        if not all([quiz_card_id, answer_id]):
-            return jsonify({
-                'error': 'Missing required fields: quiz_card_id and answer_id'
-            }), 400
-
-        # Validate that the answer exists
-        answer = db.query(QuizAnswer).filter(
-            QuizAnswer.answer_id == answer_id
-        ).first()
-
-        if not answer:
-            return jsonify({'error': 'Invalid answer_id'}), 400
-
-        is_correct = answer.is_correct
-        is_first_attempt = bool(is_first_attempt)
-
-        # Find or create UserCard to track progress
-        user_card = db.query(UserCard).filter(
-            UserCard.user_id == user_id,
-            UserCard.quiz_card_id == quiz_card_id
-        ).first()
-
-        if user_card:
-            # Update existing progress record
-            user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct and is_first_attempt:
-                user_card.success_count = (
-                    user_card.success_count or 0
-                ) + 1
-            elif not is_correct:
-                user_card.failure_count = (
-                    user_card.failure_count or 0
-                ) + 1
-            user_card.last_reviewed = datetime.utcnow()
-        else:
-            # Create new progress record
-            user_card = UserCard(
-                user_id=user_id,
-                quiz_card_id=quiz_card_id,
-                repetitions=1,
-                success_count=1 if (is_correct and is_first_attempt) else 0,
-                failure_count=0 if is_correct else 1,
-                last_reviewed=datetime.utcnow()
-            )
-            db.add(user_card)
-
-        db.commit()
-        db.refresh(user_card)
-
-        # Calculate total reviews for response
-        total_reviews = user_card.repetitions or 0
-
-        return jsonify({
-            'is_correct': is_correct,
-            'explanation': answer.explanation,
-            'times_seen': total_reviews,
-            'times_correct': user_card.success_count
-        })
-    except IntegrityError:
-        db.rollback()
-        # UserCard already exists, try to update it instead
-        user_card = db.query(UserCard).filter(
-            UserCard.user_id == user_id,
-            UserCard.quiz_card_id == quiz_card_id
-        ).first()
-        if user_card:
-            # Update existing progress record
-            user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct and is_first_attempt:
-                user_card.success_count = (
-                    user_card.success_count or 0
-                ) + 1
-            elif not is_correct:
-                user_card.failure_count = (
-                    user_card.failure_count or 0
-                ) + 1
-            user_card.last_reviewed = datetime.utcnow()
-            db.commit()
-            db.refresh(user_card)
-            total_reviews = user_card.repetitions or 0
-            return jsonify({
-                'is_correct': is_correct,
-                'explanation': answer.explanation,
-                'times_seen': total_reviews,
-                'times_correct': user_card.success_count
-            })
-        else:
-            return jsonify({'error': 'Failed to update progress'}), 500
+        
+        try:
+            validate_quiz_submission(data)
+        except ValidationError as e:
+            logger.info(f'Quiz validation failed: {str(e)}')
+            return jsonify({'error': str(e)}), 400
+        
+        submit_req = QuizSubmitRequest(
+            quiz_card_id=data['quiz_card_id'],
+            selected_answer_id=data['selected_answer_id'],
+            is_correct=data['is_correct']
+        )
+        
+        quiz_service = get_quiz_service()
+        user_card = quiz_service.submit_quiz_answer(
+            user_id=user_id,
+            quiz_card_id=submit_req.quiz_card_id,
+            is_correct=submit_req.is_correct
+        )
+        
+        response = QuizSubmitResponse.from_model(user_card)
+        logger.info(
+            f'Quiz submitted: user={user_id}, '
+            f'card={submit_req.quiz_card_id}'
+        )
+        return jsonify(response.to_dict()), 200
+        
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
-        db.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        db.close()
+        logger.error(f'Quiz submission error: {str(e)}')
+        return jsonify({'error': 'Failed to submit quiz'}), 500

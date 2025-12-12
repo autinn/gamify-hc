@@ -1,9 +1,30 @@
 # Backend
 
 This directory holds the backend API layer for the Gamify-HC project. The
-Flask application uses a modular blueprint architecture with SQLAlchemy models
-for database operations. The database automatically initializes and seeds when
-the Flask app starts.
+Flask application uses a **clean architecture** with clear separation of
+concerns and follows **12-Factor App** methodology.
+
+## Architecture Overview
+
+The backend implements a layered architecture:
+
+```
+Routes (HTTP) → Middleware → Validators → Services (Business Logic) 
+  → Repositories (Data Access) → Database (PostgreSQL)
+```
+
+**Key Features:**
+- ✅ **Thin Controllers** - Routes handle HTTP concerns only
+- ✅ **Service Layer** - Business logic and orchestration
+- ✅ **Repository Pattern** - Data access abstraction
+- ✅ **Environment-based Config** - No hardcoded values
+- ✅ **Structured Logging** - JSON logs to stdout/stderr
+- ✅ **Production WSGI** - Gunicorn with worker processes
+- ✅ **Graceful Shutdown** - SIGTERM/SIGINT handlers
+- ✅ **Health Checks** - Liveness and readiness probes
+- ✅ **Admin CLI** - One-off admin processes
+
+📖 **For detailed architecture documentation, see [`ARCHITECTURE.md`](../ARCHITECTURE.md)**
 
 ## Project Structure
 
@@ -214,8 +235,29 @@ run.py
 - `GET /api/users/:id` - Get user info
 - `GET /api/users/:id/progress` - Get user progress
 
-### Health Check
-- `GET /api/health` - Check if API is running
+### Health Checks (`/api/health`)
+- `GET /api/health` - Comprehensive health status with database check
+- `GET /api/health/live` - Liveness probe (Kubernetes/monitoring)
+- `GET /api/health/ready` - Readiness probe (load balancers/orchestration)
+
+**Health Check Details:**
+
+`/api/health` - Returns detailed status including:
+- Application info (name, version, environment)
+- Database connectivity and response time
+- Uptime in seconds
+- PostgreSQL version
+
+`/api/health/live` - Simple liveness check:
+- Returns 200 OK if app is running
+- Does NOT check database (by design)
+- Used by Kubernetes to restart crashed pods
+
+`/api/health/ready` - Readiness check with database:
+- Returns 200 OK if ready to accept traffic
+- Returns 503 if database is unavailable
+- Used by load balancers to route traffic
+- Used during rolling deployments
 
 ## Authentication
 
@@ -265,6 +307,68 @@ pytest
 Tests are located in `backend/tests/` and use pytest fixtures for database
 setup and teardown. The test database is automatically created and destroyed
 for each test session.
+
+## Admin CLI Tool (12-Factor: Admin Processes)
+
+The backend includes a Click-based CLI for administrative tasks. These commands
+are designed to run as **one-off processes**, separate from the web application,
+following 12-Factor App methodology.
+
+### Available Commands
+
+#### Seed Database
+```bash
+python -m backend.cli seed
+```
+Populates the database with course data from `backend/database/seed_data/`.
+
+Options:
+- `--force` - Re-seed even if data already exists (clears existing course data)
+
+#### Create User
+```bash
+python -m backend.cli create-user
+```
+Creates a new user account. Prompts for username, email, and password.
+Useful for creating test accounts or admin users.
+
+#### Database Info
+```bash
+python -m backend.cli db-info
+```
+Displays database statistics and health information:
+- Table counts (courses, units, concepts, quiz cards, users)
+- PostgreSQL version
+- Connection status
+
+#### Reset Database (DANGER!)
+```bash
+python -m backend.cli reset-db
+```
+Drops and recreates all tables, **deleting all data** including users and progress.
+Requires confirmation. Use with caution!
+
+### Usage Examples
+
+```bash
+# Seed a fresh database
+python -m backend.cli seed
+
+# Create a test user
+python -m backend.cli create-user
+# (then follow prompts)
+
+# Check database statistics
+python -m backend.cli db-info
+
+# Force re-seed (clears and re-populates)
+python -m backend.cli seed --force
+
+# Reset everything (careful!)
+python -m backend.cli reset-db
+```
+
+**Note**: All CLI commands require the `DATABASE_URL` environment variable to be set.
 
 ## Database
 

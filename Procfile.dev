@@ -1,0 +1,18 @@
+# ==============================================================================
+# PROCFILE.DEV - Development Process Configuration
+# ==============================================================================
+# For local development using tools like Overmind, Foreman, or Honcho
+#
+# Usage:
+#   overmind start -f Procfile.dev     # Using Overmind (recommended)
+#   foreman start -f Procfile.dev      # Using Foreman
+#   honcho start -f Procfile.dev       # Using Honcho
+#
+# This runs both frontend and backend together for full-stack development
+# ==============================================================================
+
+# Backend API: Flask development server with auto-reload
+backend: cd backend && python ../run.py
+
+# Frontend: React development server with hot reload
+frontend: cd frontend && npm start

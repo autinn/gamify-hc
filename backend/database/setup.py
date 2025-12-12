@@ -8,7 +8,12 @@ from typing import Optional, Union
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer
+from backend.database.models import (
+    Base, Course, Unit, Concept, QuizCard, QuizAnswer
+)
+from backend.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def _str_to_bool(value: Optional[str], default: bool = False) -> bool:
@@ -37,7 +42,8 @@ def _resolve_database_url(database_url: Optional[str]) -> str:
         raise ValueError(
             "DATABASE_URL environment variable is required. "
             "Start PostgreSQL with: docker compose up postgres -d\n"
-            "Then set: DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc"
+            "Then set: DATABASE_URL=postgresql://"
+            "gamify:gamify_secret@localhost:5432/gamify_hc"
         )
     return url
 
@@ -101,7 +107,7 @@ def create_database(
             # Check if database is empty (no courses)
             course_count = session.query(Course).count()
             if course_count == 0:
-                print("Database is empty. Seeding initial data...")
+                logger.info("Database is empty. Seeding initial data...")
                 # Import seed function - works as module or direct execution
                 try:
                     # Relative import (works when imported as module)
@@ -110,9 +116,9 @@ def create_database(
                     # Absolute import (works when run directly)
                     from seed_data.seed import populate_database
                 populate_database(session)
-                print("✓ Seeding complete!")
+                logger.info("Seeding complete!")
         except Exception as e:
-            print(f"Warning: Failed to seed database: {e}")
+            logger.error(f"Failed to seed database: {e}", exc_info=True)
             session.rollback()
         finally:
             session.close()
@@ -148,71 +154,74 @@ def get_session(database_url: Optional[str] = None):
 
 if __name__ == '__main__':
     # Create the database and tables
-    print("Creating database...")
+    logger.info("Creating database...")
     engine, Session = create_database()
-    print("Database created successfully!\n")
+    logger.info("Database created successfully!")
 
     # Display database content
     session = Session()
     try:
         # Summary statistics
-        print("=" * 80)
-        print("DATABASE SUMMARY")
-        print("=" * 80)
-        print(f"Total Courses: {session.query(Course).count()}")
-        print(f"Total Units: {session.query(Unit).count()}")
-        print(f"Total Concepts: {session.query(Concept).count()}")
-        print(f"Total Quiz Cards: {session.query(QuizCard).count()}")
-        print(f"Total Answers: {session.query(QuizAnswer).count()}")
-        print("=" * 80)
-        print()
+        logger.info("=" * 80)
+        logger.info("DATABASE SUMMARY")
+        logger.info("=" * 80)
+        logger.info(f"Total Courses: {session.query(Course).count()}")
+        logger.info(f"Total Units: {session.query(Unit).count()}")
+        logger.info(f"Total Concepts: {session.query(Concept).count()}")
+        logger.info(f"Total Quiz Cards: {session.query(QuizCard).count()}")
+        logger.info(f"Total Answers: {session.query(QuizAnswer).count()}")
+        logger.info("=" * 80)
 
         # Display all courses with their content
         courses = session.query(Course).order_by(Course.course_id).all()
         for course in courses:
-            print(f"\n{'=' * 80}")
-            print(f"COURSE: {course.title}")
-            print(f"Description: {course.description}")
-            print(f"Units: {len(course.units)}")
-            print(f"{'=' * 80}")
+            logger.info(f"\n{'=' * 80}")
+            logger.info(f"COURSE: {course.title}")
+            logger.info(f"Description: {course.description}")
+            logger.info(f"Units: {len(course.units)}")
+            logger.info(f"{'=' * 80}")
 
             # Display units
             for unit in sorted(course.units, key=lambda u: u.order_index or 0):
-                print(f"\n  UNIT {unit.order_index}: {unit.title}")
-                print(f"  Description: {unit.description}")
-                print(f"  Concepts: {len(unit.concepts)}")
+                logger.info(f"\n  UNIT {unit.order_index}: {unit.title}")
+                logger.info(f"  Description: {unit.description}")
+                logger.info(f"  Concepts: {len(unit.concepts)}")
 
                 # Display concepts
                 for concept in unit.concepts:
-                    print(f"\n    CONCEPT: {concept.title}")
-                    print(f"    Definition: {concept.definition}")
-                    print(f"    Questions: {len(concept.quiz_cards)}")
+                    logger.info(f"\n    CONCEPT: {concept.title}")
+                    logger.info(f"    Definition: {concept.definition}")
+                    logger.info(f"    Questions: {len(concept.quiz_cards)}")
 
                     # Display quiz cards/questions
                     for quiz_card in concept.quiz_cards:
-                        print("\n      QUESTION:")
-                        print(f"      {quiz_card.question}")
-                        print(f"      Answers: {len(quiz_card.answers)}")
+                        logger.info("\n      QUESTION:")
+                        logger.info(f"      {quiz_card.question}")
+                        logger.info(f"      Answers: {len(quiz_card.answers)}")
 
                         # Display answers
                         for answer in quiz_card.answers:
                             correct_marker = "✓" if answer.is_correct else " "
-                            print(
+                            logger.info(
                                 f"        [{correct_marker}] "
                                 f"{answer.answer_text}"
                             )
                         if quiz_card.answers:
                             explanation = quiz_card.answers[0].explanation
                             if explanation:
-                                print(f"      Explanation: {explanation}")
+                                logger.info(
+                                    f"      Explanation: {explanation}"
+                                )
                             else:
-                                print("      Explanation: (none provided)")
+                                logger.info(
+                                    "      Explanation: (none provided)"
+                                )
                         else:
-                            print("      Explanation: N/A")
+                            logger.info("      Explanation: N/A")
 
-        print(f"\n{'=' * 80}")
-        print("END OF DATABASE CONTENT")
-        print(f"{'=' * 80}\n")
+        logger.info(f"\n{'=' * 80}")
+        logger.info("END OF DATABASE CONTENT")
+        logger.info(f"{'=' * 80}\n")
 
     finally:
         session.close()

@@ -1,64 +1,168 @@
+# ==============================================================================
+# Docker Compose Configuration for Gamify-HC
+# ==============================================================================
+# Orchestrates three services: PostgreSQL, Backend API, and Frontend
+#
+# Usage:
+#   docker compose up              # Start all services (foreground)
+#   docker compose up -d           # Start in background
+#   docker compose down            # Stop all services
+#   docker compose down -v         # Stop and delete database volume
+#   docker compose logs -f         # View logs
+#   docker compose up --build      # Rebuild after code changes
+#
+# Architecture:
+#   - PostgreSQL 16 (database)
+#   - Flask + Gunicorn (backend API)
+#   - React + Nginx (frontend)
+#
+# Implements 12-Factor App:
+#   - Factor IV: Backing Services (PostgreSQL as attached resource)
+#   - Factor V: Build, Release, Run (separate build/run stages)
+#   - Factor IX: Disposability (health checks, graceful shutdown)
+#   - Factor X: Dev/Prod Parity (same stack everywhere)
+# ==============================================================================
+
 version: '3.8'
 
 services:
+  # ===========================================================================
+  # PostgreSQL Database Service
+  # ===========================================================================
+  # Primary data store for all application data
+  # Includes health checks for dependent services
   postgres:
     image: postgres:16-alpine
     container_name: gamify-hc-postgres
+    
+    # Environment variables for database initialization
     environment:
       POSTGRES_USER: gamify
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gamify_secret}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gamify_secret}  # Override via .env
       POSTGRES_DB: gamify_hc
+    
+    # Persistent volume for database data
+    # Data survives container restarts but deleted with 'docker compose down -v'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    
+    # Expose PostgreSQL port for local development
+    # Backend connects via 'postgres:5432' (internal network)
+    # Host machine can connect via 'localhost:5432' (for debugging)
     ports:
       - "5432:5432"
+    
+    # Health check ensures database is ready before backend starts
+    # Used by depends_on conditions
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U gamify -d gamify_hc"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      interval: 10s          # Check every 10 seconds
+      timeout: 5s            # Fail if query takes > 5 seconds
+      retries: 5             # Try 5 times before marking unhealthy
+      start_period: 10s      # Grace period during startup
+    
+    # Restart policy: restart unless explicitly stopped
     restart: unless-stopped
 
+  # ===========================================================================
+  # Backend API Service (Flask + Gunicorn)
+  # ===========================================================================
+  # REST API with clean architecture (see ARCHITECTURE.md)
+  # Production WSGI server with worker processes
   backend:
+    # Build from backend/Dockerfile (multi-stage build)
     build:
-      context: .
+      context: .              # Build context is project root
       dockerfile: backend/Dockerfile
+    
     container_name: gamify-hc-backend
+    
+    # Expose API port
+    # External: http://localhost:5001/api
+    # Internal: http://backend:5001/api
     ports:
       - "5001:5001"
+    
+    # Environment variables (12-Factor III: Config)
+    # Override via .env file or docker-compose.override.yml
     environment:
+      # Database connection (points to 'postgres' service)
       - DATABASE_URL=postgresql://gamify:${POSTGRES_PASSWORD:-gamify_secret}@postgres:5432/gamify_hc
+      
+      # Application environment
       - FLASK_ENV=production
+      
+      # Security (change in production!)
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
+      
+      # Logging (structured logs to stdout)
+      - LOG_FORMAT=json
+      - LOG_LEVEL=INFO
+      
+      # Gunicorn configuration
+      - GUNICORN_WORKERS=4
+      - GUNICORN_THREADS=2
+      - GUNICORN_TIMEOUT=30
+    
+    # Wait for PostgreSQL to be healthy before starting
+    # Implements graceful dependency management
     depends_on:
       postgres:
         condition: service_healthy
+    
+    # Health check for load balancers and orchestration
+    # Uses /api/health/live endpoint (liveness probe)
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health/live"]
+      interval: 30s          # Check every 30 seconds
+      timeout: 10s           # Fail if check takes > 10 seconds
+      retries: 3             # Try 3 times before marking unhealthy
+      start_period: 15s      # Grace period for app startup
+    
     restart: unless-stopped
 
+  # ===========================================================================
+  # Frontend Service (React + Nginx)
+  # ===========================================================================
+  # Single-page application served by Nginx
+  # Proxies API requests to backend service
   frontend:
+    # Build from frontend/Dockerfile (multi-stage: npm build → nginx)
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
+        # API URL baked into build (can override for different environments)
         REACT_APP_API_BASE_URL: http://localhost:5001/api
+    
     container_name: gamify-hc-frontend
+    
+    # Expose HTTP port
+    # External: http://localhost:3000
     ports:
       - "3000:80"
+    
+    # Wait for backend to be healthy before starting
+    # Ensures API is available when frontend loads
     depends_on:
       backend:
         condition: service_healthy
+    
     restart: unless-stopped
+    
+    # Startup message to help developers find the app
     command: >
       sh -c "echo '🔷📣🔷 OPEN THE APP AT: http://localhost:3000' &&
             echo '🔷📣🔷 Backend API: http://localhost:5001/api' &&
             nginx -g 'daemon off;'"
 
+# ==============================================================================
+# Volumes
+# ==============================================================================
+# Named volumes for persistent data
 volumes:
+  # PostgreSQL data persists across container restarts
+  # Delete with: docker compose down -v
   postgres_data:
+    driver: local
+

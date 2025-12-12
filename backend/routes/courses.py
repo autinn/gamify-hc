@@ -1,167 +1,144 @@
 """
-Course routes blueprint.
+Course routes blueprint - Thin controller layer.
 
-This module handles all course-related API endpoints for the gamify-hc
-application. It provides endpoints to retrieve course information and
-associated units.
+This module handles HTTP concerns for course-related endpoints:
+- Parse requests
+- Call service layer
+- Return responses
 
-Endpoints:
-    GET /api/courses: Retrieve all courses
-    GET /api/courses/<course_id>: Retrieve a specific course by ID
-    GET /api/courses/<course_id>/units: Retrieve all units for a course
+Business logic is in backend/services/course_service.py
 """
 
 from flask import Blueprint, jsonify
-from backend.database.models import Course, Unit
-from backend.utils.database_manager import get_db
+
+from backend.schemas.course_schemas import CourseResponse, UnitResponse
+from backend.utils.logger import get_logger
+from backend.utils.service_factory import get_course_service
 
 # Create blueprint for course-related routes
-# All routes in this blueprint will be prefixed with '/api'
 courses_bp = Blueprint('courses', __name__, url_prefix='/api')
 
-
-def _serialize_course(course):
-    """
-    Serialize a Course model instance to a dictionary.
-
-    Args:
-        course (Course): The course model instance to serialize
-
-    Returns:
-        dict: Serialized course data with id, code, name, and description
-    """
-    return {
-        'id': course.course_id,
-        'code': course.title,
-        'name': course.title,
-        'description': course.description
-    }
+# Logger
+logger = get_logger(__name__)
 
 
 @courses_bp.route('/courses', methods=['GET'])
 def get_courses():
     """
-    Retrieve all courses.
-
-    This endpoint fetches all available courses in the system.
+    Retrieve all courses - Thin controller.
 
     Returns:
-        JSON response containing a list of courses, each with the
-        following structure:
         [
             {
-                'id': int,           # Course ID
-                'code': str,          # Course code (currently uses title)
-                'name': str,         # Course name/title
-                'description': str   # Course description
+                'id': int,
+                'code': str,
+                'name': str,
+                'description': str
             },
             ...
         ]
 
     HTTP Status Codes:
-        200: Success - Returns list of courses (may be empty)
-
-    Example:
-        GET /api/courses
-        Returns: [{"id": 1, "code": "EA50", "name": "...", ...}, ...]
+        200: Success
+        500: Server error
     """
-    db = get_db()
     try:
-        courses = db.query(Course).all()
-        return jsonify([_serialize_course(c) for c in courses])
-    finally:
-        db.close()
+        # 1. Call service layer
+        course_service = get_course_service()
+        courses = course_service.get_all_courses()
+
+        # 2. Serialize response
+        courses_data = [
+            CourseResponse.from_model(c).to_dict()
+            for c in courses
+        ]
+
+        return jsonify(courses_data), 200
+
+    except Exception as e:
+        logger.error(f'Get courses error: {str(e)}')
+        return jsonify({'error': 'Failed to get courses'}), 500
 
 
 @courses_bp.route('/courses/<int:course_id>', methods=['GET'])
 def get_course(course_id):
     """
-    Retrieve a specific course by its ID.
-
-    This endpoint fetches course details including its ID, code, name,
-    and description. If the course is not found, returns a 404 error.
+    Retrieve a specific course by ID - Thin controller.
 
     Args:
-        course_id (int): The unique identifier of the course to retrieve
+        course_id: Course unique identifier
 
     Returns:
-        JSON response with the following structure:
         {
-            'id': int,           # Course ID
-            'code': str,          # Course code (currently uses title)
-            'name': str,         # Course name/title
-            'description': str   # Course description
+            'id': int,
+            'code': str,
+            'name': str,
+            'description': str
         }
 
     HTTP Status Codes:
-        200: Success - Course found and returned
-        404: Not Found - Course with the given ID does not exist
-
-    Example:
-        GET /api/courses/1
-        Returns: {"id": 1, "code": "EA50", "name": "...", ...}
+        200: Success
+        404: Course not found
+        500: Server error
     """
-    db = get_db()
     try:
-        course = db.query(Course).filter(
-            Course.course_id == course_id
-        ).first()
+        # 1. Call service layer
+        course_service = get_course_service()
+        course = course_service.get_course_by_id(course_id)
 
         if not course:
             return jsonify({'error': 'Course not found'}), 404
 
-        return jsonify(_serialize_course(course))
-    finally:
-        db.close()
+        # 2. Serialize response
+        course_data = CourseResponse.from_model(course).to_dict()
+
+        return jsonify(course_data), 200
+
+    except ValueError as e:
+        logger.info(f'Course not found: {course_id}')
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        logger.error(f'Get course error: {str(e)}')
+        return jsonify({'error': 'Failed to get course'}), 500
 
 
 @courses_bp.route('/courses/<int:course_id>/units', methods=['GET'])
 def get_course_units(course_id):
     """
-    Retrieve all units associated with a specific course.
-
-    This endpoint fetches all units for a given course, ordered by their
-    order_index. Units are returned in the order they should be displayed
-    or completed.
+    Retrieve all units for a course - Thin controller.
 
     Args:
-        course_id (int): The unique identifier of the course whose units
-            should be retrieved
+        course_id: Course unique identifier
 
     Returns:
-        JSON response containing a list of units, each with the following
-        structure:
         [
             {
-                'id': int,           # Unit ID
-                'course_id': int,    # Associated course ID
-                'name': str,         # Unit name/title
-                'description': str,  # Unit description
-                'order_index': int   # Display order within the course
+                'id': int,
+                'course_id': int,
+                'name': str,
+                'description': str,
+                'order_index': int
             },
             ...
         ]
 
     HTTP Status Codes:
-        200: Success - Returns list of units (may be empty if no units
-            exist for the course)
-
-    Example:
-        GET /api/courses/1/units
-        Returns: [{"id": 1, "course_id": 1, "name": "...", ...}, ...]
+        200: Success
+        500: Server error
     """
-    db = get_db()
     try:
-        units = db.query(Unit).filter(
-            Unit.course_id == course_id
-        ).order_by(Unit.order_index).all()
+        # 1. Call service layer
+        course_service = get_course_service()
+        units = course_service.get_course_units(course_id)
 
-        return jsonify([{
-            'id': u.unit_id,
-            'course_id': u.course_id,
-            'name': u.title,
-            'description': u.description,
-            'order_index': u.order_index
-        } for u in units])
-    finally:
-        db.close()
+        # 2. Serialize response
+        units_data = [
+            UnitResponse.from_model(u).to_dict()
+            for u in units
+        ]
+
+        return jsonify(units_data), 200
+
+    except Exception as e:
+        logger.error(f'Get course units error: {str(e)}')
+        return jsonify({'error': 'Failed to get units'}), 500

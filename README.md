@@ -181,6 +181,8 @@ const result = await api.submitQuizAnswer({
 ```
 
 For detailed documentation, see:
-- Backend: `backend/README.md`
-- Frontend: `frontend/README.md`
-- Contributing: `docs/USING_GITHUB.md`
+- **Architecture**: `ARCHITECTURE.md` - Clean architecture and design principles
+- **Backend**: `backend/README.md` - API documentation and setup
+- **Frontend**: `frontend/README.md` - React app documentation
+- **Deployment**: `DEPLOYMENT.md` - Production deployment guide
+- **Contributing**: `docs/USING_GITHUB.md` - Git workflow and collaboration
