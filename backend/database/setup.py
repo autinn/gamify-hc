@@ -11,25 +11,12 @@ from sqlalchemy.orm import sessionmaker
 from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer
 
 
-def _str_to_bool(value: Optional[str], default: bool = False) -> bool:
-    """Convert common string representations to boolean values."""
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "t", "yes", "y"}
 
+# Remove the try/except fallback - just import Config directly
+from backend.config import Config
 
-# Import configuration from centralized config module
-try:
-    from backend.config import Config
-    DEFAULT_DATABASE_URL = Config.DATABASE_URL
-    DEFAULT_SQLALCHEMY_ECHO = Config.SQLALCHEMY_ECHO
-except ImportError:
-    # Fallback for cases where config module is not available
-    DEFAULT_DATABASE_URL = os.getenv("DATABASE_URL")
-    DEFAULT_SQLALCHEMY_ECHO = _str_to_bool(
-        os.getenv("SQLALCHEMY_ECHO"),
-        default=False,
-    )
+DEFAULT_DATABASE_URL = Config.DATABASE_URL
+DEFAULT_SQLALCHEMY_ECHO = Config.SQLALCHEMY_ECHO
 
 
 def _resolve_database_url(database_url: Optional[str]) -> str:
