@@ -10,8 +10,6 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.database.models import Base, Course, Unit, Concept, QuizCard, QuizAnswer
 
-
-
 # Remove the try/except fallback - just import Config directly
 from backend.config import Config
 
@@ -30,7 +28,8 @@ def _resolve_database_url(database_url: Optional[str]) -> str:
         raise ValueError(
             "DATABASE_URL environment variable is required. "
             "Start PostgreSQL with: docker compose up postgres -d\n"
-            "Then set: DATABASE_URL=postgresql://gamify:gamify_secret@localhost:5432/gamify_hc"
+            "Then set DATABASE_URL in your .env file or environment. "
+            "See .env.example for the format."
         )
     return url
 
