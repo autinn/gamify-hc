@@ -39,9 +39,10 @@ frontend/build/
 .DS_Store
 Thumbs.db
 
-# Documentation (not needed in container)
+# Documentation (not needed in container, except Swagger spec)
 *.md
 docs/
+!docs/swagger.json
 
 # Tests (not needed in production container)
 **/__tests__/
@@ -57,4 +58,3 @@ pytest.ini
 *.tmp
 .coverage
 htmlcov/
-
