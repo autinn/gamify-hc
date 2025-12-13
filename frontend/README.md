@@ -42,8 +42,9 @@ npm test -- --watch    # Watch mode for development
 src/
 ├── pages/              # 7 page components (Main, Login, Register, Course, Unit, Concept, Quiz)
 ├── components/         # Reusable UI components (common, course, unit, quiz, concept)
+├── contexts/           # React Context providers (Onboarding)
 ├── hooks/              # 10 custom React hooks for state & logic
-├── services/           # 7 API services (auth, course, unit, concept, quiz, progress, dataMappers)
+├── services/           # 8 API services (api.js + auth, course, unit, concept, quiz, progress, dataMappers)
 ├── __tests__/          # Test suite with Vitest setup
 ├── App.js              # Root component
 └── index.js            # Entry point
@@ -156,15 +157,16 @@ export function useQuiz(conceptId, unitId, courseId) {
 
 #### 3. **Services** - The API Layer
 Services handle all HTTP communication with the backend. They:
-- Make API requests using Axios (via `api.js`)
+- Make API requests using fetch (via `api.js` wrapper)
 - Transform API responses into frontend data structures
 - Handle authentication tokens
 - Manage error states
 
-**Service Files:**
+**Service Files (8 total):**
 
 | Service | Endpoints | Purpose |
 |---------|-----------|---------|
+| `api.js` | All endpoints | Centralized HTTP client with auth & error handling |
 | `authService.js` | `/api/auth/login`, `/api/auth/register` | User authentication & validation |
 | `courseService.js` | `/api/courses`, `/api/courses/{id}` | Course data fetching |
 | `unitService.js` | `/api/units`, `/api/units/{id}` | Unit and concept data |
@@ -172,7 +174,6 @@ Services handle all HTTP communication with the backend. They:
 | `progressService.js` | `/api/progress` | User progress metrics |
 | `conceptService.js` | `/api/concepts` | Concept details |
 | `dataMappers.js` | (No API) | Data transformation utilities |
-| API endpoints for onboarding | `/api/users/{id}/onboarding` | Get/update onboarding status |
 
 **Example Service:**
 ```javascript
