@@ -42,8 +42,9 @@ npm test -- --watch    # Watch mode for development
 src/
 ├── pages/              # 7 page components (Main, Login, Register, Course, Unit, Concept, Quiz)
 ├── components/         # Reusable UI components (common, course, unit, quiz, concept)
+├── contexts/           # React Context providers (Onboarding)
 ├── hooks/              # 10 custom React hooks for state & logic
-├── services/           # 7 API services (auth, course, unit, concept, quiz, progress, dataMappers)
+├── services/           # 8 API services (api.js + auth, course, unit, concept, quiz, progress, dataMappers)
 ├── __tests__/          # Test suite with Vitest setup
 ├── App.js              # Root component
 └── index.js            # Entry point
@@ -126,7 +127,7 @@ Hooks encapsulate all state management, API communication, and data processing l
 | `useAuth()` | Login/register logic | `{ login, register, loading, error }` |
 | `useCurrentUser()` | Current user info | `{ user, loading, token }` |
 | `useHeaderNavigation()` | Navigation structure | `{ courses, units, error }` |
-| `useGameification()` | Gamification state | `{ badges, points, level }` |
+| `useOnboarding()` | First-time user guide | `{ isFirstTime, startGuide, completeOnboarding }` |
 
 **Example Hook:**
 ```javascript
@@ -156,15 +157,16 @@ export function useQuiz(conceptId, unitId, courseId) {
 
 #### 3. **Services** - The API Layer
 Services handle all HTTP communication with the backend. They:
-- Make API requests using Axios (via `api.js`)
+- Make API requests using fetch (via `api.js` wrapper)
 - Transform API responses into frontend data structures
 - Handle authentication tokens
 - Manage error states
 
-**Service Files:**
+**Service Files (8 total):**
 
 | Service | Endpoints | Purpose |
 |---------|-----------|---------|
+| `api.js` | All endpoints | Centralized HTTP client with auth & error handling |
 | `authService.js` | `/api/auth/login`, `/api/auth/register` | User authentication & validation |
 | `courseService.js` | `/api/courses`, `/api/courses/{id}` | Course data fetching |
 | `unitService.js` | `/api/units`, `/api/units/{id}` | Unit and concept data |
@@ -318,6 +320,38 @@ const { user } = useCurrentUser();
 9. useCurrentUser() fetches user profile with token
 10. Redirect to MainPage
 ```
+
+## Onboarding System
+
+New users are guided through an interactive onboarding tutorial that explains the platform's key features and navigation.
+
+**How It Works:**
+
+1. **First-Time Detection** — After login, `useOnboarding()` checks if the user has completed onboarding via `/api/users/{id}/onboarding`
+
+2. **Onboarding Guide Trigger** — If `has_completed_onboarding` is false, `OnboardingGuide` component displays an interactive tutorial overlay
+
+3. **Context Management** — `OnboardingContext` provides global access to onboarding state across all components:
+   ```javascript
+   const { isFirstTime, startGuide, completeOnboarding } = useOnboardingContext();
+   ```
+
+4. **Guide Completion** — When the user dismisses the guide, `completeOnboarding()` is called, which:
+   - Updates backend via `api.updateOnboardingStatus(userId, true)`
+   - Persists completion status to database
+   - Prevents guide from showing again on future visits
+
+5. **Components Involved:**
+   - `OnboardingGuide.js` — Interactive tutorial component with step-by-step instructions
+   - `OnboardingContext.js` — Global state provider for onboarding
+   - `useOnboarding.js` — Hook managing onboarding lifecycle and API communication
+   - `App.js` — Wraps app with `OnboardingProvider` and conditional `OnboardingGuide` rendering
+
+**Key Features:**
+- Non-intrusive overlay doesn't block core functionality
+- Users can skip/dismiss at any time
+- Only shown once per user (persistent via backend)
+- Works seamlessly with authentication flow
 
 ## Error Handling
 

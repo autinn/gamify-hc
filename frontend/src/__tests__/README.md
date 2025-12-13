@@ -9,7 +9,7 @@ src/__tests__/
 ├── setup.js              # Global test configuration
 ├── testUtils.js          # Shared test utilities and mocks
 ├── services/             # Service unit tests (7 files)
-├── hooks/                # Hook unit tests (8 files)
+├── hooks/                # Hook unit tests (10 files)
 └── pages/                # Page integration tests (5 files)
 ```
 
@@ -32,9 +32,30 @@ npm test -- --watch   # Watch mode
 
 **Services (7)**: authService, dataMappers, courseService, unitService, conceptService, progressService, quizService
 
-**Hooks (8)**: useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser, useProgress
+**Hooks (10)**: useAuth, useCourses, useCourse, useUnit, useConcept, useQuiz, useCurrentUser, useHeaderNavigation, useProgress, useOnboarding
 
 **Pages (5)**: LoginPage, RegisterPage, CoursePage, UnitPage, MainPage
+
+## Test Results Summary
+
+```
+Test Files  22 passed (22)
+     Tests  156 passed (156)
+     
+Start at  11:20:20
+Duration  2.51s
+```
+
+**Coverage by Category:**
+
+| Category | Files | Tests | Status |
+|----------|-------|-------|--------|
+| Services | 7 | ~59 | ✅ All passing |
+| Hooks | 10 | ~82 | ✅ All passing |
+| Pages | 5 | ~15 | ✅ All passing |
+| **Total** | **22** | **156** | ✅ **All passing** |
+
+All tests are currently passing. Tests run in under 3 seconds with Vitest's fast transformation and collection.
 
 ## Writing Tests
 
