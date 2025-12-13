@@ -1,6 +1,7 @@
 SQLAlchemy>=2.0.36
 Flask>=3.0.0
 Flask-CORS>=4.0.0
+flask-swagger-ui>=4.11.1
 python-dotenv>=1.0.0
 pytest>=7.4.0
 pytest-flask>=1.2.0

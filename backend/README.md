@@ -47,8 +47,18 @@ This starts:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5001/api/health
 - You should see: `{"status": "ok", "message": "Gamify-HC API is running"}`
+- API Docs: Swagger UI at http://localhost:5001/api/docs, raw spec at http://localhost:5001/api/swagger.json (spec file lives at `docs/swagger.json`)
 
 All environment variables (including `DATABASE_URL`) are automatically configured by `docker-compose.yml`.
+
+---
+
+## API Documentation (Swagger/OpenAPI)
+
+- Start the backend and open **http://localhost:5001/api/docs** (Swagger UI).
+- Raw spec at **http://localhost:5001/api/swagger.json** (served from `docs/swagger.json`).
+- Update `docs/swagger.json` in PRs alongside any API changes; the backend serves this static spec directly.
+- The spec is copied into the backend Docker image; `.dockerignore` whitelists it so docs work in containers.
 
 ---
 

@@ -1,0 +1,1301 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Gamify-HC API",
+    "version": "1.0.0",
+    "description": "API for the Gamify-HC learning platform."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5001",
+      "description": "Local development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Courses"
+    },
+    {
+      "name": "Units"
+    },
+    {
+      "name": "Concepts"
+    },
+    {
+      "name": "Quiz"
+    },
+    {
+      "name": "Users"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "API is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gamify-HC API is running"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username or email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login and receive JWT token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Get current authenticated user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "List courses",
+        "responses": {
+          "200": {
+            "description": "Courses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Get course by ID",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Course"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/units": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "List units for a course",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Units",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Unit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/units/{unit_id}": {
+      "get": {
+        "tags": [
+          "Units"
+        ],
+        "summary": "Get unit by ID",
+        "parameters": [
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unit"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/units/{unit_id}/concepts": {
+      "get": {
+        "tags": [
+          "Units"
+        ],
+        "summary": "List concepts for a unit",
+        "parameters": [
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Concepts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Concept"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/concepts/{concept_id}": {
+      "get": {
+        "tags": [
+          "Concepts"
+        ],
+        "summary": "Get concept by ID",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Concept",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Concept"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Concept not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/concepts/{concept_id}/quiz-cards": {
+      "get": {
+        "tags": [
+          "Concepts"
+        ],
+        "summary": "List quiz cards for a concept",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizCard"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz-cards/{quiz_card_id}": {
+      "get": {
+        "tags": [
+          "Quiz"
+        ],
+        "summary": "Get quiz card by ID",
+        "parameters": [
+          {
+            "name": "quiz_card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz card",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizCard"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz card not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/quiz-cards": {
+      "get": {
+        "tags": [
+          "Quiz"
+        ],
+        "summary": "List quiz cards for a course",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizCard"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/units/{unit_id}/quiz-cards": {
+      "get": {
+        "tags": [
+          "Quiz"
+        ],
+        "summary": "List quiz cards for a unit",
+        "parameters": [
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizCard"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz-cards/random": {
+      "get": {
+        "tags": [
+          "Quiz"
+        ],
+        "summary": "List all quiz cards (random selection handled by client)",
+        "responses": {
+          "200": {
+            "description": "Quiz cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizCard"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz-submit": {
+      "post": {
+        "tags": [
+          "Quiz"
+        ],
+        "summary": "Submit quiz answer",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizSubmissionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submission result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSubmissionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid submission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/progress": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get quiz progress for a user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progress entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserProgress"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/progress/courses": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get progress aggregated by courses",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressChart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/progress/courses/{course_id}/units": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get progress aggregated by units",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unit progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressChart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/progress/courses/{course_id}/units/{unit_id}/concepts": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get progress aggregated by concepts",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Concept progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressChart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "jdoe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@minerva.edu"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "strongpassword"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "password"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username or email",
+            "example": "user@minerva.edu"
+          },
+          "password": {
+            "type": "string",
+            "example": "strongpassword"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "user_id",
+          "username",
+          "email"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "jdoe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@minerva.edu"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "user_id",
+          "username",
+          "email"
+        ]
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "example": "EA50"
+          },
+          "name": {
+            "type": "string",
+            "example": "Essential Algebra"
+          },
+          "description": {
+            "type": "string",
+            "example": "Core algebra concepts"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
+      "Unit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10
+          },
+          "course_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Introduction"
+          },
+          "description": {
+            "type": "string",
+            "example": "Foundational material"
+          },
+          "order_index": {
+            "type": "integer",
+            "example": 0
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "name"
+        ]
+      },
+      "Concept": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 100
+          },
+          "unit_id": {
+            "type": "integer",
+            "example": 10
+          },
+          "name": {
+            "type": "string",
+            "example": "Variables"
+          },
+          "tag": {
+            "type": "string",
+            "example": "Variables"
+          },
+          "definition": {
+            "type": "string",
+            "example": "A variable stores a value that can change."
+          }
+        },
+        "required": [
+          "id",
+          "unit_id",
+          "name",
+          "tag",
+          "definition"
+        ]
+      },
+      "QuizAnswer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1000
+          },
+          "answer_text": {
+            "type": "string",
+            "example": 42
+          },
+          "is_correct": {
+            "type": "boolean",
+            "example": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true,
+            "example": "The calculation results in 42."
+          }
+        },
+        "required": [
+          "id",
+          "answer_text",
+          "is_correct"
+        ]
+      },
+      "QuizCard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 200
+          },
+          "concept_id": {
+            "type": "integer",
+            "example": 100
+          },
+          "question": {
+            "type": "string",
+            "example": "What is 6 x 7?"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizAnswer"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "concept_id",
+          "question",
+          "answers"
+        ]
+      },
+      "QuizSubmissionRequest": {
+        "type": "object",
+        "properties": {
+          "quiz_card_id": {
+            "type": "integer",
+            "example": 200
+          },
+          "answer_id": {
+            "type": "integer",
+            "example": 1000
+          },
+          "is_first_attempt": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "quiz_card_id",
+          "answer_id"
+        ]
+      },
+      "QuizSubmissionResponse": {
+        "type": "object",
+        "properties": {
+          "is_correct": {
+            "type": "boolean",
+            "example": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true,
+            "example": "Correct because..."
+          },
+          "times_seen": {
+            "type": "integer",
+            "example": 3
+          },
+          "times_correct": {
+            "type": "integer",
+            "example": 2
+          }
+        },
+        "required": [
+          "is_correct",
+          "times_seen",
+          "times_correct"
+        ]
+      },
+      "UserProgress": {
+        "type": "object",
+        "properties": {
+          "quiz_card_id": {
+            "type": "integer",
+            "example": 200
+          },
+          "times_seen": {
+            "type": "integer",
+            "example": 5
+          },
+          "times_correct": {
+            "type": "integer",
+            "example": 3
+          },
+          "last_seen": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "quiz_card_id",
+          "times_seen",
+          "times_correct"
+        ]
+      },
+      "ProgressMetadata": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "courses"
+          },
+          "course_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "unit_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "example": 2
+          },
+          "timestamp": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProgressChart": {
+        "type": "object",
+        "properties": {
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "EA50",
+              "FA50"
+            ]
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "example": [
+              0.8,
+              0.6
+            ]
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ProgressMetadata"
+          }
+        },
+        "required": [
+          "labels",
+          "values"
+        ]
+      }
+    }
+  }
+}
