@@ -17,7 +17,7 @@ EA50_DATA = {
                     'definition': 'Characterize a complex problem in detail to really understand it.',
                     'questions': [
                         {
-                            'question': 'A city proposes "add more buses" to cut congestion without describing current traffic flows or success metrics. What\'s missing?',
+                            'question': 'A city proposes "add more buses" to cut congestion without describing current traffic flows or success metrics. What\'s missing from their approach to this problem?',
                             'answers': [
                                 {'text': 'Goal state', 'correct': False, 'explanation': 'Goal state is not enough; we need to know the initial state and how we\'ll measure success.'},
                                 {'text': 'Initial state and measurement plan', 'correct': True, 'explanation': 'Exactly right! We need to understand the current situation and how we\'ll measure improvement.'},
@@ -38,7 +38,7 @@ EA50_DATA = {
                             'question': 'You listed initial state, goal state, obstacles, and scale, but not likely consequences if nothing changes. What should you add?',
                             'answers': [
                                 {'text': 'Constraint list', 'correct': False, 'explanation': 'Constraints are important, but consequences of inaction are critical for robust problem characterization.'},
-                                {'text': 'Future implications of the problem', 'correct': True, 'explanation': 'Correct! Including future implications ensures a complete understanding of the problem.'},
+                                {'text': 'Future implications of the problem', 'correct': True, 'explanation': ' Including future implications ensures a complete understanding of the problem.'},
                                 {'text': 'Budget section only', 'correct': False, 'explanation': 'Budget is important, but it does not address the consequences of inaction.'},
                                 {'text': 'SWOT table', 'correct': False, 'explanation': 'A SWOT table is useful, but it does not replace the need to consider future implications.'},
                             ],
@@ -47,7 +47,7 @@ EA50_DATA = {
                             'question': 'A hospital aims to "reduce patient complaints" but doesn\'t specify which types of complaints or current frequency. Why is this problematic?',
                             'answers': [
                                 {'text': 'The goal is too ambitious', 'correct': False, 'explanation': 'Ambition is not the issue; the lack of specificity and baseline data is.'},
-                                {'text': 'Without baseline data and specificity, success cannot be measured', 'correct': True, 'explanation': 'Correct! Specificity and baseline data are essential for measuring success.'},
+                                {'text': 'Without baseline data and specificity, success cannot be measured', 'correct': True, 'explanation': ' Specificity and baseline data are essential for measuring success.'},
                                 {'text': 'Complaints are not important', 'correct': False, 'explanation': 'Complaints are important, but they need to be clearly defined to address them effectively.'},
                                 {'text': 'Solutions should come before measurement', 'correct': False, 'explanation': 'Jumping to solutions without measurement is premature.'},
                             ],
@@ -56,7 +56,7 @@ EA50_DATA = {
                             'question': 'A startup identifies "low user engagement" as their problem but hasn\'t examined which features users actually use or why they leave. What critical step is missing?',
                             'answers': [
                                 {'text': 'Defining the goal state', 'correct': False, 'explanation': 'Defining the goal state is important, but understanding the initial state comes first.'},
-                                {'text': 'Characterizing the initial state through data analysis', 'correct': True, 'explanation': 'Correct! Data analysis of the initial state is critical to understanding user behavior.'},
+                                {'text': 'Characterizing the initial state through data analysis', 'correct': True, 'explanation': ' Data analysis of the initial state is critical to understanding user behavior.'},
                                 {'text': 'Listing constraints', 'correct': False, 'explanation': 'Constraints are important but do not replace the need for initial state analysis.'},
                                 {'text': 'Brainstorming solutions', 'correct': False, 'explanation': 'Brainstorming solutions without understanding the problem is ineffective.'},
                             ],
@@ -65,7 +65,7 @@ EA50_DATA = {
                             'question': 'Two teams tackle food waste. Team A defines the goal as "implement composting programs." Team B defines it as "reduce cafeteria waste by 40% within 6 months." Which follows #rightproblem better?',
                             'answers': [
                                 {'text': 'Team A, because composting is a proven solution', 'correct': False, 'explanation': 'Team A presupposes a solution, which limits flexibility.'},
-                                {'text': 'Team B, because they specify measurable outcomes without presupposing one solution', 'correct': True, 'explanation': 'Correct! Team B focuses on measurable outcomes, leaving room for multiple solutions.'},
+                                {'text': 'Team B, because they specify measurable outcomes without presupposing one solution', 'correct': True, 'explanation': ' Team B focuses on measurable outcomes, leaving room for multiple solutions.'},
                                 {'text': 'Both equally, since goals are subjective', 'correct': False, 'explanation': 'Goals are not purely subjective; measurable outcomes are preferable.'},
                                 {'text': 'Neither, since waste reduction is too vague', 'correct': False, 'explanation': 'Waste reduction is not vague when paired with specific metrics like Team B\'s goal.'},
                             ],
@@ -74,7 +74,7 @@ EA50_DATA = {
                             'question': 'A school says "students are failing math" but hasn\'t identified whether the issue is foundational gaps, teaching methods, or motivation. What should they do first?',
                             'answers': [
                                 {'text': 'Hire more tutors immediately', 'correct': False, 'explanation': 'Hiring tutors may help, but it\'s not the first step without understanding the problem.'},
-                                {'text': 'Characterize the problem by analyzing failure patterns and root causes', 'correct': True, 'explanation': 'Correct! Analyzing failure patterns will identify the real issues needing addressal.'},
+                                {'text': 'Characterize the problem by analyzing failure patterns and root causes', 'correct': True, 'explanation': ' Analyzing failure patterns will identify the real issues needing addressal.'},
                                 {'text': 'Switch to a new curriculum', 'correct': False, 'explanation': 'Changing the curriculum might not address the underlying issues causing the failures.'},
                                 {'text': 'Increase homework assignments', 'correct': False, 'explanation': 'More homework won\'t help if the fundamental problems are not addressed.'},
                             ],
@@ -83,7 +83,7 @@ EA50_DATA = {
                             'question': 'A company characterizes a problem with initial state, goal state, and obstacles—but omits constraints like budget and regulatory requirements. What risk does this create?',
                             'answers': [
                                 {'text': 'The problem becomes too easy to solve', 'correct': False, 'explanation': 'Ignoring constraints does not make the problem easier; it makes solutions impractical.'},
-                                {'text': 'Solutions may be infeasible or illegal', 'correct': True, 'explanation': 'Correct! Ignoring constraints can lead to solutions that are not feasible or legal.'},
+                                {'text': 'Solutions may be infeasible or illegal', 'correct': True, 'explanation': ' Ignoring constraints can lead to solutions that are not feasible or legal.'},
                                 {'text': 'Obstacles will disappear', 'correct': False, 'explanation': 'Obstacles do not disappear just because constraints are ignored.'},
                                 {'text': 'The initial state will change', 'correct': False, 'explanation': 'The initial state remains the same regardless of whether constraints are considered.'},
                             ],
@@ -92,7 +92,7 @@ EA50_DATA = {
                             'question': 'A nonprofit states their problem as "need more funding" rather than "cannot serve 200+ families on waitlist due to capacity limits." Which framing better applies #rightproblem?',
                             'answers': [
                                 {'text': 'The first, because funding is always the core issue', 'correct': False, 'explanation': 'Framing the problem as a resource need limits solution options.'},
-                                {'text': 'The second, because it describes the real problem and goal state without presupposing one solution', 'correct': True, 'explanation': 'Correct! This framing focuses on the outcome and opens up multiple solution pathways.'},
+                                {'text': 'The second, because it describes the real problem and goal state without presupposing one solution', 'correct': True, 'explanation': ' This framing focuses on the outcome and opens up multiple solution pathways.'},
                                 {'text': 'Both are equally valid', 'correct': False, 'explanation': 'The second framing is more effective because it avoids presupposing a solution.'},
                                 {'text': 'Neither, since nonprofits should not define problems', 'correct': False, 'explanation': 'Nonprofits must define problems to address them effectively.'},
                             ],
@@ -101,7 +101,7 @@ EA50_DATA = {
                             'question': 'An urban planning team characterizes traffic congestion by documenting peak hours, bottleneck locations, commuter origins, and economic costs. What component would complete their characterization?',
                             'answers': [
                                 {'text': 'A list of potential solutions', 'correct': False, 'explanation': 'Listing solutions is premature without fully characterizing the problem.'},
-                                {'text': 'Projected consequences if congestion continues unchecked', 'correct': True, 'explanation': 'Correct! Considering future implications completes the problem characterization.'},
+                                {'text': 'Projected consequences if congestion continues unchecked', 'correct': True, 'explanation': ' Considering future implications completes the problem characterization.'},
                                 {'text': 'A detailed budget breakdown', 'correct': False, 'explanation': 'A budget breakdown is useful but does not complete the characterization.'},
                                 {'text': 'Stakeholder voting results', 'correct': False, 'explanation': 'Stakeholder input is important but not the missing component here.'},
                             ],
@@ -134,7 +134,7 @@ EA50_DATA = {
                             'question': 'Which is an idiosyncratic feature to discard when translating a source solution?',
                             'answers': [
                                 {'text': 'Core mechanism', 'correct': False, 'explanation': 'The core mechanism is often the key to why the analogy works.'},
-                                {'text': 'Domain-specific regulation irrelevant to target', 'correct': True, 'explanation': 'Correct! Irrelevant regulations should be discarded as they don\'t apply to the new context.'},
+                                {'text': 'Domain-specific regulation irrelevant to target', 'correct': True, 'explanation': ' Irrelevant regulations should be discarded as they don\'t apply to the new context.'},
                                 {'text': 'Structural mapping', 'correct': False, 'explanation': 'Structural mapping is essential to maintain the integrity of the analogy.'},
                                 {'text': 'Performance criterion', 'correct': False, 'explanation': 'The performance criterion is usually central to the analogy\'s effectiveness.'},
                             ],
@@ -152,7 +152,7 @@ EA50_DATA = {
                             'question': 'A city borrows "immune system response" to model epidemic containment: detect threats, isolate infections, mobilize resources. What must they adapt?',
                             'answers': [
                                 {'text': 'Nothing—biological systems translate directly', 'correct': False, 'explanation': 'This is incorrect; direct translation ignores critical differences between biological and social systems.'},
-                                {'text': 'Scale, timescales, and human behavioral factors absent in cellular immunity', 'correct': True, 'explanation': 'Correct! These factors are crucial to consider when adapting the analogy to a new domain.'},
+                                {'text': 'Scale, timescales, and human behavioral factors absent in cellular immunity', 'correct': True, 'explanation': ' These factors are crucial to consider when adapting the analogy to a new domain.'},
                                 {'text': 'The entire analogy should be discarded', 'correct': False, 'explanation': 'Discarding the entire analogy is not necessary; only certain aspects need adaptation.'},
                                 {'text': 'Only visual metaphors', 'correct': False, 'explanation': 'Adapting only visual metaphors is insufficient; the underlying concepts also need adaptation.'},
                             ],
@@ -178,8 +178,8 @@ EA50_DATA = {
                         {
                             'question': 'A team uses "Netflix recommendation algorithms" as an analogy for suggesting personalized learning paths in education. What challenge must they address?',
                             'answers': [
-                                {'text': 'Students and viewers are identical', 'correct': False, 'explanation': 'This is not true; students and viewers have different contexts, needs, and goals.'},
-                                {'text': 'Educational goals differ from entertainment engagement; success metrics must be redefined', 'correct': True, 'explanation': 'Correct! The analogy requires adaptation of success metrics to fit the educational context.'},
+                                {'text': 'Students and viewers are identical', 'correct': False, 'explanation': 'It might seem true because both groups consume content, but their contexts, needs, and goals differ significantly.'},
+                                {'text': 'Educational goals differ from entertainment engagement; success metrics must be redefined', 'correct': True, 'explanation': ' The analogy requires adaptation of success metrics to fit the educational context.'},
                                 {'text': 'The analogy is completely invalid', 'correct': False, 'explanation': 'The analogy is not completely invalid; it just needs careful adaptation to the new context.'},
                                 {'text': 'Algorithms cannot be applied to education', 'correct': False, 'explanation': 'This is too broad; while direct application may be flawed, adapted algorithms can be useful.'},
                             ],
@@ -190,7 +190,7 @@ EA50_DATA = {
                                 {'text': 'Companies and teams both have members', 'correct': False, 'explanation': 'Having members is too vague a similarity; the structures and goals of the entities matter more.'},
                                 {'text': 'Corporate goals are often more ambiguous and long-term than game outcomes', 'correct': True, 'explanation': 'Exactly! This difference in goal clarity and timeframe can limit the analogy\'s applicability.'},
                                 {'text': 'Sports teams never collaborate', 'correct': False, 'explanation': 'This is false; sports teams often collaborate with other teams, coaches, and staff.'},
-                                {'text': 'All organizational analogies are perfect', 'correct': False, 'explanation': 'This is not true; analogies can be helpful but are never perfect due to the uniqueness of each organization.'},
+                                {'text': 'All organizational analogies are perfect', 'correct': False, 'explanation': 'Analogies can seem perfect because they highlight similarities, but they overlook the unique aspects of each organization.'},
                             ],
                         },
                         {
@@ -198,7 +198,7 @@ EA50_DATA = {
                             'answers': [
                                 {'text': 'Cars and data are both physical objects', 'correct': False, 'explanation': 'This is too superficial; the validity of an analogy depends on deeper structural similarities.'},
                                 {'text': 'Both systems exhibit congestion, bottlenecks, and throughput optimization challenges', 'correct': True, 'explanation': 'Exactly! These shared characteristics validate the use of traffic flow models as an analogy for data packet routing.'},
-                                {'text': 'Traffic and networks are unrelated', 'correct': False, 'explanation': 'This is not true; there are relevant similarities that make the analogy valid.'},
+                                {'text': 'Traffic and networks are unrelated', 'correct': False, 'explanation': 'This might seem valid because they operate in different domains, but both share congestion and optimization challenges.'},
                                 {'text': 'All analogies between transport and computing work', 'correct': False, 'explanation': 'This is too broad; each analogy must be evaluated on its own merits and relevance.'},
                             ],
                         },
@@ -211,7 +211,7 @@ EA50_DATA = {
                         {
                             'question': 'Budget is fixed this quarter. How should you treat it?',
                             'answers': [
-                                {'text': 'Constraint', 'correct': True, 'explanation': 'Correct! A fixed budget is a constraint that limits options.'},
+                                {'text': 'Constraint', 'correct': True, 'explanation': ' A fixed budget is a constraint that limits options.'},
                                 {'text': 'Obstacle', 'correct': False, 'explanation': 'An obstacle is something that prevents progress, but a constraint is a limit we work within.'},
                                 {'text': 'Neither', 'correct': False, 'explanation': 'It is both a constraint and an obstacle; calling it neither ignores its impact.'},
                                 {'text': 'Both—depends on mood', 'correct': False, 'explanation': 'Constraints and obstacles are not subjective; they have objective characteristics.'},
@@ -230,71 +230,71 @@ EA50_DATA = {
                             'question': 'You misclassified a reparable equipment failure as a constraint. What\'s the fix?',
                             'answers': [
                                 {'text': 'Keep it a constraint', 'correct': False, 'explanation': 'If it can be repaired, it should not be classified as a constraint which is typically fixed.'},
-                                {'text': 'Reframe as an obstacle and plan remediation', 'correct': True, 'explanation': 'Correct! This allows for addressing the issue directly rather than treating it as an unchangeable constraint.'},
-                                {'text': 'Remove it entirely', 'correct': False, 'explanation': 'This is not feasible if the equipment is essential and the failure is reparable.'},
+                                {'text': 'Reframe as an obstacle and plan remediation', 'correct': True, 'explanation': ' This allows for addressing the issue directly rather than treating it as an unchangeable constraint.'},
+                                {'text': 'Remove it entirely', 'correct': False, 'explanation': 'It might seem feasible, but if the equipment is essential and reparable, it cannot be removed.'},
                                 {'text': 'Treat it as a success metric', 'correct': False, 'explanation': 'This is incorrect; it does not measure success but rather indicates a problem that needs fixing.'},
                             ],
                         },
                         {
                             'question': 'A team must schedule a conference with 5 constraints: venue availability, speaker schedules, budget limits, accessibility requirements, and catering lead times. What approach applies #constraints?',
                             'answers': [
-                                {'text': 'Pick one constraint and ignore the rest', 'correct': False, 'explanation': 'This is not feasible as multiple constraints must be satisfied simultaneously.'},
+                                {'text': 'Pick one constraint and ignore the rest', 'correct': False, 'explanation': 'This might seem practical, but multiple constraints must be satisfied simultaneously.'},
                                 {'text': 'Find a solution that simultaneously satisfies all 5 constraints', 'correct': True, 'explanation': 'Yes, this is the correct approach to satisfy all constraints.'},
-                                {'text': 'Remove constraints until the problem is easy', 'correct': False, 'explanation': 'This is not a valid approach as it may lead to overlooking important factors.'},
+                                {'text': 'Remove constraints until the problem is easy', 'correct': False, 'explanation': 'Simplifying the problem by removing constraints might overlook critical factors.'},
                                 {'text': 'Prioritize constraints and violate lower-priority ones', 'correct': False, 'explanation': 'This could lead to significant issues if lower-priority constraints are violated.'},
                             ],
                         },
                         {
                             'question': 'A city faces "traffic congestion during construction season." Is the construction a constraint or an obstacle?',
                             'answers': [
-                                {'text': 'Obstacle, because construction can be rescheduled or phased differently', 'correct': True, 'explanation': 'Correct! Construction is an obstacle that can be managed, not a fixed constraint.'},
+                                {'text': 'Obstacle, because construction can be rescheduled or phased differently', 'correct': True, 'explanation': ' Construction is an obstacle that can be managed, not a fixed constraint.'},
                                 {'text': 'Constraint, because construction is happening', 'correct': False, 'explanation': 'This is incorrect; construction is an obstacle that affects traffic flow.'},
                                 {'text': 'Neither, because it\'s temporary', 'correct': False, 'explanation': 'The temporary nature does not change the fact that it is an obstacle.'},
-                                {'text': 'Both equally', 'correct': False, 'explanation': 'This is not accurate; it is primarily an obstacle.'},
+                                {'text': 'Both equally', 'correct': False, 'explanation': 'While both may seem important, one is primarily an obstacle.'},
                             ],
                         },
                         {
                             'question': 'A software project has hard constraints (regulatory compliance, system compatibility) and soft preferences (user interface aesthetics). How should they be treated?',
                             'answers': [
-                                {'text': 'Treat preferences as constraints to simplify', 'correct': False, 'explanation': 'This is incorrect; preferences are not constraints and should not be treated as such.'},
-                                {'text': 'Satisfy hard constraints first; optimize preferences within feasible solutions', 'correct': True, 'explanation': 'Correct! This ensures that essential requirements are met while still considering preferences.'},
-                                {'text': 'Ignore hard constraints if they conflict with preferences', 'correct': False, 'explanation': 'This is not feasible as hard constraints are non-negotiable requirements.'},
-                                {'text': 'All constraints are equally negotiable', 'correct': False, 'explanation': 'This is not true; some constraints are fixed while others are flexible.'},
+                                {'text': 'Treat preferences as constraints to simplify', 'correct': False, 'explanation': 'Preferences are not constraints and should be considered separately.'},
+                                {'text': 'Satisfy hard constraints first; optimize preferences within feasible solutions', 'correct': True, 'explanation': ' This ensures that essential requirements are met while still considering preferences.'},
+                                {'text': 'Ignore hard constraints if they conflict with preferences', 'correct': False, 'explanation': 'Hard constraints are non-negotiable and must be addressed.'},
+                                {'text': 'All constraints are equally negotiable', 'correct': False, 'explanation': 'Some constraints are fixed, while others can be adjusted.'},
                             ],
                         },
                         {
                             'question': 'A meal planner must satisfy: dietary restrictions (vegan, nut-free), budget ($50), prep time (under 2 hours), and ingredient availability. Two menus meet all constraints. What should guide the final choice?',
                             'answers': [
                                 {'text': 'Additional preferences like taste or nutrition balance', 'correct': True, 'explanation': 'Yes! Additional preferences should guide the final choice between equally viable options.'},
-                                {'text': 'Randomly select one', 'correct': False, 'explanation': 'This is not a good idea as it does not consider the best option available.'},
-                                {'text': 'Add more constraints until only one remains', 'correct': False, 'explanation': 'This is not practical or necessary; the goal is to find a satisfactory solution, not to eliminate options.'},
-                                {'text': 'Violate one constraint to simplify', 'correct': False, 'explanation': 'This is not advisable as it could lead to an unsatisfactory or unviable solution.'},
+                                {'text': 'Randomly select one', 'correct': False, 'explanation': 'Random selection ignores the importance of evaluating the best option.'},
+                                {'text': 'Add more constraints until only one remains', 'correct': False, 'explanation': 'Adding constraints unnecessarily complicates the problem.'},
+                                {'text': 'Violate one constraint to simplify', 'correct': False, 'explanation': 'Violating constraints can lead to unsatisfactory solutions.'},
                             ],
                         },
                         {
                             'question': 'A warehouse layout must accommodate: fire safety codes (constraint), forklift turning radii (constraint), and "easy access to popular items" (preference). What distinguishes the constraint from the preference?',
                             'answers': [
                                 {'text': 'Constraints are legally mandated or physically necessary; preferences are desirable but negotiable', 'correct': True, 'explanation': 'Exactly! Constraints are mandatory requirements, while preferences are additional desirable factors.'},
-                                {'text': 'Preferences are always more important', 'correct': False, 'explanation': 'This is not true; preferences are not more important than constraints.'},
+                                {'text': 'Preferences are always more important', 'correct': False, 'explanation': 'Preferences are secondary to constraints, which are mandatory.'},
                                 {'text': 'Constraints can be violated with enough creativity', 'correct': False, 'explanation': 'This is incorrect; constraints are fixed and cannot be violated.'},
-                                {'text': 'There is no distinction', 'correct': False, 'explanation': 'This is not accurate; there is a clear distinction between constraints and preferences.'},
+                                {'text': 'There is no distinction', 'correct': False, 'explanation': 'Constraints are mandatory, while preferences are negotiable.'},
                             ],
                         },
                         {
                             'question': 'A project faces "insufficient expertise in the team" and "a non-negotiable December deadline." Which is the constraint?',
                             'answers': [
-                                {'text': 'The expertise gap, because it limits capability', 'correct': False, 'explanation': 'This is not a constraint; it is a gap that needs to be addressed.'},
-                                {'text': 'The December deadline, because it cannot be changed', 'correct': True, 'explanation': 'Correct! The December deadline is a fixed constraint that must be met.'},
-                                {'text': 'Both are constraints', 'correct': False, 'explanation': 'This is not accurate; only the December deadline is a constraint.'},
-                                {'text': 'Neither—both are just challenges', 'correct': False, 'explanation': 'This is incorrect; the December deadline is a clear constraint.'},
+                                {'text': 'The expertise gap, because it limits capability', 'correct': False, 'explanation': 'The expertise gap is a challenge, not a fixed constraint.'},
+                                {'text': 'The December deadline, because it cannot be changed', 'correct': True, 'explanation': ' The December deadline is a fixed constraint that must be met.'},
+                                {'text': 'Both are constraints', 'correct': False, 'explanation': 'Insufficient expertise might feel like a constraint because it is hard to change, but new talent can be hired and staff can be trained.'},
+                                {'text': 'Neither—both are just challenges', 'correct': False, 'explanation': 'The December deadline is a clear constraint that must be met.'},
                             ],
                         },
                         {
                             'question': 'A school must assign 30 teachers to 30 classrooms, ensuring each teacher\'s subject matches room equipment, schedule fits personal constraints, and no room is double-booked. This is an example of:',
                             'answers': [
-                                {'text': 'A heuristic problem', 'correct': False, 'explanation': 'This is not a heuristic problem; it is a complex problem with multiple constraints.'},
+                                {'text': 'A heuristic problem', 'correct': False, 'explanation': 'This problem involves multiple constraints, not just heuristics.'},
                                 {'text': 'A constraint satisfaction problem', 'correct': True, 'explanation': 'Exactly! This problem requires satisfying multiple constraints simultaneously.'},
-                                {'text': 'An unconstrained optimization', 'correct': False, 'explanation': 'This is not an unconstrained optimization problem; there are clear constraints that must be met.'},
+                                {'text': 'An unconstrained optimization', 'correct': False, 'explanation': 'This problem has clear constraints that must be met.'},
                                 {'text': 'A purely creative task', 'correct': False, 'explanation': 'This task is not purely creative; it requires careful consideration of constraints.'},
                             ],
                         },
@@ -308,7 +308,7 @@ EA50_DATA = {
                             'question': 'When are fast-and-frugal heuristics most appropriate?',
                             'answers': [
                                 {'text': 'High stakes, abundant data', 'correct': False, 'explanation': 'High stakes with abundant data call for careful analysis, not heuristics.'},
-                                {'text': 'Low stakes, limited time/information', 'correct': True, 'explanation': 'Correct! Heuristics are great when stakes are low and time or information is limited.'},
+                                {'text': 'Low stakes, limited time/information', 'correct': True, 'explanation': ' Heuristics are great when stakes are low and time or information is limited.'},
                                 {'text': 'Anytime—they\'re always best', 'correct': False, 'explanation': 'Heuristics are not always best; they\'re useful in specific situations, like under uncertainty.'},
                                 {'text': 'Never—use full analysis only', 'correct': False, 'explanation': 'This is too rigid; heuristics can be very useful in the right circumstances.'},
                             ],
@@ -336,36 +336,36 @@ EA50_DATA = {
                         {
                             'question': 'A doctor quickly diagnoses a patient based on the most common symptoms matching typical cases. This uses which heuristic?',
                             'answers': [
-                                {'text': 'Anchoring', 'correct': False, 'explanation': 'This is not anchoring; it\'s using representative symptoms to make a quick diagnosis.'},
-                                {'text': 'Representativeness', 'correct': True, 'explanation': 'Correct! This is an example of the representativeness heuristic in action.'},
-                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This is not means-ends analysis; it\'s a quick, heuristic-based diagnosis.'},
-                                {'text': 'Constraint satisfaction', 'correct': False, 'explanation': 'This is not about satisfying constraints; it\'s about matching symptoms to diagnoses.'},
+                                {'text': 'Anchoring', 'correct': False, 'explanation': 'Anchouring involves people relying too heavily on the first piece of information, we don\'t see a first piece of information that is relevant here.'},
+                                {'text': 'Representativeness', 'correct': True, 'explanation': ' This is an example of the representativeness heuristic in action.'},
+                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This diagnosis uses heuristics to act quickly, not lengthy means-ends analysis.'},
+                                {'text': 'Constraint satisfaction', 'correct': False, 'explanation': 'This diagnosis matches symptoms to cases, not constraints.'},
                             ],
                         },
                         {
                             'question': 'A manager sets project timelines by starting with an initial estimate (30 days) and adjusting slightly upward (35 days). What heuristic bias might occur?',
                             'answers': [
                                 {'text': 'Anchoring—the initial 30 days overly influences the final estimate', 'correct': True, 'explanation': 'Exactly! This is a classic case of anchoring bias in decision making.'},
-                                {'text': 'Availability', 'correct': False, 'explanation': 'This is not related to the availability heuristic; it\'s about anchoring to an initial value.'},
-                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'This is not means-ends analysis; it\'s a biased adjustment of an initial estimate.'},
-                                {'text': 'Representativeness', 'correct': False, 'explanation': 'This is not representativeness; it\'s a cognitive bias affecting the estimate.'},
+                                {'text': 'Availability', 'correct': False, 'explanation': 'The availability heuristic is about easy examples that come to mind, which we see no example of here; the manager is making their decision based on the first estimate.'},
+                                {'text': 'Means-ends analysis', 'correct': False, 'explanation': 'We aren\'t doing a full analysis, we are making a biased adjustment of an initial estimate.'},
+                                {'text': 'Representativeness', 'correct': False, 'explanation': 'The representativeness heuristic a mental shortcut where you judge an event\'s likelihood by how similar it seems to your existing prototype, which we see no example of here; the manager is making their decision based on the first estimate.'},
                             ],
                         },
                         {
                             'question': 'A team uses means-ends analysis to plan a product launch: identify launch date (goal), determine current readiness (initial state), then define subgoals (complete testing, finalize marketing). What makes this effective?',
                             'answers': [
-                                {'text': 'It relies on random exploration', 'correct': False, 'explanation': 'This is not random; it\'s a systematic approach to problem-solving.'},
+                                {'text': 'It relies on random exploration', 'correct': False, 'explanation': 'Means-ends analysis is systematic, not random.'},
                                 {'text': 'It systematically decomposes the gap into manageable subgoals', 'correct': True, 'explanation': 'Exactly! This systematic decomposition is key to effective means-ends analysis.'},
-                                {'text': 'It ignores constraints', 'correct': False, 'explanation': 'This is not true; effective means-ends analysis considers relevant constraints.'},
-                                {'text': 'It avoids planning altogether', 'correct': False, 'explanation': 'This is incorrect; means-ends analysis is a form of planning.'},
+                                {'text': 'It ignores constraints', 'correct': False, 'explanation': 'Effective means-ends analysis considers relevant constraints.'},
+                                {'text': 'It avoids planning altogether', 'correct': False, 'explanation': 'Means-ends analysis is a form of planning, involving careful consideration of steps to reach the goal.'},
                             ],
                         },
                         {
                             'question': 'After a plane crash receives heavy media coverage, people overestimate flight risks despite statistical safety. Which heuristic explains this?',
                             'answers': [
-                                {'text': 'Availability—vivid recent events are easily recalled', 'correct': True, 'explanation': 'Exactly! This is a clear example of the availability heuristic affecting risk perception.'},
-                                {'text': 'Representativeness', 'correct': False, 'explanation': 'This is not related to representativeness; it\'s about the availability of recent, vivid memories.'},
-                                {'text': 'Anchoring', 'correct': False, 'explanation': 'This is not anchoring; it\'s a biased recall of recent events that skews perception of risk.'},
+                                {'text': 'Availability', 'correct': True, 'explanation': 'Exactly! This is a clear example of the availability heuristic affecting risk perception.'},
+                                {'text': 'Representativeness', 'correct': False, 'explanation': 'This could be mistaken for representativeness, but it\'s about vivid recent events that are easily recalled.'},
+                                {'text': 'Anchoring', 'correct': False, 'explanation': 'This could be mistaken for anchoring, but it\'s a biased recall of recent events that skews perception of risk.'},
                                 {'text': 'Means-ends', 'correct': False, 'explanation': 'This is not means-ends analysis; it\'s a cognitive bias affecting judgment.'},
                             ],
                         },
@@ -425,9 +425,9 @@ EA50_DATA = {
                         {
                             'question': 'Which pairing matches Kosslyn\'s Maxims?',
                             'answers': [
-                                {'text': 'Think it Through → retrieval cues; Make and Use Associations → deep processing', 'correct': False, 'explanation': 'This is not the correct pairing according to Kosslyn\'s Maxims.'},
-                                {'text': 'Think it Through → deep processing; Make and Use Associations → rich retrieval cues', 'correct': True, 'explanation': 'Correct! This pairing aligns with Kosslyn\'s Maxims for effective learning.'},
-                                {'text': 'Think it Through → dual codes only; Make and Use Associations → spacing only', 'correct': False, 'explanation': 'This is not accurate; the maxims involve broader principles than just dual codes and spacing.'},
+                                {'text': 'Think it Through → retrieval cues; Make and Use Associations → deep processing', 'correct': False, 'explanation': 'This pairing does not align with Kosslyn’s Maxims.'},
+                                {'text': 'Think it Through → deep processing; Make and Use Associations → rich retrieval cues', 'correct': True, 'explanation': ' This pairing aligns with Kosslyn\'s Maxims for effective learning.'},
+                                {'text': 'Think it Through → dual codes only; Make and Use Associations → spacing only', 'correct': False, 'explanation': 'This pairing oversimplifies Kosslyn’s Maxims.'},
                                 {'text': 'Both maxims → massed practice', 'correct': False, 'explanation': 'This is incorrect; massed practice is not aligned with the principles of spaced practice and retrieval practice.'},
                             ],
                         },
@@ -452,7 +452,7 @@ EA50_DATA = {
                         {
                             'question': 'A teacher presents a lesson using diagrams, verbal explanations, and hands-on activities. Which learning principle is being applied?',
                             'answers': [
-                                {'text': 'Massed practice', 'correct': False, 'explanation': 'This is not massed practice; it\'s an integrated approach using multiple modalities.'},
+                                {'text': 'Massed practice', 'correct': False, 'explanation': 'Massed practice is like cramming, whereas this is an integrated approach using multiple modalities.'},
                                 {'text': 'Dual coding—combining verbal and visual modalities', 'correct': True, 'explanation': 'Exactly! This approach uses dual coding to enhance learning through multiple channels.'},
                                 {'text': 'Interference', 'correct': False, 'explanation': 'This is not interference; it\'s a well-structured, multimodal teaching approach.'},
                                 {'text': 'Rote memorization', 'correct': False, 'explanation': 'This is not rote memorization; it\'s an active learning approach engaging multiple senses.'},
@@ -461,10 +461,10 @@ EA50_DATA = {
                         {
                             'question': 'Students who quiz themselves without looking at notes perform better on exams than those who repeatedly reread. What explains this?',
                             'answers': [
-                                {'text': 'Rereading is more effortful', 'correct': False, 'explanation': 'This is not the reason; the key is in the effectiveness of retrieval practice.'},
+                                {'text': 'Rereading is more effortful', 'correct': False, 'explanation': 'The key is in the effectiveness of retrieval practice.'},
                                 {'text': 'Retrieval practice strengthens memory more than passive review', 'correct': True, 'explanation': 'Exactly! Actively retrieving information strengthens memory retention much more than passive review like rereading.'},
                                 {'text': 'Quizzing reduces study time', 'correct': False, 'explanation': 'This is not the main factor; it\'s about the effectiveness of the retrieval practice itself.'},
-                                {'text': 'Rereading always fails', 'correct': False, 'explanation': 'This is not true; rereading can be effective, but it\'s not as effective as retrieval practice.'},
+                                {'text': 'Rereading always fails', 'correct': False, 'explanation': 'Rereading can be useful, but it\'s not as effective as retrieval practice.'},
                             ],
                         },
                         {
@@ -473,24 +473,24 @@ EA50_DATA = {
                                 {'text': 'Shallow processing', 'correct': False, 'explanation': 'This is not shallow processing; it\'s a deep, meaningful way to learn and remember new words.'},
                                 {'text': 'Elaboration—connecting new information to existing knowledge', 'correct': True, 'explanation': 'Exactly! This principle of elaboration helps to create strong mental connections for better recall.'},
                                 {'text': 'Massed practice', 'correct': False, 'explanation': 'This is not massed practice; it\'s an active engagement strategy for learning.'},
-                                {'text': 'Passive review', 'correct': False, 'explanation': 'This is not passive review; it\'s an active and meaningful way to learn vocabulary.'},
+                                {'text': 'Passive review', 'correct': False, 'explanation': 'Generating sentences is not passive, this is an active and meaningful way to learn vocabulary.'},
                             ],
                         },
                         {
                             'question': 'Why is interleaved practice (mixing problem types) often more effective than blocked practice (one type at a time)?',
                             'answers': [
-                                {'text': 'Interleaving is easier and less confusing', 'correct': False, 'explanation': 'This is not true; interleaving is often harder and requires more cognitive effort.'},
+                                {'text': 'Interleaving is easier and less confusing', 'correct': False, 'explanation': 'Interleaving is often harder and requires more cognitive effort.'},
                                 {'text': 'Interleaving requires discriminating between problem types, strengthening learning', 'correct': True, 'explanation': 'Exactly! This discrimination process strengthens learning and improves problem-solving skills.'},
-                                {'text': 'Blocked practice always produces better results', 'correct': False, 'explanation': 'This is not true; blocked practice can lead to faster forgetting and is less effective for long-term retention.'},
-                                {'text': 'Interleaving eliminates errors', 'correct': False, 'explanation': 'This is not accurate; interleaving helps to reduce errors over time but does not eliminate them.'},
+                                {'text': 'Blocked practice always produces better results', 'correct': False, 'explanation': 'Blocked practice can lead to faster forgetting and is less effective for long-term retention.'},
+                                {'text': 'Interleaving eliminates errors', 'correct': False, 'explanation': 'Interleaving helps to reduce errors over time but does not eliminate them.'},
                             ],
                         },
                         {
                             'question': 'A medical student uses mnemonics, visual diagrams, and teaches concepts to study partners. Which combination of strategies is most effective according to science of learning?',
                             'answers': [
-                                {'text': 'Only mnemonics', 'correct': False, 'explanation': 'This is not enough; mnemonics are helpful but should be combined with other strategies.'},
+                                {'text': 'Only mnemonics', 'correct': False, 'explanation': 'Mnemonics are helpful but should be combined with other strategies.'},
                                 {'text': 'Elaboration (mnemonics), dual coding (diagrams), and retrieval practice (teaching)', 'correct': True, 'explanation': 'Exactly! This combination engages multiple effective learning principles for deeper understanding and retention.'},
-                                {'text': 'Passive rereading only', 'correct': False, 'explanation': 'This is not effective; passive rereading is one of the least effective study strategies.'},
+                                {'text': 'Passive rereading only', 'correct': False, 'explanation': 'Passive rereading is one of the least effective study strategies.'},
                                 {'text': 'Cramming the night before', 'correct': False, 'explanation': 'This is not effective for long-term retention and understanding; it\'s a poor study strategy.'},
                             ],
                         },
@@ -532,37 +532,19 @@ EA50_DATA = {
                         {
                             'question': 'A team faces "low customer satisfaction." They break it down into: slow response times, product defects, and unclear instructions. What makes this effective?',
                             'answers': [
-                                {'text': 'It creates more problems', 'correct': False, 'explanation': 'This is not true; breaking down a problem into components does not create more problems.'},
+                                {'text': 'It creates more problems', 'correct': False, 'explanation': 'Breaking down a problem into components does not create more problems.'},
                                 {'text': 'It decomposes a vague issue into specific, actionable components', 'correct': True, 'explanation': 'Exactly! This decomposition makes the problem more manageable and solutions more actionable.'},
-                                {'text': 'It ignores root causes', 'correct': False, 'explanation': 'This is not necessarily true; breaking down a problem can help to identify root causes.'},
-                                {'text': 'It avoids prioritization', 'correct': False, 'explanation': 'This is not accurate; breaking down a problem can actually help with prioritization of issues.'},
-                            ],
-                        },
-                        {
-                            'question': 'A project manager decomposes "launch product" into: design MVP, conduct user testing, fix bugs, prepare marketing, and train support staff. What principle is applied?',
-                            'answers': [
-                                {'text': 'Keeping the problem vague', 'correct': False, 'explanation': 'This is not vague; it\'s a clear breakdown of the product launch process.'},
-                                {'text': 'Breaking into sequential, manageable tasks', 'correct': True, 'explanation': 'Exactly! This principle of breaking down tasks makes the project more manageable.'},
-                                {'text': 'Avoiding structure', 'correct': False, 'explanation': 'This is not avoiding structure; it\'s creating a structured plan for the project.'},
-                                {'text': 'Treating the problem as indivisible', 'correct': False, 'explanation': 'This is not accurate; the problem is being broken down into manageable parts.'},
-                            ],
-                        },
-                        {
-                            'question': 'A city addresses "traffic congestion" by breaking it into: peak-hour bottlenecks, inadequate public transit, and parking shortages. Why is this better than tackling "congestion" directly?',
-                            'answers': [
-                                {'text': 'It creates unnecessary complexity', 'correct': False, 'explanation': 'This is not true; breaking down a problem usually clarifies complexity rather than creating it.'},
-                                {'text': 'It identifies specific leverage points for intervention', 'correct': True, 'explanation': 'Exactly! This approach helps to identify specific areas where interventions can be most effective.'},
-                                {'text': 'It avoids solving anything', 'correct': False, 'explanation': 'This is not accurate; breaking down a problem is a step towards finding effective solutions.'},
-                                {'text': 'General solutions are always better', 'correct': False, 'explanation': 'This is not true; specific solutions are often more effective than general ones.'},
+                                {'text': 'It ignores root causes', 'correct': False, 'explanation': 'Breaking down a problem can help to identify root causes.'},
+                                {'text': 'It avoids prioritization', 'correct': False, 'explanation': 'Breaking down a problem can actually help with prioritization of issues.'},
                             ],
                         },
                         {
                             'question': 'When decomposing a problem, what should guide how granular the breakdown becomes?',
                             'answers': [
-                                {'text': 'Always break down to the smallest possible pieces', 'correct': False, 'explanation': 'This is not practical; the breakdown should be as granular as necessary to make the problem manageable.'},
+                                {'text': 'Always break down to the smallest possible pieces', 'correct': False, 'explanation': 'The breakdown should be as granular as necessary to make the problem manageable.'},
                                 {'text': 'Stop when subproblems are tractable and actionable', 'correct': True, 'explanation': 'Exactly! The breakdown should result in subproblems that are manageable and actionable.'},
                                 {'text': 'Never break down beyond one level', 'correct': False, 'explanation': 'This is too rigid; some problems may require multiple levels of breakdown to be manageable.'},
-                                {'text': 'Random stopping points', 'correct': False, 'explanation': 'This is not effective; the stopping point should be determined by the nature of the problem, not randomly.'},
+                                {'text': 'Random stopping points', 'correct': False, 'explanation': 'The stopping point should be determined by the nature of the problem, not randomly.'},
                             ],
                         },
                         {
@@ -570,26 +552,26 @@ EA50_DATA = {
                             'answers': [
                                 {'text': 'Avoiding the problem', 'correct': False, 'explanation': 'This is not avoiding the problem; it\'s a detailed breakdown to understand the problem better.'},
                                 {'text': 'Iterative decomposition—refining subproblems into smaller components', 'correct': True, 'explanation': 'Exactly! This process helps to refine the understanding of the problem and identify specific areas for intervention.'},
-                                {'text': 'Random categorization', 'correct': False, 'explanation': 'This is not random; it\'s a systematic process of breaking down the problem.'},
-                                {'text': 'Constraint identification', 'correct': False, 'explanation': 'This is not about identifying constraints; it\'s about breaking down the problem into manageable parts.'},
+                                {'text': 'Random categorization', 'correct': False, 'explanation': 'This is a systematic process of breaking down the problem.'},
+                                {'text': 'Constraint identification', 'correct': False, 'explanation': 'Identifying constraints might look like identifying budget as a constraint, we are looking for manageable parts.'},
                             ],
                         },
                         {
                             'question': 'A software team decomposes "improve app performance" into: reduce load times, optimize database queries, and minimize memory usage. They use a fishbone diagram to visualize these categories. What\'s the advantage?',
                             'answers': [
-                                {'text': 'Diagrams make problems disappear', 'correct': False, 'explanation': 'This is not true; diagrams do not solve problems, but they help to visualize and organize thoughts.'},
+                                {'text': 'Diagrams assign work clearly', 'correct': False, 'explanation': 'A fishbone diagram helps to visualize and organize thoughts, but assigning work is a different step.'},
                                 {'text': 'Visual organization clarifies relationships and facilitates systematic analysis', 'correct': True, 'explanation': 'Exactly! Visual organization helps to see the relationships between different parts of the problem and facilitates a systematic approach to analysis.'},
-                                {'text': 'Fishbone diagrams solve problems automatically', 'correct': False, 'explanation': 'This is not true; fishbone diagrams are a tool to help organize thoughts, not a solution to problems.'},
-                                {'text': 'Visualization is unnecessary', 'correct': False, 'explanation': 'This is not accurate; visualization can be a very helpful part of the problem-solving process.'},
+                                {'text': 'Fishbone diagrams give managers a task', 'correct': False, 'explanation': 'Diagrams are more than busy work, they are a tool to help organize thoughts and plan solution to problems.'},
+                                {'text': 'Visualization is unnecessary', 'correct': False, 'explanation': 'Visualization can be a very helpful part of the problem-solving process.'},
                             ],
                         },
                         {
                             'question': 'After breaking "reduce hospital readmissions" into multiple subproblems, a team realizes one component ("state regulations") is a fixed constraint, not solvable. What should they do?',
                             'answers': [
-                                {'text': 'Try to solve the constraint anyway', 'correct': False, 'explanation': 'This is not feasible; fixed constraints cannot be solved or changed.'},
+                                {'text': 'Try to solve the constraint anyway', 'correct': False, 'explanation': 'Fixed constraints cannot be solved or changed.'},
                                 {'text': 'Reclassify it as a constraint and focus effort on solvable subproblems', 'correct': True, 'explanation': 'Exactly! This allows the team to focus on subproblems that can actually be solved.'},
-                                {'text': 'Abandon the entire breakdown', 'correct': False, 'explanation': 'This is not necessary; only the approach to the unsolvable subproblem needs to be adjusted.'},
-                                {'text': 'Ignore regulations completely', 'correct': False, 'explanation': 'This is not advisable; regulations are important and must be considered in the problem-solving process.'},
+                                {'text': 'Abandon the entire breakdown', 'correct': False, 'explanation': 'Only the approach to the unsolvable subproblem needs to be adjusted.'},
+                                {'text': 'Ignore regulations completely', 'correct': False, 'explanation': 'Regulations are important and must be considered in the problem-solving process.'},
                             ],
                         },
                     ]
@@ -604,7 +586,7 @@ EA50_DATA = {
                                 {'text': 'Build a novel solution anyway', 'correct': False, 'explanation': 'This is not efficient; if an existing tool works with minor changes, it\'s better to use it.'},
                                 {'text': 'Use the existing tool and document justification', 'correct': True, 'explanation': 'Exactly! This is a practical approach that saves time and resources.'},
                                 {'text': 'Switch to analogies', 'correct': False, 'explanation': 'This is unnecessary; the problem can be solved with the existing tool.'},
-                                {'text': 'Ignore constraints', 'correct': False, 'explanation': 'This is not advisable; constraints are important to consider in problem-solving.'},
+                                {'text': 'Ignore constraints', 'correct': False, 'explanation': 'Constraints are important to consider in problem-solving.'},
                             ],
                             
                         },
@@ -614,15 +596,15 @@ EA50_DATA = {
                                 {'text': 'Listing one familiar option', 'correct': False, 'explanation': 'This is not enough; multiple solutions should be evaluated for a solid gap analysis.'},
                                 {'text': 'Deep evaluation of multiple existing solutions against requirements/constraints', 'correct': True, 'explanation': 'Exactly! This thorough evaluation is key to effective gap analysis.'},
                                 {'text': 'Brainstorming new ideas only', 'correct': False, 'explanation': 'Gap analysis focuses on evaluating existing solutions, not just brainstorming new ones.'},
-                                {'text': 'Assuming gaps exist', 'correct': False, 'explanation': 'This is not correct; gaps should be identified through analysis, not assumed.'},
+                                {'text': 'Assuming gaps exist', 'correct': False, 'explanation': 'Gaps should be identified through analysis, not assumed.'},
                             ],
                             
                         },
                         {
                             'question': 'Using a proven same-domain solution with slight tweaks typically reflects:',
                             'answers': [
-                                {'text': '#analogies', 'correct': False, 'explanation': 'This is not an analogy; it\'s an adaptation of an existing solution.'},
-                                {'text': '#heuristics', 'correct': False, 'explanation': 'This is not a heuristic; it\'s a practical approach to using existing solutions.'},
+                                {'text': '#analogies', 'correct': False, 'explanation': 'Analogy is for the purpose of explanation or clarification; this is an adaptation of an existing solution.'},
+                                {'text': '#heuristics', 'correct': False, 'explanation': 'It might seem similr, but this is a practical approach to using existing solutions.'},
                                 {'text': '#gapanalysis', 'correct': True, 'explanation': 'Exactly! This reflects a gap analysis approach where an existing solution is used with minor tweaks.'},
                                 {'text': '#rightproblem', 'correct': False, 'explanation': 'This is not directly related to framing the problem; it\'s about using an existing solution.'},
                             ],
@@ -630,64 +612,64 @@ EA50_DATA = {
                         {
                             'question': 'A company needs scheduling software. After evaluating 5 existing platforms, they find one that meets 90% of needs with minor customization. What should they do?',
                             'answers': [
-                                {'text': 'Build custom software from scratch for 100% fit', 'correct': False, 'explanation': 'This is not efficient; building custom software is time-consuming and costly.'},
+                                {'text': 'Build custom software from scratch for 100% fit', 'correct': False, 'explanation': 'Building custom software is time-consuming and costly.'},
                                 {'text': 'Adopt the existing solution with targeted customization', 'correct': True, 'explanation': 'Exactly! This is a practical and efficient approach to meet the company\'s needs.'},
-                                {'text': 'Continue searching indefinitely for a perfect match', 'correct': False, 'explanation': 'This is not practical; it\'s better to use a good existing solution than to keep searching indefinitely.'},
+                                {'text': 'Continue searching indefinitely for a perfect match', 'correct': False, 'explanation': 'It\'s better to use a good existing solution than to keep searching indefinitely.'},
                                 {'text': 'Use analogies from unrelated domains', 'correct': False, 'explanation': 'This is unnecessary; the problem can be solved with an existing solution in the same domain.'},
                             ],
                         },
                         {
                             'question': 'A hospital reviews 10 patient check-in systems used by similar institutions. None fully meet their needs due to unique regulatory requirements. What does gap analysis conclude?',
                             'answers': [
-                                {'text': 'Force-fit an inadequate existing solution', 'correct': False, 'explanation': 'This is not advisable; forcing a solution that doesn\'t fit can cause more problems.'},
+                                {'text': 'Force-fit an existing solution', 'correct': False, 'explanation': 'Forcing a solution that doesn\'t fit can cause more problems.'},
                                 {'text': 'A gap exists; custom development or major adaptation is needed', 'correct': True, 'explanation': 'Exactly! The gap analysis shows that the existing solutions do not fully meet the hospital\'s needs.'},
-                                {'text': 'Give up on improving check-in', 'correct': False, 'explanation': 'This is not a solution; the hospital should find a way to meet its check-in needs.'},
-                                {'text': 'Ignore regulatory requirements', 'correct': False, 'explanation': 'This is not advisable; regulatory requirements are important and must be followed.'},
+                                {'text': 'Give up on improving check-in', 'correct': False, 'explanation': 'The hospital should find a way to meet its check-in needs.'},
+                                {'text': 'Ignore regulatory requirements', 'correct': False, 'explanation': 'Regulatory requirements are important and must be followed.'},
                             ],
                         },
                         {
                             'question': 'What distinguishes #gapanalysis from #analogies?',
                             'answers': [
                                 {'text': 'Gap analysis looks within the same domain; analogies transfer across domains', 'correct': True, 'explanation': 'Exactly! Gap analysis evaluates solutions within the same domain, while analogies apply solutions from one domain to another.'},
-                                {'text': 'They are identical approaches', 'correct': False, 'explanation': 'This is not true; they are different approaches used in different situations.'},
-                                {'text': 'Gap analysis never uses existing solutions', 'correct': False, 'explanation': 'This is not correct; gap analysis often involves evaluating existing solutions.'},
-                                {'text': 'Analogies only work within the same field', 'correct': False, 'explanation': 'This is not true; analogies are used to transfer knowledge across different domains.'},
+                                {'text': 'They are identical approaches', 'correct': False, 'explanation': 'They are different approaches used in different situations.'},
+                                {'text': 'Gap analysis never uses existing solutions', 'correct': False, 'explanation': 'Gap analysis often involves evaluating existing solutions.'},
+                                {'text': 'Analogies only work within the same field', 'correct': False, 'explanation': 'Analogies are used to transfer knowledge across different domains.'},
                             ],
                         },
                         {
                             'question': 'A startup evaluates CRM platforms. Platform A meets 80% of needs at low cost; Platform B meets 95% at 5x cost. Gap analysis suggests:',
                             'answers': [
-                                {'text': 'Always choose the most complete solution', 'correct': False, 'explanation': 'This is not always the best approach; the most complete solution may not be the most cost-effective.'},
+                                {'text': 'Always choose the most complete solution', 'correct': False, 'explanation': 'The most complete solution may not be the most cost-effective.'},
                                 {'text': 'Weigh trade-offs between fit, cost, and customization; 80% may suffice', 'correct': True, 'explanation': 'Exactly! This is a practical approach that considers multiple factors in the decision.'},
                                 {'text': 'Build entirely from scratch', 'correct': False, 'explanation': 'This is not efficient; building from scratch is time-consuming and costly.'},
-                                {'text': 'Choose randomly', 'correct': False, 'explanation': 'This is not a sensible approach; the decision should be based on careful analysis, not random choice.'},
+                                {'text': 'Choose randomly', 'correct': False, 'explanation': 'Random choice does not lead to a sensible or effective decision.'},
                             ],
                         },
                         {
                             'question': 'After thorough gap analysis, a team finds no existing solutions meet their needs. What should they do next?',
                             'answers': [
-                                {'text': 'Force an existing solution despite poor fit', 'correct': False, 'explanation': 'This is not advisable; forcing a solution that doesn\'t fit can cause more problems.'},
+                                {'text': 'Force an existing solution despite poor fit', 'correct': False, 'explanation': 'Forcing a solution that doesn\'t fit can cause more problems.'},
                                 {'text': 'Pursue novel solution development or explore cross-domain analogies', 'correct': True, 'explanation': 'Exactly! This is a good approach when no existing solutions fit the needs.'},
-                                {'text': 'Abandon the project', 'correct': False, 'explanation': 'This is not a solution; the project should be adjusted to find a viable path forward.'},
-                                {'text': 'Repeat the same gap analysis', 'correct': False, 'explanation': 'This is not useful; the gap analysis has already been done, and the next steps should be solution-oriented.'},
+                                {'text': 'Abandon the project', 'correct': False, 'explanation': 'The project should be adjusted to find a viable path forward.'},
+                                {'text': 'Repeat the same gap analysis', 'correct': False, 'explanation': 'The gap analysis has already been done, and the next steps should be solution-oriented.'},
                             ],
                         },
                         {
                             'question': 'A university wants to improve advising. They find that 3 peer institutions use similar systems successfully. What does gap analysis recommend?',
                             'answers': [
-                                {'text': 'Ignore peer solutions and invent something entirely new', 'correct': False, 'explanation': 'This is not advisable; ignoring potential solutions wastes time and resources.'},
+                                {'text': 'Create a brand new advising system', 'correct': False, 'explanation': 'Ignoring potential solutions wastes time and resources.'},
                                 {'text': 'Evaluate and adapt proven peer solutions to local context', 'correct': True, 'explanation': 'Exactly! This is a practical approach that builds on proven solutions.'},
-                                {'text': 'Adopt without any evaluation', 'correct': False, 'explanation': 'This is not advisable; adopting without evaluation may lead to unsuitable solutions being implemented.'},
-                                {'text': 'Use analogies from unrelated industries', 'correct': False, 'explanation': 'This is not necessary; there are already proven solutions in similar institutions.'},
+                                {'text': 'Adopt the peer institiutions systems', 'correct': False, 'explanation': 'Adopting without evaluation may lead to unsuitable solutions being implemented.'},
+                                {'text': 'Adapt the advising system after internal review', 'correct': False, 'explanation': 'The university should learn from proven solutions in similar institutions.'},
                             ],
                         },
                         {
                             'question': 'Why conduct gap analysis before designing new solutions?',
                             'answers': [
-                                {'text': 'To waste time', 'correct': False, 'explanation': 'This is not true; gap analysis saves time by identifying existing solutions.'},
+                                {'text': 'To waste time', 'correct': False, 'explanation': 'Gap analysis saves time by identifying existing solutions.'},
                                 {'text': 'To avoid reinventing the wheel and leverage existing work', 'correct': True, 'explanation': 'Exactly! Gap analysis helps to build on existing solutions and avoid unnecessary duplication of effort.'},
-                                {'text': 'To ensure no solutions exist', 'correct': False, 'explanation': 'This is not the goal; the goal is to find the best solution, whether existing or new.'},
-                                {'text': 'Gap analysis is unnecessary', 'correct': False, 'explanation': 'This is not true; gap analysis is a valuable part of the problem-solving process.'},
+                                {'text': 'To ensure no solutions exist', 'correct': False, 'explanation': 'The goal is to find the best solution, whether existing or new; there should be room in the plan to inovate when a better solution can be created.'},
+                                {'text': 'Gap analysis is unnecessary', 'correct': False, 'explanation': 'Gap analysis is a valuable part of the problem-solving process.'},
                             ],
                         },
                     ]
@@ -700,7 +682,7 @@ EA50_DATA = {
                             'question': 'A nonprofit defines "reduce food insecurity by 20% in 18 months," lists stakeholders, and maps constraints (budget cap, delivery windows). What\'s the best next step?',
                             'answers': [
                                 {'text': '#analogies', 'correct': False, 'explanation': 'Analogies are not the next step; the problem needs to be broken down first.'},
-                                {'text': '#breakitdown', 'correct': True, 'explanation': 'Correct! Breaking down the problem will help in selecting tractable subproblems.'},
+                                {'text': '#breakitdown', 'correct': True, 'explanation': ' Breaking down the problem will help in selecting tractable subproblems.'},
                                 {'text': '#gapanalysis', 'correct': False, 'explanation': 'Gap analysis is not the immediate next step; the problem needs to be broken down first.'},
                                 {'text': '#rightproblem', 'correct': False, 'explanation': 'The right problem has already been framed; now it needs to be broken down into components.'},
                             ],
@@ -720,7 +702,7 @@ EA50_DATA = {
                             'question': 'A startup must choose quickly between two marketing channels with limited data and small downside. Which approach fits best?',
                             'answers': [
                                 {'text': '#systemdynamics', 'correct': False, 'explanation': 'System dynamics is not applicable for a quick choice between two options.'},
-                                {'text': '#heuristics', 'correct': True, 'explanation': 'Correct! Heuristics are suitable here due to the low stakes and limited information.'},
+                                {'text': '#heuristics', 'correct': True, 'explanation': ' Heuristics are suitable here due to the low stakes and limited information.'},
                                 {'text': '#gapanalysis', 'correct': False, 'explanation': 'Gap analysis is not needed for a quick decision between two clear options.'},
                                 {'text': '#analogies', 'correct': False, 'explanation': 'Analogies are not relevant for choosing between two known marketing channels.'},
                             ],

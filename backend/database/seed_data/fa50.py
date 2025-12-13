@@ -43,6 +43,15 @@ FA50_DATA = {
                                 {'text': 'Measure Big-O only', 'correct': False, 'explanation': 'Knowing the Big-O complexity doesn\'t help in identifying why the sorting routine fails for certain inputs.'},
                             ],
                         },
+                        {
+                            'question': 'A student explains their triage algorithm by listing inputs/outputs, laying out the main steps, and showing a branching flowchart. So far in this explanation of #algorithms, they have identified components, sequenced the steps, and represented decision points. What could this student do to enhance this 3 into a 4?',
+                            'answers': [
+                                {'text': 'Add explicit handling for edge cases.', 'correct': True, 'explanation': "A 4 requires explaining why the algorithm works under all conditions, including failures and unusual inputs."},
+                                {'text': 'Add all detail to the flowchart.', 'correct': False, 'explanation': "They may believe more detail signals a stronger algorithm, but too much detail could be unclear."},
+                                {'text': 'Rewrite the steps using more technical vocabulary.','correct': False,'explanation': "Fancy terminology can feel like an upgrade, but it doesn\'t improve the algorithm\'s completeness or correctness."},
+                                {'text': 'Add more branches even if the logic doesn\'t require them.','correct': False,'explanation': "Students may assume ‘more branches = better algorithm,\' but unnecessary branching harms clarity rather than strengthening correctness."}
+                            ]
+                        }
                     ]
                 },
                 {
@@ -76,6 +85,15 @@ FA50_DATA = {
                                 {'text': 'Survivorship bias', 'correct': False, 'explanation': 'Survivorship bias involves focusing on successful cases while ignoring failures. It doesn\'t directly relate to time estimation.'},
                             ],
                         },
+                        {
+                            'question': 'A student estimates daily bike-share usage by multiplying stations times bikes per station times turnover rate. So far in this explanation of #estimation, they have decomposed the problem, used reasonable units, and produced an order-of-magnitude answer. What could this student do to enhance this 3 into a 4?',
+                            'answers': [
+                                {'text': 'Justify each assumption and show how sensitive the estimate is to those assumptions.', 'correct': True,'explanation': "Students often think a single clean estimate is enough, but a 4 needs transparent assumptions and acknowledgement of uncertainty."},
+                                { 'text': 'Add more multiplication factors.', 'correct': False, 'explanation': "They may think adding complexity improves rigor, but irrelevant factors weaken the estimate." },
+                                {'text': 'Provide the exact real-world number instead of estimating.','correct': False, 'explanation': "Students may believe “precision = quality,” but estimation is about reasoning under uncertainty, not finding the actual value."  },
+                                {'text': 'Round everything to whole numbers to avoid decimals.', 'correct': False,'explanation': "Avoiding decimals feels tidy, but it doesn't add value to the application." }
+                            ]
+                        }
                     ]
                 },
                 {
@@ -109,6 +127,15 @@ FA50_DATA = {
                                 {'text': 'P → Q ≡ P ∧ ¬Q', 'correct': False, 'explanation': 'This is a misrepresentation of the implication; it doesn\'t hold logically.'},
                             ],
                         },
+                        {
+                            'question': 'A student analyzes a deductive argument by restating the premises, identifying the conclusion, and naming the relevant logical structure. So far in this explanation of #deduction, they have correctly recognized form, validity, and structure. What could this student do to enhance this 3 into a 4?',
+                            'answers': [
+                                {'text': 'Explain why the argument\'s structure guarantees the conclusion and address potential misinterpretations of the premises.','correct': True,'explanation': "Students often stop at naming the form, but a 4 requires justification—showing how the form ensures validity and clarifying the premises’ meaning." },
+                                {'text': 'Memorize more named syllogisms to list in the answer.','correct': False,'explanation': "They may think more labels look sophisticated, but deduction requires reasoning, not name-dropping."},
+                                {'text': 'Rewrite the argument using symbolic notation.','correct': False,'explanation': "Symbolic notation can help, but using it alone doesn\'t demonstrate deep understanding or justification."},
+                                {'text': 'Add rhetorical commentary on why the argument is persuasive.','correct': False,'explanation': "Persuasiveness isn\'t the same as deductive validity; this misses the core of deductive reasoning."}
+                            ]
+                        }
                     ]
                 },
                 {
