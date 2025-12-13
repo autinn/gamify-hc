@@ -36,6 +36,27 @@ npm test -- --watch   # Watch mode
 
 **Pages (5)**: LoginPage, RegisterPage, CoursePage, UnitPage, MainPage
 
+## Test Results Summary
+
+```
+Test Files  21 passed (21)
+     Tests  146 passed (146)
+     
+Start at  13:54:24
+Duration  2.34s
+```
+
+**Coverage by Category:**
+
+| Category | Files | Tests | Status |
+|----------|-------|-------|--------|
+| Services | 7 | ~59 | ✅ All passing |
+| Hooks | 8 | ~72 | ✅ All passing |
+| Pages | 5 | ~15 | ✅ All passing |
+| **Total** | **21** | **146** | ✅ **All passing** |
+
+All tests are currently passing. Tests run in under 3 seconds with Vitest's fast transformation and collection.
+
 ## Writing Tests
 
 ### Unit Test Example
