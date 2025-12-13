@@ -5,172 +5,69 @@ This module handles all authentication-related API endpoints for the gamify-hc
 application. It provides endpoints for user registration, login, and token
 management using JWT (JSON Web Tokens).
 
+This module follows separation of concerns by delegating business logic to
+service classes and keeping routes focused on HTTP request/response handling.
+
 Endpoints:
     POST /api/auth/register: Register a new user
     POST /api/auth/login: Login and receive JWT token
     GET /api/auth/me: Get current user info (requires authentication)
 """
 
-import re
-from datetime import datetime, timedelta
-from functools import wraps
-
-import jwt
 from flask import Blueprint, jsonify, request
-from sqlalchemy.exc import IntegrityError
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from backend.config import Config
-from backend.database.models import User
+from backend.decorators import (
+    jwt_required as jwt_required_decorator,
+    validate_json,
+    handle_errors
+)
+from backend.services.auth import AuthService
+from backend.services.user import UserService
+from backend.services.serializers import serialize_user
 from backend.utils.database_manager import get_db
 
 # Create blueprint for authentication-related routes
 # All routes in this blueprint will be prefixed with '/api'
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
-# Load JWT configuration from centralized config
-jwt_config = Config.get_jwt_config()
-JWT_SECRET_KEY = jwt_config['secret_key']
-JWT_ALGORITHM = jwt_config['algorithm']
-JWT_EXPIRATION_HOURS = jwt_config['expiration_hours']
+# Initialize services
+# AuthService handles JWT token management and validation logic
+auth_service = AuthService(
+    secret_key=Config.JWT_SECRET_KEY,
+    algorithm=Config.JWT_ALGORITHM,
+    expiration_hours=Config.JWT_EXPIRATION_HOURS
+)
+
+# UserService handles user CRUD operations and authentication
+user_service = UserService(db_session=None)  # DB session set per request
 
 
-def create_token(user_id):
+# Create a backward-compatible jwt_required decorator for other routes
+# This allows existing routes (like users.py) to continue using @jwt_required
+# without needing to import auth_service
+def jwt_required_compat(f):
     """
-    Create a JWT token for a user.
-
-    Args:
-        user_id (int): The user ID to encode in the token
-
-    Returns:
-        str: Encoded JWT token
-    """
-    payload = {
-        'user_id': user_id,
-        'exp': datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
-        'iat': datetime.utcnow()
-    }
-    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-
-
-def verify_token(token):
-    """
-    Verify a JWT token and extract user ID.
-
-    Args:
-        token (str): The JWT token to verify
-
-    Returns:
-        dict: Decoded token payload if valid, None otherwise
-    """
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        return payload
-    except jwt.ExpiredSignatureError:
-        return None
-    except jwt.InvalidTokenError:
-        return None
-
-
-def jwt_required(f):
-    """
-    Decorator to require JWT authentication for a route.
-
-    Usage:
-        @auth_bp.route('/protected')
+    Backward-compatible jwt_required decorator.
+    
+    This is a thin wrapper around the new jwt_required decorator that
+    automatically provides the auth_service. It maintains compatibility
+    with existing routes that import jwt_required from this module.
+    
+    Usage in other route files:
+        from backend.routes.auth import jwt_required
+        
+        @users_bp.route('/profile')
         @jwt_required
-        def protected_route():
-            # user_id is available in g.user_id
-            pass
+        def get_profile():
+            user_id = request.user_id
+            return jsonify({'user_id': user_id})
     """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = None
-        auth_header = request.headers.get('Authorization')
-
-        if auth_header:
-            try:
-                # Extract token from "Bearer <token>"
-                token = auth_header.split(' ')[1]
-            except IndexError:
-                return jsonify({
-                    'error': 'Invalid authorization header format'
-                }), 401
-
-        if not token:
-            return jsonify({'error': 'Authorization token is missing'}), 401
-
-        payload = verify_token(token)
-        if not payload:
-            return jsonify({'error': 'Invalid or expired token'}), 401
-
-        # Store user_id in request context for use in route
-        request.user_id = payload['user_id']
-        return f(*args, **kwargs)
-
-    return decorated_function
+    return jwt_required_decorator(auth_service)(f)
 
 
-def validate_email(email):
-    """
-    Validate email format and check if it ends with minerva.edu.
-
-    Args:
-        email (str): Email address to validate
-
-    Returns:
-        tuple: (is_valid, error_message)
-    """
-    if not email:
-        return False, 'Email is required'
-
-    # Basic email format check (matches database constraint)
-    if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
-        return False, 'Invalid email format'
-
-    # Check if email ends with minerva.edu
-    if not email.endswith('minerva.edu'):
-        return False, 'Email must end with minerva.edu'
-
-    return True, None
-
-
-def validate_username(username):
-    """
-    Validate username length (3-50 characters).
-
-    Args:
-        username (str): Username to validate
-
-    Returns:
-        tuple: (is_valid, error_message)
-    """
-    if not username:
-        return False, 'Username is required'
-
-    if len(username) < 3 or len(username) > 50:
-        return False, 'Username must be between 3 and 50 characters'
-
-    return True, None
-
-
-def validate_password(password):
-    """
-    Validate password strength.
-
-    Args:
-        password (str): Password to validate
-
-    Returns:
-        tuple: (is_valid, error_message)
-    """
-    if not password:
-        return False, 'Password is required'
-
-    if len(password) < 8:
-        return False, 'Password must be at least 8 characters long'
-
-    return True, None
+# Export as 'jwt_required' for backward compatibility
+jwt_required = jwt_required_compat
 
 
 @auth_bp.route('/auth/register', methods=['POST'])
@@ -181,6 +78,8 @@ def register():
     This endpoint creates a new user account with username, email, and
     password. The password is hashed before storage. Email must end with
     minerva.edu.
+
+    Business logic is delegated to AuthService and UserService.
 
     Request Body:
         {
@@ -202,88 +101,64 @@ def register():
         201: Created - User successfully registered
         400: Bad Request - Validation error
         409: Conflict - Username or email already exists
+        500: Internal Server Error - Registration failed
     """
     db = get_db()
     try:
+        # Set database session for user service
+        user_service.db_session = db
+        
+        # Parse request body
         data = request.get_json()
-
         if not data:
             return jsonify({'error': 'Request body is required'}), 400
 
+        # Extract and sanitize input
         username = data.get('username', '').strip()
         email = data.get('email', '').strip().lower()
         password = data.get('password', '')
 
-        # Validate input
-        is_valid, error = validate_username(username)
-        if not is_valid:
-            return jsonify({'error': error}), 400
-
-        is_valid, error = validate_email(email)
-        if not is_valid:
-            return jsonify({'error': error}), 400
-
-        is_valid, error = validate_password(password)
-        if not is_valid:
-            return jsonify({'error': error}), 400
-
-        # Check for duplicate username
-        existing_user = db.query(User).filter(
-            User.username == username
-        ).first()
-        if existing_user:
-            return jsonify({'error': 'Username already exists'}), 409
-
-        # Check for duplicate email
-        existing_email = db.query(User).filter(
-            User.email == email
-        ).first()
-        if existing_email:
-            return jsonify({'error': 'Email already exists'}), 409
-
-        # Hash password
-        password_hash = generate_password_hash(password)
-
-        # Create new user
-        new_user = User(
+        # Validate registration data using auth service
+        is_valid, error = auth_service.validate_registration_data(
             username=username,
             email=email,
-            password_hash=password_hash
+            password=password
+        )
+        if not is_valid:
+            # Return validation error
+            return jsonify({'error': error}), 400
+
+        # Check for existing username
+        if user_service.user_exists_by_username(username):
+            return jsonify({'error': 'Username already exists'}), 409
+
+        # Check for existing email
+        if user_service.user_exists_by_email(email):
+            return jsonify({'error': 'Email already exists'}), 409
+
+        # Create new user (service handles password hashing)
+        new_user = user_service.create_user(
+            username=username,
+            email=email,
+            password=password
         )
 
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
+        # Convert user to dict for response
+        user_dict = serialize_user(new_user)
 
+        return jsonify(user_dict), 201
 
-        # Return user data with access token (same format as login)
+    except ValueError as e:
+        # Validation error from service
+        db.rollback()
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        # Unexpected error
+        db.rollback()
         return jsonify({
-            'user_id': new_user.user_id,
-            'username': new_user.username,
-            'email': new_user.email,
-            'created_at': (
-                new_user.created_at.isoformat()
-                if new_user.created_at else None
-            )
-        }), 201
-
-    except IntegrityError as e:
-        db.rollback()
-        # Check if it's a duplicate username or email
-        error_msg = str(e.orig) if hasattr(e, 'orig') else str(e)
-        username_constraint = 'UNIQUE constraint failed: users.username'
-        email_constraint = 'UNIQUE constraint failed: users.email'
-        if ('username' in error_msg.lower() or
-                username_constraint in error_msg):
-            return jsonify({'error': 'Username already exists'}), 409
-        elif ('email' in error_msg.lower() or
-              email_constraint in error_msg):
-            return jsonify({'error': 'Email already exists'}), 409
-        else:
-            return jsonify({'error': 'Registration failed'}), 500
-    except Exception:
-        db.rollback()
-        return jsonify({'error': 'Registration failed'}), 500
+            'error': 'Registration failed',
+            'detail': str(e)
+        }), 500
     finally:
         db.close()
 
@@ -295,6 +170,8 @@ def login():
 
     This endpoint authenticates a user by username/email and password,
     and returns a JWT token for subsequent authenticated requests.
+
+    Business logic is delegated to AuthService and UserService.
 
     Request Body:
         {
@@ -318,8 +195,8 @@ def login():
     """
     db = get_db()
     try:
+        # Parse request body
         data = request.get_json()
-
         if not data:
             return jsonify({'error': 'Request body is required'}), 400
 
@@ -331,22 +208,20 @@ def login():
                 'error': 'Username and password are required'
             }), 400
 
-        # Query user by username or email
-        user = db.query(User).filter(
-            (User.username == username_or_email) |
-            (User.email == username_or_email.lower())
-        ).first()
+        # Authenticate user using auth service
+        user = auth_service.authenticate_user(
+            username_or_email,
+            password,
+            db_session=db
+        )
 
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        # Verify password
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({'error': 'Invalid credentials'}), 401
+        # Generate JWT token using auth service
+        token = auth_service.create_token(user.user_id)
 
-        # Generate JWT token
-        token = create_token(user.user_id)
-
+        # Return token and user information
         return jsonify({
             'access_token': token,
             'user_id': user.user_id,
@@ -359,13 +234,15 @@ def login():
 
 
 @auth_bp.route('/auth/me', methods=['GET'])
-@jwt_required
+@jwt_required_decorator(auth_service)
 def get_current_user():
     """
     Get current authenticated user information.
 
     This endpoint requires a valid JWT token in the Authorization header.
     Returns the user information for the authenticated user.
+
+    Business logic is delegated to UserService.
 
     Headers:
         Authorization: Bearer <jwt_token>
@@ -376,34 +253,34 @@ def get_current_user():
             'user_id': int,        # User ID
             'username': str,       # User's username
             'email': str,          # User's email address
-            'created_at': str      # ISO format timestamp
+            'created_at': str,     # ISO format timestamp
+            'has_completed_onboarding': bool  # Onboarding status
         }
 
     HTTP Status Codes:
         200: Success - User information returned
         401: Unauthorized - Invalid or missing token
+        404: Not Found - User not found
     """
     db = get_db()
     try:
+        # Set database session for user service
+        user_service.db_session = db
+        
+        # Get user ID from JWT (set by jwt_required decorator)
         user_id = request.user_id
 
-        user = db.query(User).filter(
-            User.user_id == user_id
-        ).first()
+        # Retrieve user using service
+        user = user_service.get_user_by_id(user_id)
 
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        return jsonify({
-            'user_id': user.user_id,
-            'username': user.username,
-            'email': user.email,
-            'created_at': (
-                user.created_at.isoformat()
-                if user.created_at else None
-            ),
-            'has_completed_onboarding': user.has_completed_onboarding
-        }), 200
+        # Convert user to dict and add onboarding status
+        user_dict = serialize_user(user)
+        user_dict['has_completed_onboarding'] = user.has_completed_onboarding
+
+        return jsonify(user_dict), 200
 
     finally:
         db.close()

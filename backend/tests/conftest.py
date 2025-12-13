@@ -377,7 +377,7 @@ def create_auth_token(user_id):
     """Helper function to create a JWT token for a user."""
     import jwt
     from datetime import datetime, timedelta
-    
+
     payload = {
         'user_id': user_id,
         'exp': datetime.utcnow() + timedelta(hours=24),
@@ -388,3 +388,72 @@ def create_auth_token(user_id):
         'dev-secret-key-change-in-production',
         algorithm='HS256'
     )
+
+
+# =============================================================================
+# Service Fixtures for Unit Testing
+# =============================================================================
+
+@pytest.fixture
+def auth_service():
+    """Create an AuthService instance for testing."""
+    from backend.services.auth import AuthService
+    return AuthService(
+        secret_key='test-secret-key',
+        algorithm='HS256',
+        expiration_hours=24
+    )
+
+
+@pytest.fixture
+def auth_service_with_db(clean_db):
+    """Create an AuthService instance with database session."""
+    from backend.services.auth import AuthService
+    return AuthService(
+        secret_key='test-secret-key',
+        algorithm='HS256',
+        expiration_hours=24,
+        db_session=clean_db
+    )
+
+
+@pytest.fixture
+def user_service(clean_db):
+    """Create a UserService instance for testing."""
+    from backend.services.user import UserService
+    return UserService(db_session=clean_db)
+
+
+@pytest.fixture
+def progress_service(clean_db):
+    """Create a UserProgressService instance for testing."""
+    from backend.services.user import UserProgressService
+    return UserProgressService(db_session=clean_db)
+
+
+@pytest.fixture
+def course_service(clean_db):
+    """Create a CourseService instance for testing."""
+    from backend.services.course import CourseService
+    return CourseService(db_session=clean_db)
+
+
+@pytest.fixture
+def unit_service(clean_db):
+    """Create a UnitService instance for testing."""
+    from backend.services.course import UnitService
+    return UnitService(db_session=clean_db)
+
+
+@pytest.fixture
+def concept_service(clean_db):
+    """Create a ConceptService instance for testing."""
+    from backend.services.course import ConceptService
+    return ConceptService(db_session=clean_db)
+
+
+@pytest.fixture
+def quiz_service(clean_db):
+    """Create a QuizService instance for testing."""
+    from backend.services.quiz import QuizService
+    return QuizService(db_session=clean_db)

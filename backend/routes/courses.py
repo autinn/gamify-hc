@@ -12,33 +12,18 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify
-from backend.database.models import Course, Unit
+
 from backend.utils.database_manager import get_db
+from backend.services.course import CourseService
+from backend.decorators import handle_errors
 
 # Create blueprint for course-related routes
 # All routes in this blueprint will be prefixed with '/api'
 courses_bp = Blueprint('courses', __name__, url_prefix='/api')
 
 
-def _serialize_course(course):
-    """
-    Serialize a Course model instance to a dictionary.
-
-    Args:
-        course (Course): The course model instance to serialize
-
-    Returns:
-        dict: Serialized course data with id, code, name, and description
-    """
-    return {
-        'id': course.course_id,
-        'code': course.title,
-        'name': course.title,
-        'description': course.description
-    }
-
-
 @courses_bp.route('/courses', methods=['GET'])
+@handle_errors
 def get_courses():
     """
     Retrieve all courses.
@@ -67,13 +52,15 @@ def get_courses():
     """
     db = get_db()
     try:
-        courses = db.query(Course).all()
-        return jsonify([_serialize_course(c) for c in courses])
+        course_service = CourseService(db_session=db)
+        courses = course_service.get_all_courses()
+        return jsonify(courses)
     finally:
         db.close()
 
 
 @courses_bp.route('/courses/<int:course_id>', methods=['GET'])
+@handle_errors
 def get_course(course_id):
     """
     Retrieve a specific course by its ID.
@@ -103,19 +90,19 @@ def get_course(course_id):
     """
     db = get_db()
     try:
-        course = db.query(Course).filter(
-            Course.course_id == course_id
-        ).first()
+        course_service = CourseService(db_session=db)
+        course = course_service.get_course_by_id(course_id)
 
         if not course:
             return jsonify({'error': 'Course not found'}), 404
 
-        return jsonify(_serialize_course(course))
+        return jsonify(course)
     finally:
         db.close()
 
 
 @courses_bp.route('/courses/<int:course_id>/units', methods=['GET'])
+@handle_errors
 def get_course_units(course_id):
     """
     Retrieve all units associated with a specific course.
@@ -152,16 +139,8 @@ def get_course_units(course_id):
     """
     db = get_db()
     try:
-        units = db.query(Unit).filter(
-            Unit.course_id == course_id
-        ).order_by(Unit.order_index).all()
-
-        return jsonify([{
-            'id': u.unit_id,
-            'course_id': u.course_id,
-            'name': u.title,
-            'description': u.description,
-            'order_index': u.order_index
-        } for u in units])
+        course_service = CourseService(db_session=db)
+        units = course_service.get_course_units(course_id)
+        return jsonify(units)
     finally:
         db.close()

@@ -15,73 +15,19 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy.exc import IntegrityError
-from backend.database.models import (
-    QuizCard, QuizAnswer, UserCard, Concept, Unit
-)
+
 from backend.utils.database_manager import get_db
 from backend.routes.auth import jwt_required
-from datetime import datetime
+from backend.services.quiz import QuizService
+from backend.decorators import handle_errors, validate_json
 
 # Create blueprint for quiz-related routes
 # All routes in this blueprint will be prefixed with '/api'
 quiz_bp = Blueprint('quiz', __name__, url_prefix='/api')
 
 
-def _serialize_quiz_card_with_answers(quiz_card, answers):
-    """
-    Serialize a QuizCard model instance with its answers to a dictionary.
-
-    Args:
-        quiz_card (QuizCard): The quiz card model instance
-        answers (list): List of QuizAnswer instances for this quiz card
-
-    Returns:
-        dict: Serialized quiz card data with id, concept_id, question,
-            and answers
-    """
-    return {
-        'id': quiz_card.quiz_card_id,
-        'concept_id': quiz_card.concept_id,
-        'question': quiz_card.question,
-        'answers': [{
-            'id': a.answer_id,
-            'answer_text': a.answer_text,
-            'is_correct': a.is_correct,
-            'explanation': a.explanation
-        } for a in answers]
-    }
-
-
-def _get_quiz_cards_for_concepts(db, concept_ids):
-    """
-    Retrieve and serialize all quiz cards for a list of concept IDs.
-
-    Args:
-        db: Database session
-        concept_ids (list): List of concept IDs to fetch quiz cards for
-
-    Returns:
-        list: List of serialized quiz cards with their answers
-    """
-    if not concept_ids:
-        return []
-
-    quiz_cards = db.query(QuizCard).filter(
-        QuizCard.concept_id.in_(concept_ids)
-    ).all()
-
-    result = []
-    for qc in quiz_cards:
-        answers = db.query(QuizAnswer).filter(
-            QuizAnswer.quiz_card_id == qc.quiz_card_id
-        ).all()
-        result.append(_serialize_quiz_card_with_answers(qc, answers))
-
-    return result
-
-
 @quiz_bp.route('/quiz-cards/<int:quiz_card_id>', methods=['GET'])
+@handle_errors
 def get_quiz_card(quiz_card_id):
     """
     Retrieve a specific quiz card by its ID.
@@ -122,26 +68,19 @@ def get_quiz_card(quiz_card_id):
     """
     db = get_db()
     try:
-        quiz_card = db.query(QuizCard).filter(
-            QuizCard.quiz_card_id == quiz_card_id
-        ).first()
+        quiz_service = QuizService(db_session=db)
+        quiz_card = quiz_service.get_quiz_card_by_id(quiz_card_id)
 
         if not quiz_card:
             return jsonify({'error': 'Quiz card not found'}), 404
 
-        # Get all answers for this quiz card
-        answers = db.query(QuizAnswer).filter(
-            QuizAnswer.quiz_card_id == quiz_card_id
-        ).all()
-
-        return jsonify(
-            _serialize_quiz_card_with_answers(quiz_card, answers)
-        )
+        return jsonify(quiz_card)
     finally:
         db.close()
 
 
 @quiz_bp.route('/courses/<int:course_id>/quiz-cards', methods=['GET'])
+@handle_errors
 def get_course_quiz_cards(course_id):
     """
     Retrieve all quiz cards associated with a specific course.
@@ -188,29 +127,15 @@ def get_course_quiz_cards(course_id):
     """
     db = get_db()
     try:
-        # Get all units for this course
-        units = db.query(Unit).filter(
-            Unit.course_id == course_id
-        ).all()
-        unit_ids = [u.unit_id for u in units]
-
-        if not unit_ids:
-            return jsonify([])
-
-        # Get all concepts for these units
-        concepts = db.query(Concept).filter(
-            Concept.unit_id.in_(unit_ids)
-        ).all()
-        concept_ids = [c.concept_id for c in concepts]
-
-        # Get and serialize all quiz cards for these concepts
-        result = _get_quiz_cards_for_concepts(db, concept_ids)
-        return jsonify(result)
+        quiz_service = QuizService(db_session=db)
+        quiz_cards = quiz_service.get_course_quiz_cards(course_id)
+        return jsonify(quiz_cards)
     finally:
         db.close()
 
 
 @quiz_bp.route('/units/<int:unit_id>/quiz-cards', methods=['GET'])
+@handle_errors
 def get_unit_quiz_cards(unit_id):
     """
     Retrieve all quiz cards associated with a specific unit.
@@ -256,20 +181,15 @@ def get_unit_quiz_cards(unit_id):
     """
     db = get_db()
     try:
-        # Get all concepts for this unit
-        concepts = db.query(Concept).filter(
-            Concept.unit_id == unit_id
-        ).all()
-        concept_ids = [c.concept_id for c in concepts]
-
-        # Get and serialize all quiz cards for these concepts
-        result = _get_quiz_cards_for_concepts(db, concept_ids)
-        return jsonify(result)
+        quiz_service = QuizService(db_session=db)
+        quiz_cards = quiz_service.get_unit_quiz_cards(unit_id)
+        return jsonify(quiz_cards)
     finally:
         db.close()
 
 
 @quiz_bp.route('/quiz-cards/random', methods=['GET'])
+@handle_errors
 def get_random_quiz_cards():
     """
     Retrieve all quiz cards from all courses (for global random quiz).
@@ -312,23 +232,16 @@ def get_random_quiz_cards():
     """
     db = get_db()
     try:
-        # Get ALL quiz cards from the database (no filtering)
-        quiz_cards = db.query(QuizCard).all()
-
-        result = []
-        for qc in quiz_cards:
-            answers = db.query(QuizAnswer).filter(
-                QuizAnswer.quiz_card_id == qc.quiz_card_id
-            ).all()
-            result.append(_serialize_quiz_card_with_answers(qc, answers))
-
-        return jsonify(result)
+        quiz_service = QuizService(db_session=db)
+        quiz_cards = quiz_service.get_all_quiz_cards()
+        return jsonify(quiz_cards)
     finally:
         db.close()
 
 
 @quiz_bp.route('/quiz-submit', methods=['POST'])
 @jwt_required
+@handle_errors
 def submit_quiz_answer():
     """
     Submit a quiz answer and update user progress.
@@ -340,11 +253,9 @@ def submit_quiz_answer():
 
     Request Body (JSON):
         {
-            'quiz_card_id': int,          # ID of the quiz card being answered
-            'answer_id': int,             # ID of the selected answer
-            'is_first_attempt': bool      # True if this was the user's first try
-                                          # at this question (optional, defaults
-                                          # to True for backwards compatibility)
+            'quiz_card_id': int,   # ID of the quiz card being answered
+            'answer_id': int,      # ID of the selected answer
+            'is_first_attempt': bool  # True if first try (optional)
         }
 
     Headers:
@@ -379,106 +290,34 @@ def submit_quiz_answer():
     db = get_db()
     try:
         data = request.get_json()
-        # Default to True so existing clients still count first-try correctness
+        
+        # Extract fields from request
+        quiz_card_id = data.get('quiz_card_id') if data else None
+        answer_id = data.get('answer_id') if data else None
+        # Default to True so existing clients still count first-try
         is_first_attempt = True if data is None else data.get(
             'is_first_attempt', True
         )
-
-        # Use authenticated user_id from JWT token instead of request body
-        user_id = request.user_id
-        quiz_card_id = data.get('quiz_card_id') if data else None
-        answer_id = data.get('answer_id') if data else None
 
         if not all([quiz_card_id, answer_id]):
             return jsonify({
                 'error': 'Missing required fields: quiz_card_id and answer_id'
             }), 400
 
-        # Validate that the answer exists
-        answer = db.query(QuizAnswer).filter(
-            QuizAnswer.answer_id == answer_id
-        ).first()
+        # Use authenticated user_id from JWT token
+        user_id = request.user_id
 
-        if not answer:
-            return jsonify({'error': 'Invalid answer_id'}), 400
-
-        is_correct = answer.is_correct
-        is_first_attempt = bool(is_first_attempt)
-
-        # Find or create UserCard to track progress
-        user_card = db.query(UserCard).filter(
-            UserCard.user_id == user_id,
-            UserCard.quiz_card_id == quiz_card_id
-        ).first()
-
-        if user_card:
-            # Update existing progress record
-            user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct and is_first_attempt:
-                user_card.success_count = (
-                    user_card.success_count or 0
-                ) + 1
-            elif not is_correct:
-                user_card.failure_count = (
-                    user_card.failure_count or 0
-                ) + 1
-            user_card.last_reviewed = datetime.utcnow()
-        else:
-            # Create new progress record
-            user_card = UserCard(
+        # Submit answer via service
+        quiz_service = QuizService(db_session=db)
+        try:
+            result = quiz_service.submit_answer(
                 user_id=user_id,
                 quiz_card_id=quiz_card_id,
-                repetitions=1,
-                success_count=1 if (is_correct and is_first_attempt) else 0,
-                failure_count=0 if is_correct else 1,
-                last_reviewed=datetime.utcnow()
+                answer_id=answer_id,
+                is_first_attempt=bool(is_first_attempt)
             )
-            db.add(user_card)
-
-        db.commit()
-        db.refresh(user_card)
-
-        # Calculate total reviews for response
-        total_reviews = user_card.repetitions or 0
-
-        return jsonify({
-            'is_correct': is_correct,
-            'explanation': answer.explanation,
-            'times_seen': total_reviews,
-            'times_correct': user_card.success_count
-        })
-    except IntegrityError:
-        db.rollback()
-        # UserCard already exists, try to update it instead
-        user_card = db.query(UserCard).filter(
-            UserCard.user_id == user_id,
-            UserCard.quiz_card_id == quiz_card_id
-        ).first()
-        if user_card:
-            # Update existing progress record
-            user_card.repetitions = (user_card.repetitions or 0) + 1
-            if is_correct and is_first_attempt:
-                user_card.success_count = (
-                    user_card.success_count or 0
-                ) + 1
-            elif not is_correct:
-                user_card.failure_count = (
-                    user_card.failure_count or 0
-                ) + 1
-            user_card.last_reviewed = datetime.utcnow()
-            db.commit()
-            db.refresh(user_card)
-            total_reviews = user_card.repetitions or 0
-            return jsonify({
-                'is_correct': is_correct,
-                'explanation': answer.explanation,
-                'times_seen': total_reviews,
-                'times_correct': user_card.success_count
-            })
-        else:
-            return jsonify({'error': 'Failed to update progress'}), 500
-    except Exception as e:
-        db.rollback()
-        return jsonify({'error': str(e)}), 500
+            return jsonify(result)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
     finally:
         db.close()

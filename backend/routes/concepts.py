@@ -12,8 +12,10 @@ Endpoints:
 """
 
 from flask import Blueprint, jsonify
-from backend.database.models import Concept, QuizCard, QuizAnswer
+
 from backend.utils.database_manager import get_db
+from backend.services.course import ConceptService
+from backend.decorators import handle_errors
 
 # Create blueprint for concept-related routes
 # All routes in this blueprint will be prefixed with '/api'
@@ -21,6 +23,7 @@ concepts_bp = Blueprint('concepts', __name__, url_prefix='/api')
 
 
 @concepts_bp.route('/concepts/<int:concept_id>', methods=['GET'])
+@handle_errors
 def get_concept(concept_id):
     """
     Retrieve a specific concept by its ID.
@@ -53,35 +56,21 @@ def get_concept(concept_id):
         GET /api/concepts/1
         Returns: {"id": 1, "unit_id": 1, "name": "Example", ...}
     """
-    # Get database session for querying
     db = get_db()
     try:
-        # Query the database for the concept with the given ID
-        concept = db.query(Concept).filter(
-            Concept.concept_id == concept_id
-        ).first()
+        concept_service = ConceptService(db_session=db)
+        concept = concept_service.get_concept_by_id(concept_id)
 
-        # Return 404 if concept doesn't exist
         if not concept:
             return jsonify({'error': 'Concept not found'}), 404
 
-        # Build and return the concept data as JSON
-        # Note: 'tag' currently uses title as a placeholder until
-        # tag field is added to DB
-        return jsonify({
-            'id': concept.concept_id,
-            'unit_id': concept.unit_id,
-            'name': concept.title,
-            # TODO: Update when tag field is added to Concept model
-            'tag': concept.title,
-            'definition': concept.definition
-        })
+        return jsonify(concept)
     finally:
-        # Always close the database session to prevent connection leaks
         db.close()
 
 
 @concepts_bp.route('/concepts/<int:concept_id>/quiz-cards', methods=['GET'])
+@handle_errors
 def get_concept_quiz_cards(concept_id):
     """
     Retrieve all quiz cards associated with a specific concept.
@@ -126,39 +115,10 @@ def get_concept_quiz_cards(concept_id):
         Returns: [{"id": 1, "concept_id": 1, "question": "...",
             "answers": [...]}, ...]
     """
-    # Get database session for querying
     db = get_db()
     try:
-        # Query all quiz cards associated with the given concept
-        quiz_cards = db.query(QuizCard).filter(
-            QuizCard.concept_id == concept_id
-        ).all()
-
-        # Build the response list with quiz cards and their answers
-        result = []
-        for q in quiz_cards:
-            # For each quiz card, fetch all associated answers
-            answers = db.query(QuizAnswer).filter(
-                QuizAnswer.quiz_card_id == q.quiz_card_id
-            ).all()
-
-            # Construct the quiz card object with nested answer data
-            result.append({
-                'id': q.quiz_card_id,
-                'concept_id': q.concept_id,
-                'question': q.question,
-                # Build list of answer objects with all relevant fields
-                'answers': [{
-                    'id': a.answer_id,
-                    'answer_text': a.answer_text,
-                    'is_correct': a.is_correct,
-                    'explanation': a.explanation
-                } for a in answers]
-            })
-
-        # Return the list of quiz cards as JSON
-        # Note: Returns empty list if no quiz cards exist for the concept
-        return jsonify(result)
+        concept_service = ConceptService(db_session=db)
+        quiz_cards = concept_service.get_concept_quiz_cards(concept_id)
+        return jsonify(quiz_cards)
     finally:
-        # Always close the database session to prevent connection leaks
         db.close()
