@@ -1,7 +1,7 @@
 version: '3.8'
 
 # IMPORTANT: .env file is REQUIRED
-# Run ./start.sh to auto-create .env from .env.example, or manually:
+# Run ./scripts/check-env.sh to auto-create .env from .env.example, or manually:
 #   cp .env.example .env
 #
 # For production, edit .env to set secure values for JWT_SECRET_KEY and POSTGRES_PASSWORD
@@ -11,15 +11,15 @@ services:
     image: postgres:16-alpine
     container_name: gamify-hc-postgres
     environment:
-      POSTGRES_USER: gamify
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: gamify_hc
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gamify -d gamify_hc"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +34,7 @@ services:
     ports:
       - "${FLASK_PORT}:5001"
     environment:
-      - DATABASE_URL=postgresql://gamify:${POSTGRES_PASSWORD}@postgres:5432/gamify_hc
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - FLASK_ENV=${FLASK_ENV}
       - FLASK_DEBUG=${FLASK_DEBUG}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
