@@ -30,13 +30,19 @@ The easiest way to run the application is with Docker.
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-1. **Copy the example file**:
+1. **Set up environment variables for development:**
+   This is meant to be used in the context of development. 
+   For deployment, please set up .env manually.
    ```bash
-   cp .env.example .env
+   ./scripts/check-env.sh
    ```
-2. **build, create and start containers**:
+   - Check if you have a .env file.
+   - Create .env from .env.example if missing.
+   - Warn you that you are using insecure development variables.
+
+2. **Build, create and start containers:**
    ```bash
-   docker compose up 
+   docker compose up
    ```
 
 What you get:
@@ -88,12 +94,40 @@ docker compose up --build
 docker compose down -v
 ```
 
+### Environment Variables
+
+The application can be customized using environment variables. A template file `.env.example` is provided with all available options.
+
+#### Setup for Development
+
+**Set up environment variables for development:**
+```bash
+./scripts/check-env.sh
+```
+This script will:
+- ✅ Check if you have a `.env` file
+- 🚀 Create `.env` from `.env.example` if missing
+- ⚠️ Warn you that you are using insecure development variables
+
+**Note**: This is meant to be used in the context of development. For deployment, please set up `.env` manually.
+
+**For Docker**: Docker Compose automatically reads the `.env` file from the project root. You can also pass individual variables:
+```bash
+# Option 1: Use .env file (recommended)
+./scripts/check-env.sh  # Sets up .env for development
+docker compose up
+
+# Option 2: Set individual variables inline
+JWT_SECRET_KEY=your-secure-secret docker compose up
+```
 
 #### Available Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://gamify:gamify_secret@localhost:5432/gamify_hc` |
+| `POSTGRES_PASSWORD` | PostgreSQL password (for Docker) | `gamify_secret` |
+| `POSTGRES_PORT` | PostgreSQL port exposed to host | `5432` |
 | `FLASK_DEBUG` | Enable Flask debug mode | `True` |
 | `FLASK_HOST` | Server host address | `0.0.0.0` |
 | `FLASK_PORT` | Server port number | `5001` |
