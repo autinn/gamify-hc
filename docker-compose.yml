@@ -1,10 +1,6 @@
 version: '3.8'
 
-# IMPORTANT: .env file is REQUIRED
-# Run ./scripts/check-env.sh to auto-create .env from .env.example, or manually:
-#   cp .env.example .env
-#
-# For production, edit .env to set secure values for JWT_SECRET_KEY and POSTGRES_PASSWORD
+# IMPORTANT: .env file is REQUIRED, please see README.md for more information.
 
 services:
   postgres:
