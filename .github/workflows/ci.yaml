@@ -65,24 +65,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env file for Docker builds
-        run: |
-          cat > .env << EOF
-          POSTGRES_PASSWORD=ci_test_password_123
-          POSTGRES_PORT=5432
-          FLASK_PORT=5001
-          FLASK_ENV=production
-          FLASK_DEBUG=False
-          JWT_SECRET_KEY=ci-test-jwt-secret-key-not-for-production
-          JWT_ALGORITHM=HS256
-          JWT_EXPIRATION_HOURS=24
-          SQLALCHEMY_ECHO=False
-          SQLALCHEMY_POOL_SIZE=10
-          SQLALCHEMY_MAX_OVERFLOW=20
-          SQLALCHEMY_POOL_PRE_PING=True
-          SQLALCHEMY_POOL_RECYCLE=300
-          AUTO_SEED_DATABASE=True
-          REACT_APP_API_BASE_URL=http://localhost:5001/api
-          EOF
+        run: ./scripts/check-env.sh
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -120,24 +103,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env file for Docker Compose
-        run: |
-          cat > .env << EOF
-          POSTGRES_PASSWORD=ci_test_password_123
-          POSTGRES_PORT=5432
-          FLASK_PORT=5001
-          FLASK_ENV=production
-          FLASK_DEBUG=False
-          JWT_SECRET_KEY=ci-test-jwt-secret-key-not-for-production
-          JWT_ALGORITHM=HS256
-          JWT_EXPIRATION_HOURS=24
-          SQLALCHEMY_ECHO=False
-          SQLALCHEMY_POOL_SIZE=10
-          SQLALCHEMY_MAX_OVERFLOW=20
-          SQLALCHEMY_POOL_PRE_PING=True
-          SQLALCHEMY_POOL_RECYCLE=300
-          AUTO_SEED_DATABASE=True
-          REACT_APP_API_BASE_URL=http://localhost:5001/api
-          EOF
+        run: ./scripts/check-env.sh
 
       - name: Build and start services
         run: |
