@@ -17,7 +17,7 @@ RUN npm ci --legacy-peer-deps
 COPY . ./
 
 # Build argument for API URL
-ARG REACT_APP_API_BASE_URL=http://localhost:5001/api
+ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
 # Build the app
