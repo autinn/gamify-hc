@@ -12,17 +12,16 @@ The easiest way to run the application is with Docker.
 
 ### Run with Docker
 
-**Option 1: Using the startup script (recommended)**
+**1. Set up environment variables:**
 ```bash
-./start.sh
+./scripts/check-env.sh
 ```
 This script will:
 - ✅ Check if you have a `.env` file
+- 🚀 Create `.env` from `.env.example` if missing
 - ⚠️ Warn you if using default/insecure values
-- 🚀 Offer to create `.env` from `.env.example` if missing
-- 🐳 Start Docker Compose
 
-**Option 2: Direct docker-compose**
+**2. Start the application:**
 ```bash
 docker compose up
 ```
