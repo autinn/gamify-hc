@@ -12,6 +12,16 @@ The easiest way to run the application is with Docker.
 
 ### Run with Docker
 
+**1. Set up environment variables:**
+```bash
+./scripts/check-env.sh
+```
+This script will:
+- ✅ Check if you have a `.env` file
+- 🚀 Create `.env` from `.env.example` if missing
+- ⚠️ Warn you if using default/insecure values
+
+**2. Start the application:**
 ```bash
 docker compose up
 ```
@@ -83,9 +93,14 @@ The application can be customized using environment variables. A template file `
    JWT_SECRET_KEY=dev-secret-key-change-in-production
    ```
 
-3. **For Docker**: Pass variables to docker-compose:
+3. **For Docker**: Docker Compose automatically reads the `.env` file from the project root. You can also pass individual variables:
    ```bash
-   # Set JWT secret for production
+   # Option 1: Use .env file (recommended)
+   cp .env.example .env
+   # Edit .env with your values
+   docker compose up
+
+   # Option 2: Set individual variables inline
    JWT_SECRET_KEY=your-secure-secret docker compose up
    ```
 
@@ -94,6 +109,8 @@ The application can be customized using environment variables. A template file `
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://gamify:gamify_secret@localhost:5432/gamify_hc` |
+| `POSTGRES_PASSWORD` | PostgreSQL password (for Docker) | `gamify_secret` |
+| `POSTGRES_PORT` | PostgreSQL port exposed to host | `5432` |
 | `FLASK_DEBUG` | Enable Flask debug mode | `True` |
 | `FLASK_HOST` | Server host address | `0.0.0.0` |
 | `FLASK_PORT` | Server port number | `5001` |
