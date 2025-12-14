@@ -1,26 +1,23 @@
 version: '3.8'
 
-# Environment variables are loaded from .env file (see .env.example)
-# Copy .env.example to .env and customize as needed:
+# IMPORTANT: .env file is REQUIRED
+# Run ./start.sh to auto-create .env from .env.example, or manually:
 #   cp .env.example .env
 #
-# Docker Compose automatically reads .env from the project root for variable substitution
+# For production, edit .env to set secure values for JWT_SECRET_KEY and POSTGRES_PASSWORD
 
 services:
   postgres:
     image: postgres:16-alpine
     container_name: gamify-hc-postgres
-    env_file:
-      - path: .env
-        required: false
     environment:
       POSTGRES_USER: gamify
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gamify_secret}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: gamify_hc
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U gamify -d gamify_hc"]
       interval: 10s
@@ -34,25 +31,21 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: gamify-hc-backend
-    env_file:
-      - path: .env
-        required: false
     ports:
-      - "${FLASK_PORT:-5001}:5001"
+      - "${FLASK_PORT}:5001"
     environment:
-      # Database URL uses Docker service name 'postgres' as host (not localhost)
-      - DATABASE_URL=postgresql://gamify:${POSTGRES_PASSWORD:-gamify_secret}@postgres:5432/gamify_hc
-      - FLASK_ENV=${FLASK_ENV:-production}
-      - FLASK_DEBUG=${FLASK_DEBUG:-False}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
-      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
-      - JWT_EXPIRATION_HOURS=${JWT_EXPIRATION_HOURS:-24}
-      - SQLALCHEMY_ECHO=${SQLALCHEMY_ECHO:-False}
-      - SQLALCHEMY_POOL_SIZE=${SQLALCHEMY_POOL_SIZE:-10}
-      - SQLALCHEMY_MAX_OVERFLOW=${SQLALCHEMY_MAX_OVERFLOW:-20}
-      - SQLALCHEMY_POOL_PRE_PING=${SQLALCHEMY_POOL_PRE_PING:-True}
-      - SQLALCHEMY_POOL_RECYCLE=${SQLALCHEMY_POOL_RECYCLE:-300}
-      - AUTO_SEED_DATABASE=${AUTO_SEED_DATABASE:-True}
+      - DATABASE_URL=postgresql://gamify:${POSTGRES_PASSWORD}@postgres:5432/gamify_hc
+      - FLASK_ENV=${FLASK_ENV}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_EXPIRATION_HOURS=${JWT_EXPIRATION_HOURS}
+      - SQLALCHEMY_ECHO=${SQLALCHEMY_ECHO}
+      - SQLALCHEMY_POOL_SIZE=${SQLALCHEMY_POOL_SIZE}
+      - SQLALCHEMY_MAX_OVERFLOW=${SQLALCHEMY_MAX_OVERFLOW}
+      - SQLALCHEMY_POOL_PRE_PING=${SQLALCHEMY_POOL_PRE_PING}
+      - SQLALCHEMY_POOL_RECYCLE=${SQLALCHEMY_POOL_RECYCLE}
+      - AUTO_SEED_DATABASE=${AUTO_SEED_DATABASE}
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,7 +62,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL:-http://localhost:5001/api}
+        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
     container_name: gamify-hc-frontend
     ports:
       - "3000:80"
