@@ -27,8 +27,6 @@
 
 **Date:** October 10, 2025  
 **Duration:** 45–60 minutes  
-**Attendees:** Full team  
-**Facilitator:** Tin Kit Au-Yeung
 
 ### Team Interests & Preferences
 
@@ -42,7 +40,7 @@
 - Sophie Bird
 - Autinn
 
-### Sprint Backlog: Starting the Project
+### Starting the Project
 
 | Task | Owner | Deadline | Status |
 |------|-------|----------|--------|
@@ -129,8 +127,7 @@ backend/
 
 **Date:** October 17, 2025  
 **Duration:** 45–60 minutes  
-**Attendees:** Full team  
-**Facilitator:** Tin Kit Au-Yeung
+
 
 ### Meeting Minutes
 
@@ -158,8 +155,7 @@ backend/
 
 **Date:** October 19, 2025  
 **Duration:** 50–70 minutes  
-**Attendees:** Taher Chaudiwala, Aldiyar, Merrick Richers  
-**Facilitator:** Merrick Richers
+
 
 ### Objective
 
@@ -467,14 +463,13 @@ Component re-renders with new state
 
 **Date:** October 24, 2025  
 **Duration:** 45–60 minutes  
-**Attendees:** Full team  
-**Facilitator:** Tin Kit Au-Yeung
+
 
 ### Objective
 
 Distribute specific development tasks for first full sprint (Oct 24–31) and confirm deliverables for initial demo.
 
-### Sprint 1 Task Assignments (Oct 24–31)
+### Task Assignments (Oct 24–31)
 
 | Team Member | Primary Task | Secondary Task | Deadline |
 |--------------|--------------|-----------------|----------|
@@ -485,7 +480,7 @@ Distribute specific development tasks for first full sprint (Oct 24–31) and co
 | **Taher** | Implement Flask blueprint structure + API routing logic | Service layer scaffolding | Oct 31 |
 | **Aldiyar** | Populate database with HC seed data (3 courses × 2 units × 3 concepts) | Data validation scripts | Oct 31 |
 
-### Sprint 1 Goals
+### Goals
 
 **Frontend (by Oct 31)**
 - ✅ All page components created with mock data
@@ -556,8 +551,7 @@ Distribute specific development tasks for first full sprint (Oct 24–31) and co
 
 **Date:** October 31, 2025  
 **Duration:** 45–60 minutes  
-**Attendees:** Full team  
-**Facilitator:** Merrick Richers
+
 
 ### Objective
 
@@ -631,8 +625,7 @@ Check sprint progress, identify blockers, and plan API integration for next phas
 
 **Date:** November 1, 2025  
 **Duration:** 50–70 minutes  
-**Attendees:** Merrick Richers, Taher Chaudiwala, Aldiyar  
-**Facilitator:** Merrick Richers
+
 
 ### Objective
 
@@ -717,8 +710,7 @@ backend/app/
 
 **Date:** November 5, 2025  
 **Duration:** 45–60 minutes  
-**Attendees:** Rachael Akwa, Sophie Bird, Autinn  
-**Facilitator:** Sophie Bird
+
 
 ### Objective
 
@@ -743,7 +735,7 @@ Integrate frontend with working backend API; finalize UI/UX for demo.
 | Navigation bar | Fix nav bar styling + persistence | Rachael | 🔄 |
 | Text overflow | Fix details (e.g., long text in graphs) | Autinn, Merrick | 🔄 |
 
-### Weekly Sprint Plan (Nov 5–12)
+### Weekly Plan (Nov 5–12)
 
 Sophie to create week-by-week plan for remaining work:
 - Week 1 (Nov 5–12): Core features polish
@@ -768,183 +760,6 @@ Sophie to create week-by-week plan for remaining work:
 ✅ Focus on polish over new features  
 ✅ Weekly planning approach to track progress  
 ✅ User testing feedback incorporated into refinements
-
----
-
-## Final Meeting: Demo Preparation & Project Wrap-Up
-
-**Date:** December 14–15, 2025 (Final Sprint)  
-**Duration:** 50–70 minutes per session  
-**Attendees:** Full team  
-**Facilitator:** Tin Kit Au-Yeung
-
-### Objective
-
-Prepare polished demo video, finalize documentation, and ensure project meets all learning outcome requirements.
-
-### Final Deliverables Checklist
-
-| Deliverable | Owner | Due | Status |
-|-------------|-------|-----|--------|
-| Film demo video (main features) | Everyone | Dec 14 (midday) | ✅ |
-| Edit demo video | Sophie | Dec 16 | ✅ |
-| Tech stack overview (5 min) | Rachael, Aldiyar, Taher | Dec 15 | ✅ |
-| Deployment overview (2 min) | Merrick | Dec 15 | ✅ |
-| Meeting notes/checklist | Taher | Dec 15 | ✅ |
-| Backend README | Merrick | Dec 16 | ✅ |
-| Frontend README | Rachael | Dec 16 | ✅ |
-| Interview documentation | Sophie | Dec 16 | ✅ |
-| Code review & cleanup | All | Dec 16 | ✅ |
-
-### Demo Video Script
-
-**Total Length:** 8–10 minutes
-
-**Segment 1: Account Creation & Login (2 min)**
-- Created by: Sophie & Autinn
-- Content:
-  - Show signup page with validation (email, password 8+ chars, username unique)
-  - Show error messages for invalid inputs
-  - Successful signup → auto-login → onboarding flow
-
-**Segment 2: Main Application Flow (3 min)**
-- Created by: Sophie & Autinn
-- Content:
-  - Dashboard → Course list (EA50, FA50, MC50, CX50)
-  - Click course → Unit list
-  - Click unit → Concept list
-  - Click concept → Show mission, link, cornerstone tags
-  - Click "Start Quiz" → Quiz interface
-
-**Segment 3: Quiz Interaction (2 min)**
-- Created by: Sophie
-- Content:
-  - Show quiz question with 4 answer options
-  - Select answer → see feedback (correct/incorrect + explanation)
-  - Progress to next question
-  - Complete quiz → show score + XP awarded
-
-**Segment 4: Progress Tracking (1 min)**
-- Created by: Autinn
-- Content:
-  - Return to dashboard
-  - Show updated progress bar (increased after quiz)
-  - Show hierarchical progress (course → unit → concept breakdown)
-
-**Segment 5: Logout (30 sec)**
-- Created by: Sophie
-- Content:
-  - Logout from user menu
-  - Redirected to login page
-
-### Technical Overview Video Script
-
-**Segment A: Folder Structure & Architecture (2 min)**
-- Presented by: Rachael, Aldiyar, Taher
-- Content:
-  - Frontend: 3-layer pattern (UI → Hooks → Services)
-  - Backend: Modular Flask blueprints (routes, models, services)
-  - Database: SQLAlchemy ORM with proper relationships
-  - Tests: pytest with mocked DB
-
-**Segment B: API Design & Contracts (2 min)**
-- Presented by: Merrick
-- Content:
-  - 10+ REST endpoints designed
-  - Consistent JSON response format
-  - Authentication: JWT tokens
-  - Error handling: proper HTTP status codes
-
-**Segment C: Testing Strategy (1 min)**
-- Presented by: Taher, Aldiyar
-- Content:
-  - Unit tests for models + services
-  - Integration tests for routes
-  - Mocked database for reproducibility
-  - Coverage targets
-
-### Deployment Overview (2 min)
-
-**Presented by:** Merrick
-
-**Content:**
-- Docker containerization (Dockerfile + docker-compose.yml)
-- GitHub Actions CI/CD pipeline
-- Environment configuration (.env files)
-- Scaling strategy (horizontal scaling with containers)
-- Deployment platforms options (AWS, Heroku, DigitalOcean)
-
-### Final Checklist Before Submission
-
-**Code Quality**
-- [x] All code follows PEP 8 (Python) + Prettier (JavaScript)
-- [x] Pre-commit hooks installed (black, isort, flake8, prettier)
-- [x] No console.logs or debug statements left
-- [x] Comments explain complex logic
-- [x] Meaningful variable/function names throughout
-
-**Learning Outcomes Evidence**
-- [x] #designthinking: User research documented (5 interviews completed)
-- [x] #codereadability: Code is self-documenting with comments
-- [x] #abstraction: Clear interfaces; complexity hidden
-- [x] #separationofconcerns: Each layer has single responsibility
-- [x] #sql: Normalized schema; efficient indexed queries
-- [x] #testing: Comprehensive pytest suite with >70% coverage
-- [x] #webstandards: Proper HTTP methods, status codes, auth headers
-- [x] #deployment: Docker + CI/CD pipeline configured
-
-**Documentation**
-- [x] README files (backend, frontend, root)
-- [x] API documentation (Swagger/OpenAPI or manual)
-- [x] Architecture diagrams
-- [x] Setup & run instructions
-- [x] User testing findings
-- [x] Interview summaries
-
-**Testing**
-- [x] All tests passing locally
-- [x] No hardcoded credentials/secrets
-- [x] Error handling for API failures
-- [x] Form validation on frontend + backend
-- [x] Session management (logout clears tokens)
-
-**Demo Readiness**
-- [x] Demo video filmed and edited
-- [x] Technical overview video prepared
-- [x] Live demo (if presented): practiced and timed
-- [x] Backup: pre-recorded demo if live fails
-- [x] Presentation slides (if required)
-
-### Individual Submissions
-
-Each team member completes:
-
-| Submission | Due | Content |
-|-----------|-----|---------|
-| **Self-evaluation** | Dec 16 | Reflect on learning outcomes achieved |
-| **Contribution summary** | Dec 16 | List PRs, commits, features owned |
-| **Code review comments** | Dec 16 | Feedback on teammates' work |
-| **Lessons learned** | Dec 16 | What went well; what to improve |
-
-### Post-Project Reflection
-
-**Questions to Answer:**
-
-1. **Design Thinking:** How did iterative design & user research improve the product?
-2. **Architecture:** What design patterns enabled scalability?
-3. **Challenges:** What technical difficulties surfaced? How were they resolved?
-4. **Learning:** Which learning outcome required most effort? Why?
-5. **Future Work:** What would you build next if continuing the project?
-
-### Team Closing Remarks
-
-**Final Actions:**
-- [ ] Everyone films their segment of demo video
-- [ ] Sophie edits video together
-- [ ] Merrick prepares deployment walkthrough
-- [ ] All create individual submissions
-- [ ] Final code review + cleanup
-- [ ] Submit all deliverables by Dec 16, 2025
 
 ---
 
@@ -1080,18 +895,144 @@ Each team member completes:
 
 ---
 
-## 📊 Meeting Summary Statistics
+## Final Meeting: Demo Preparation & Project Wrap-Up
 
-| Metric | Count |
-|--------|-------|
-| Total Meetings | 9 |
-| Full Team Meetings | 5 |
-| Subteam Meetings | 4 |
-| Date Range | Oct 10 — Dec 15, 2025 |
-| Duration per Meeting | 45–70 minutes |
-| Total Team Hours | ~50–60 hours |
+**Date:** December 14–15, 2025 (Final Sprint)  
+**Duration:** 50–70 minutes  
 
----
+
+### Objective
+
+Prepare polished demo video, finalize documentation, and ensure project meets all learning outcome requirements.
+
+### Final Deliverables Checklist
+
+| Deliverable | Owner | Due | Status |
+|-------------|-------|-----|--------|
+| Film demo video (main features) | Everyone | Dec 14 (midday) | ✅ |
+| Edit demo video | Sophie | Dec 16 | ✅ |
+| Tech stack overview (5 min) | Rachael, Aldiyar, Taher | Dec 15 | ✅ |
+| Deployment overview (2 min) | Merrick | Dec 15 | ✅ |
+| Meeting notes/checklist | Taher | Dec 15 | ✅ |
+| Backend README | Merrick | Dec 16 | ✅ |
+| Frontend README | Rachael | Dec 16 | ✅ |
+| Interview documentation | Sophie | Dec 16 | ✅ |
+| Code review & cleanup | All | Dec 16 | ✅ |
+
+### Demo Video Script
+
+**Total Length:** 8–10 minutes
+
+**Segment 1: Account Creation & Login (2 min)**
+- Created by: Sophie & Autinn
+- Content:
+  - Show signup page with validation (email, password 8+ chars, username unique)
+  - Show error messages for invalid inputs
+  - Successful signup → auto-login → onboarding flow
+  - Logo out
+
+**Segment 2: Main Application Flow (3 min)**
+- Created by: Sophie & Autinn
+- Content:
+  - Dashboard → Course list (EA50, FA50, MC50, CX50)
+  - Click course → Unit list
+  - Click unit → Concept list
+  - Click concept → Show mission, link, cornerstone tags
+  - Click "Start Quiz" → Quiz interface
+
+**Segment 3: Quiz Interaction (2 min)**
+- Created by: Sophie
+- Content:
+  - Show quiz question with 4 answer options
+  - Select answer → see feedback (correct/incorrect + explanation)
+  - Progress to next question
+  - Complete quiz → show score + XP awarded
+
+**Segment 4: Progress Tracking (1 min)**
+- Created by: Autinn
+- Content:
+  - Return to dashboard
+  - Show updated progress bar (increased after quiz)
+  - Show hierarchical progress (course → unit → concept breakdown)
+
+
+### Technical Overview Video Script
+
+**Segment A: Folder Structure & Architecture (2 min)**
+- Presented by: Rachael, Aldiyar, Taher
+- Content:
+  - Frontend: 3-layer pattern (UI → Hooks → Services)
+  - Backend: Modular Flask blueprints (routes, models, services)
+  - Database: SQLAlchemy ORM with proper relationships
+  - Tests: pytest with mocked DB
+
+**Segment B: API Design & Contracts (2 min)**
+- Presented by: Merrick
+- Content:
+  - 10+ REST endpoints designed
+  - Consistent JSON response format
+  - Authentication: JWT tokens
+  - Error handling: proper HTTP status codes
+
+**Segment C: Testing Strategy (1 min)**
+- Presented by: Taher, Aldiyar
+- Content:
+  - Unit tests for models + services
+  - Integration tests for routes
+  - Mocked database for reproducibility
+  - Coverage targets
+
+### Deployment Overview (2 min)
+
+**Presented by:** Merrick
+
+**Content:**
+- Docker containerization (Dockerfile + docker-compose.yml)
+- GitHub Actions CI/CD pipeline
+- Environment configuration (.env files)
+- Scaling strategy (horizontal scaling with containers)
+- Deployment platforms options (AWS, Heroku, DigitalOcean)
+
+### Final Checklist Before Submission
+
+**Code Quality**
+- [x] All code follows PEP 8 (Python) + Prettier (JavaScript)
+- [x] Pre-commit hooks installed (black, isort, flake8, prettier)
+- [x] No console.logs or debug statements left
+- [x] Comments explain complex logic
+- [x] Meaningful variable/function names throughout
+
+**Learning Outcomes Evidence**
+- [x] #designthinking: User research documented (5 interviews completed)
+- [x] #codereadability: Code is self-documenting with comments
+- [x] #abstraction: Clear interfaces; complexity hidden
+- [x] #separationofconcerns: Each layer has single responsibility
+- [x] #sql: Normalized schema; efficient indexed queries
+- [x] #testing: Comprehensive pytest suite with >70% coverage
+- [x] #webstandards: Proper HTTP methods, status codes, auth headers
+- [x] #deployment: Docker + CI/CD pipeline configured
+
+**Documentation**
+- [x] README files (backend, frontend, root)
+- [x] API documentation 
+- [x] Architecture diagrams
+- [x] Setup & run instructions
+- [x] User testing findings
+- [x] Interview summaries
+
+**Testing**
+- [x] All tests passing locally
+- [x] No hardcoded credentials/secrets
+- [x] Error handling for API failures
+- [x] Form validation on frontend + backend
+- [x] Session management (logout clears tokens)
+
+**Demo Readiness**
+- [x] Demo video filmed and edited
+- [x] Technical overview video prepared
+- [x] Live demo (if presented): practiced and timed
+- [x] Backup: pre-recorded demo if live fails
+- [x] Presentation slides (if required)
 
 ## 🎯 Key Project Milestones
 
