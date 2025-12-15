@@ -11,7 +11,7 @@ This document captures all user interviews chronologically with key findings and
 
 | # | Interviewer | Date | Participant | Due Date |
 |---|-------------|------|-------------|----------|
-| 1 | Rachael | Oct 23, 2025 | Minerva M29 (first-year) | Oct 28 |
+| 1 | Rachael | Oct 23, 2025 | Minerva M29 (Emily) | Oct 28 |
 | 2 | Autinn | Nov 18, 2025 | Minerva M29 (Michael) | Nov 18 |
 | 3 | Aldiyar | Nov 27, 2025 | Ali Zhumatayev (M29) | Nov 28 |
 | 4 | Taher | Dec 4, 2025 | Minerva M29 (Sevval) | Dec 4 |
@@ -24,7 +24,7 @@ This document captures all user interviews chronologically with key findings and
 
 **Due:** Oct 28  
 **Completed:** Oct 23, 2025 (frontend meeting)  
-**Participant:** Minerva M29 (first-year student)
+**Participant:** Minerva M29 (Emily)
 
 ### Interview Goals and Purpose
 - Is the navigation intuitive?
@@ -39,7 +39,7 @@ This document captures all user interviews chronologically with key findings and
 - Participant rated UX 4/5 and said it would "really help freshmen learn HCs."
 
 ### Impact
-Validated concept, clarified early design priorities, and set direction for first code sprint beginning Oct 28.
+Validated concept, clarified early design priorities, and set direction for first code sprint beginning Oct 28. 
 
 ---
 
